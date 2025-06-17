@@ -2,7 +2,7 @@ import eslintPlugin from 'eslint-plugin-next';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 
-/** @type {import("eslint").Linter.FlatConfig[]} */
+/** @type {import("eslint").FlatConfig[]} */
 export default [
   {
     ignores: ['**/node_modules/**', '**/.next/**'],
@@ -23,5 +23,5 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off',
     },
   },
-  eslintPlugin.configs['recommended'],
+  ...eslintPlugin.configs.recommended,
 ];
