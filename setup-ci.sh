@@ -2,16 +2,18 @@
 
 echo "🔧 Setting up Alora CI/Code Quality tools..."
 
-# Step 1: Install dev dependencies
-echo "📦 Installing dev dependencies..."
+
+echo "Installing dev dependencies..."
 npm install --save-dev \
   eslint prettier jest ts-jest @types/jest \
   @typescript-eslint/parser @typescript-eslint/eslint-plugin \
+  eslint-plugin-next \
   husky lint-staged \
   @commitlint/cli @commitlint/config-conventional
 
-# Step 2: Setup Prettier config
-echo "⚙️ Creating .prettierrc..."
+
+
+echo "Creating .prettierrc..."
 cat > .prettierrc <<EOL
 {
   "semi": true,
@@ -22,8 +24,8 @@ cat > .prettierrc <<EOL
 }
 EOL
 
-# Step 3: Update ESLint (Flat config assumed)
-echo "⚙️ Updating eslint.config.mjs..."
+
+echo "Updating eslint.config.mjs..."
 cat > eslint.config.mjs <<'EOL'
 import eslintPlugin from 'eslint-plugin-next';
 import tseslint from '@typescript-eslint/eslint-plugin';
@@ -54,8 +56,8 @@ export default [
 ];
 EOL
 
-# Step 4: Setup Jest config
-echo "🧪 Creating jest.config.js..."
+
+echo "Creating jest.config.js..."
 cat > jest.config.js <<EOL
 module.exports = {
   preset: 'ts-jest',
@@ -75,20 +77,20 @@ module.exports = {
 };
 EOL
 
-# Step 5: Setup commitlint
-echo "📜 Creating commitlint.config.js..."
+
+echo "Creating commitlint.config.js..."
 cat > commitlint.config.js <<EOL
 module.exports = { extends: ['@commitlint/config-conventional'] };
 EOL
 
-# Step 6: Setup Husky
-echo "🐶 Setting up Husky hooks..."
+
+echo "Setting up Husky hooks..."
 npx husky install
 npx husky add .husky/pre-commit "npx lint-staged"
 npx husky add .husky/commit-msg "npx --no -- commitlint --edit \$1"
 
-# Step 7: Configure lint-staged in package.json
-echo "📄 Updating package.json with lint-staged..."
+
+echo "Updating package.json with lint-staged..."
 npx json -I -f package.json -e '
   this["lint-staged"] = {
     "*.{ts,tsx,js,jsx}": [
@@ -97,15 +99,15 @@ npx json -I -f package.json -e '
     ]
   }'
 
-# Step 8: Add scripts
-echo "📜 Adding test & coverage scripts..."
+
+echo "Adding test & coverage scripts..."
 npx json -I -f package.json -e '
   this.scripts = Object.assign(this.scripts || {}, {
     "test": "jest",
     "test:coverage": "jest --coverage"
   })'
 
-# Step 9: (Optional) Create CI pipeline
+
 mkdir -p .github/workflows
 cat > .github/workflows/ci.yml <<'EOL'
 name: CI
@@ -143,10 +145,10 @@ jobs:
         run: |
           COVERAGE=$(npx jest --coverage --silent | grep -oP 'All files[^|]+\|\s+\K([0-9]+)(?=%)' | head -1)
           if [ "$COVERAGE" -lt 80 ]; then
-            echo "❌ Coverage is below 80%"
+            echo "Coverage is below 80%"
             exit 1
           else
-            echo "✅ Coverage is $COVERAGE%"
+            echo "Coverage is $COVERAGE%"
           fi
 
   commit-msg-check:
@@ -158,4 +160,4 @@ jobs:
         uses: wagoid/commitlint-github-action@v5
 EOL
 
-echo "✅ Setup complete!"
+echo "Setup complete!"
