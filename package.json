@@ -6,7 +6,11 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "test": "jest",
+    "lint": "next lint",
+    "lint:check": "eslint . --ext .ts,.tsx --max-warnings=0",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
   },
   "dependencies": {
     "next": "15.3.3",
@@ -27,7 +31,7 @@
     "commitlint": "^19.8.1",
     "eslint": "^9.29.0",
     "eslint-config-next": "15.3.3",
-    "eslint-plugin-next": "^0.0.0",
+    "eslint-plugin-next": "15.3.3",
     "husky": "^9.1.7",
     "jest": "^30.0.0",
     "lint-staged": "^16.1.2",
