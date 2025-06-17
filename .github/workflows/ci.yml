@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint || exit 1
+
+      - name: Prettier Check
+        run: npx prettier . --check || exit 1
+
+      - name: Run Tests
+        run: npm run test:coverage
+
+      - name: Check Test Coverage
+        run: |
+          COVERAGE=$(npx jest --coverage --silent | grep -oP 'All files[^|]+\|\s+\K([0-9]+)(?=%)' | head -1)
+          if [ "$COVERAGE" -lt 80 ]; then
+            echo "❌ Coverage is below 80%"
+            exit 1
+          else
+            echo "✅ Coverage is $COVERAGE%"
+          fi
+
+  commit-msg-check:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate commit message
+        uses: wagoid/commitlint-github-action@v5
