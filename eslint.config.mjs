@@ -1,4 +1,4 @@
-import eslintPlugin from 'eslint-plugin-next';
+import next from 'eslint-config-next';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 
@@ -23,5 +23,5 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off',
     },
   },
-  ...eslintPlugin.configs.recommended,
+  ...next(),
 ];
