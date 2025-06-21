@@ -2,7 +2,6 @@
 
 echo "🔧 Setting up Alora CI/Code Quality tools..."
 
-
 echo "Installing dev dependencies..."
 npm install --save-dev \
   eslint prettier jest ts-jest @types/jest \
@@ -10,8 +9,6 @@ npm install --save-dev \
   eslint-plugin-next \
   husky lint-staged \
   @commitlint/cli @commitlint/config-conventional
-
-
 
 echo "Creating .prettierrc..."
 cat > .prettierrc <<EOL
@@ -23,7 +20,6 @@ cat > .prettierrc <<EOL
   "trailingComma": "es5"
 }
 EOL
-
 
 echo "Updating eslint.config.mjs..."
 cat > eslint.config.mjs <<'EOL'
@@ -56,7 +52,6 @@ export default [
 ];
 EOL
 
-
 echo "Creating jest.config.js..."
 cat > jest.config.js <<EOL
 module.exports = {
@@ -77,18 +72,15 @@ module.exports = {
 };
 EOL
 
-
 echo "Creating commitlint.config.js..."
 cat > commitlint.config.js <<EOL
 module.exports = { extends: ['@commitlint/config-conventional'] };
 EOL
 
-
 echo "Setting up Husky hooks..."
 npx husky install
 npx husky add .husky/pre-commit "npx lint-staged"
 npx husky add .husky/commit-msg "npx --no -- commitlint --edit \$1"
-
 
 echo "Updating package.json with lint-staged..."
 npx json -I -f package.json -e '
@@ -99,7 +91,6 @@ npx json -I -f package.json -e '
     ]
   }'
 
-
 echo "Adding test & coverage scripts..."
 npx json -I -f package.json -e '
   this.scripts = Object.assign(this.scripts || {}, {
@@ -107,10 +98,9 @@ npx json -I -f package.json -e '
     "test:coverage": "jest --coverage"
   })'
 
-
 mkdir -p .github/workflows
 cat > .github/workflows/ci.yml <<'EOL'
-name: CI
+name: CI & Docker
 
 on:
   push:
@@ -158,6 +148,30 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate commit message
         uses: wagoid/commitlint-github-action@v5
+
+  docker:
+    name: Docker Build & Push
+    runs-on: ubuntu-latest
+    needs: [check]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: your-dockerhub-username/alora-appointments:latest
 EOL
 
-echo "Setup complete!"
+echo "✅ Setup complete!"
