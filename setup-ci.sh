@@ -104,9 +104,9 @@ name: CI & Docker
 
 on:
   push:
-    branches: ['*']
+    branches: ['**']
   pull_request:
-    branches: ['*']
+    branches: ['**']
 
 jobs:
   check:
@@ -174,4 +174,4 @@ jobs:
           tags: your-dockerhub-username/alora-appointments:latest
 EOL
 
-echo "Setup complete!"
+echo "✅ Setup complete!"
