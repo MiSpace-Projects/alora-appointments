@@ -72,3 +72,4 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/alora-appointments:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/alora-appointments:${{ github.sha }}
+
