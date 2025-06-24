@@ -6,3 +6,4 @@ coverage/
 *.config.mjs
 commitlint.config.js
 jest.config.js
+src/generated/prisma/*
