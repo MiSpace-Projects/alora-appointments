@@ -3,9 +3,9 @@ import styles from "./page.module.css";
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <p>Hello RSA</p>
-    </div>
+   <>
+    <p>Lets do this.</p>
+   </>
   );
 }
  
