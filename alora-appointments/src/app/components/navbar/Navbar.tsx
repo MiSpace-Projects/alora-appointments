@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { routes } from "@/app/config/routes"
+import { useTheme } from "@/app/contexts/ThemeContext"
 import styles from "./Navbar.module.css"
 
 const navItems = [
@@ -13,6 +14,7 @@ const navItems = [
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
+  const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -29,8 +31,8 @@ export default function Navbar() {
     <header className={styles.header}>
       <div className={styles.container}>
         <Link href={routes.home.path} className={styles.logo}>
-          <span className={styles.logoMark}>A</span>
-          <span className={styles.logoText}>Alora</span>
+          <img src="/alora-hair.png" alt="Alora" className={styles.logoMark} />
+          <span className={styles.logoText}><strong>Alora</strong> Appointments</span>
         </Link>
 
         <nav className={styles.nav}>

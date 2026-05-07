@@ -1,0 +1,18 @@
+.hero {
+  width: 100%;
+  min-height: calc(100vh - 72px);
+  background: var(--background);
+  margin-top: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(2rem, 6vw, 4rem) 1.5rem;
+}
+
+.hero p {
+  max-width: 760px;
+  color: var(--foreground);
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  line-height: 1.8;
+  text-align: center;
+}
