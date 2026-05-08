@@ -1,0 +1,26 @@
+.profilePage {
+  padding: 3rem 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.profileTitle {
+  margin-bottom: 1rem;
+  font-size: clamp(2rem, 4vw, 2.5rem);
+}
+
+.profileText {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--foreground);
+  opacity: 0.9;
+}
+
+.profileActions {
+  margin-top: 1.5rem;
+}
+
+.profileLink {
+  color: #4f46e5;
+  text-decoration: underline;
+}

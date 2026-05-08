@@ -1,0 +1,17 @@
+:global(body) {
+  margin: 0;
+}
+
+.footer {
+  background: var(--content-bg);
+  color: var(--foreground);
+  padding: 1.25rem 1.5rem;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footerText {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.85;
+}

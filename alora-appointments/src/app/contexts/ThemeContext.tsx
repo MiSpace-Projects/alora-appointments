@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useLayoutEffect, ReactNode } from 'react'
 
 type Theme = 'light' | 'dark'
 
@@ -11,18 +11,28 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme') as Theme
-      return savedTheme || 'light'
-    }
+function getInitialTheme(): Theme {
+  if (typeof window === 'undefined') {
     return 'light'
-  })
+  }
+
+  const savedTheme = window.localStorage.getItem('theme')
+  if (savedTheme === 'light' || savedTheme === 'dark') {
+    return savedTheme
+  }
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>(getInitialTheme)
+
+  useLayoutEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('theme', theme)
+    window.localStorage.setItem('theme', theme)
   }, [theme])
 
   const toggleTheme = () => {

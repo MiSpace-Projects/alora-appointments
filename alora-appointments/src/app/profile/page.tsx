@@ -1,15 +1,17 @@
-import Link from "next/link";
+import Link from "next/link"
+import styles from "./page.module.css"
+import { profilePageCopy } from "./profileData"
 
 export default function ProfilePage() {
   return (
-    <div style={{ padding: "3rem 1.5rem", maxWidth: 900, margin: "0 auto" }}>
-      <h1>My Profile</h1>
-      <p>Welcome to your profile page. Update your account details and review recent activity here.</p>
-      <div style={{ marginTop: "1.5rem" }}>
-        <Link href="/" style={{ color: "#4f46e5", textDecoration: "underline" }}>
-          Back to home
+    <div className={styles.profilePage}>
+      <h1 className={styles.profileTitle}>{profilePageCopy.title}</h1>
+      <p className={styles.profileText}>{profilePageCopy.description}</p>
+      <div className={styles.profileActions}>
+        <Link href={profilePageCopy.backLink.href} className={styles.profileLink}>
+          {profilePageCopy.backLink.label}
         </Link>
       </div>
     </div>
-  );
+  )
 }
