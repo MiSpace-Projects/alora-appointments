@@ -4,20 +4,14 @@ import Link from "next/link"
 import Image from "next/image"
 import { useState, useEffect, useRef } from "react"
 import { routes } from "@/app/config/routes"
-import { useTheme } from "@/app/contexts/ThemeContext"
+import { navItems, avatarMenuItems } from "./navbarData"
 import styles from "./Navbar.module.css"
-
-const navItems = [
-  routes.services,
-  routes.bookNow,
-]
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
   const menuRef = useRef<HTMLDivElement | null>(null)
-  const { toggleTheme } = useTheme()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -72,13 +66,16 @@ export default function Navbar() {
 
           {isOpen && (
             <div className={styles.dropdown}>
-              <Link
-                href={routes.myProfile.path}
-                className={styles.dropdownItem}
-                onClick={() => setIsOpen(false)}
-              >
-                My Profile
-              </Link>
+              {avatarMenuItems.map((item) => (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={styles.dropdownItem}
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
             </div>
           )}
         </div>

@@ -1,13 +1,10 @@
-export default function Footer(){
-    return(
-        <footer style={{
-            background: 'var(--content-bg)',
-            color: 'var(--foreground)',
-            padding: '1rem',
-            textAlign: 'center',
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)'
-        }}>
-            <p>This is my Footer</p>
-        </footer>
-    )
+import { footerCopy } from "./footerData"
+import styles from "./Footer.module.css"
+
+export default function Footer() {
+  return (
+    <footer className={styles.footer}>
+      <p className={styles.footerText}>{footerCopy.text}</p>
+    </footer>
+  )
 }
