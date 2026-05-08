@@ -13,13 +13,18 @@ const navItems = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
+  const menuRef = useRef<HTMLDivElement | null>(null)
   const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false)
+      }
+      if (menuRef.current && !menuRef.current.contains(event.target as Node) && !(event.target as HTMLElement).closest(`.${styles.menuButton}`)) {
+        setMenuOpen(false)
       }
     }
 
@@ -35,9 +40,19 @@ export default function Navbar() {
           <span className={styles.logoText}><strong>Alora</strong> Appointments</span>
         </Link>
 
-        <nav className={styles.nav}>
+        <button
+          type="button"
+          className={styles.menuButton}
+          aria-expanded={menuOpen}
+          aria-label="Toggle navigation menu"
+          onClick={() => setMenuOpen((prev) => !prev)}
+        >
+          Menu
+        </button>
+
+        <nav ref={menuRef} className={`${styles.nav} ${menuOpen ? styles.open : ""}`}>
           {navItems.map((item) => (
-            <Link key={item.path} href={item.path} className={styles.navLink}>
+            <Link key={item.path} href={item.path} className={styles.navLink} onClick={() => setMenuOpen(false)}>
               {item.label}
             </Link>
           ))}
@@ -51,7 +66,7 @@ export default function Navbar() {
             aria-expanded={isOpen}
             onClick={() => setIsOpen((prev) => !prev)}
           >
-            <span className={styles.avatarCircle}>AM</span>
+            <span className={styles.avatarCircle}>MM</span>
           </button>
 
           {isOpen && (
