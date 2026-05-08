@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useState, useEffect, useRef } from "react"
 import { routes } from "@/app/config/routes"
 import { useTheme } from "@/app/contexts/ThemeContext"
@@ -16,7 +17,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
   const menuRef = useRef<HTMLDivElement | null>(null)
-  const { theme, toggleTheme } = useTheme()
+  const { toggleTheme } = useTheme()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -36,7 +37,7 @@ export default function Navbar() {
     <header className={styles.header}>
       <div className={styles.container}>
         <Link href={routes.home.path} className={styles.logo}>
-          <img src="/alora-hair.png" alt="Alora" className={styles.logoMark} />
+          <Image src="/alora-hair.png" alt="Alora" className={styles.logoMark} width={32} height={32} />
           <span className={styles.logoText}><strong>Alora</strong> Appointments</span>
         </Link>
 
