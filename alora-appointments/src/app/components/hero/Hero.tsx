@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, Easing } from "framer-motion";
 import styles from "./Hero.module.css";
 
 const heroVariants = {
@@ -19,7 +19,7 @@ const textBlockVariants = {
   visible: {
     opacity: 1,
     x: 0,
-    transition: { duration: 0.7, ease: "easeOut" },
+    transition: { duration: 0.7, ease: "easeOut" as Easing },
   },
 };
 
@@ -28,7 +28,7 @@ const buttonGroupVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.55, ease: "easeOut", delay: 0.2 },
+    transition: { duration: 0.55, ease: "easeOut" as Easing, delay: 0.2 },
   },
 };
 
@@ -49,7 +49,7 @@ const statItemVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { duration: 0.5, ease: "easeOut" },
+    transition: { duration: 0.5, ease: "easeOut" as Easing },
   },
 };
 
@@ -58,7 +58,7 @@ const scrollIndicatorVariants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: "easeOut", delay: 0.6 },
+    transition: { duration: 0.7, ease: "easeOut" as Easing, delay: 0.6 },
   },
 };
 
@@ -68,7 +68,7 @@ const scrollDotAnimation = {
   transition: {
     duration: 1.8,
     repeat: Infinity,
-    ease: "easeInOut",
+    ease: "easeInOut" as Easing,
   },
 };
 
