@@ -11,8 +11,7 @@
 
 .container {
   width: 100%;
-  margin: 0;
-  padding: 0 1.5rem;
+  padding: 0rem 2.5rem;
   display: flex;
   align-items: center;
   min-height: 72px;
@@ -41,13 +40,15 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
-    margin: 0;
+    margin: 1rem;
     padding: 1rem;
     background: var(--navbar-bg);
     transform: translateY(-110%);
     opacity: 0;
     pointer-events: none;
-    transition: transform 0.25s ease, opacity 0.25s ease;
+    transition:
+      transform 0.25s ease,
+      opacity 0.25s ease;
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     z-index: 49;
   }

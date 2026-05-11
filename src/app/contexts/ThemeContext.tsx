@@ -1,55 +1,51 @@
-"use client"
+'use client';
 
-import { createContext, useContext, useState, useEffect, useLayoutEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useLayoutEffect, ReactNode } from 'react';
 
-type Theme = 'light' | 'dark'
+type Theme = 'light' | 'dark';
 
 interface ThemeContextType {
-  theme: Theme
-  toggleTheme: () => void
+  theme: Theme;
+  toggleTheme: () => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 function getInitialTheme(): Theme {
   if (typeof window === 'undefined') {
-    return 'light'
+    return 'light';
   }
 
-  const savedTheme = window.localStorage.getItem('theme')
+  const savedTheme = window.localStorage.getItem('theme');
   if (savedTheme === 'light' || savedTheme === 'dark') {
-    return savedTheme
+    return savedTheme;
   }
 
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme)
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
 
   useLayoutEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   useEffect(() => {
-    window.localStorage.setItem('theme', theme)
-  }, [theme])
+    window.localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light')
-  }
+    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>;
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext)
+  const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider')
+    throw new Error('useTheme must be used within a ThemeProvider');
   }
-  return context
+  return context;
 }
