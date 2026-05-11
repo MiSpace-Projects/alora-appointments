@@ -9,6 +9,7 @@
   --space-6: 2rem;
   --space-7: 2.5rem;
   --space-8: 3rem;
+  --space-9: 7rem;
 
   --radius-md: 1.2rem;
   --radius-lg: 1.4rem;
@@ -40,9 +41,9 @@
 }
 
 .services {
-  width: min(1080px, 100%);
+  width: 100vw;
   margin: 0 auto;
-  padding: var(--space-6);
+  padding: var(--space-9);
   display: flex;
   flex-direction: column;
   gap: var(--space-8);

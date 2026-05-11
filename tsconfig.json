@@ -30,7 +30,8 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts",
     "jest.config.ts",
-    "jest.setup.ts"
+    "jest.setup.ts",
+    "src/app/loyaltyView/page.module.css"
   ],
   "exclude": ["node_modules"]
 }

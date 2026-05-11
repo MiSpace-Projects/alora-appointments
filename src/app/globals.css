@@ -3,7 +3,7 @@
   --foreground: #171717;
 }
 
-[data-theme="light"] {
+[data-theme='light'] {
   --background: #ffffff;
   --foreground: #171717;
   --navbar-bg: rgba(255, 255, 255, 0.95);
@@ -12,12 +12,12 @@
   --logo-filter: none;
 }
 
-[data-theme="dark"] {
-  --background: #0a0a0a;
+[data-theme='dark'] {
+  --background: #000;
   --foreground: #ededed;
   --navbar-bg: rgba(0, 0, 0, 0.08);
   --text-color: #ffffff;
-  --content-bg: #1a1a1a;
+  --content-bg: #000;
   --logo-filter: brightness(0) invert(1);
 }
 
@@ -40,12 +40,6 @@ body {
 main {
   width: 100%;
   background: var(--content-bg);
-}
-
-.app-content {
-  width: min(1200px, calc(100% - 2rem));
-  margin: 0 auto;
-  padding: 2rem 0 4rem;
 }
 
 @media (max-width: 768px) {

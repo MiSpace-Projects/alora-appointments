@@ -1,6 +1,6 @@
 'use client';
 
-import styles from './page.module.css';
+import styles from './ServiceSection.module.css';
 import { motion } from 'framer-motion';
 
 // const reveal = {
