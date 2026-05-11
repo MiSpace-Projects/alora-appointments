@@ -1,5 +1,5 @@
-import DynamicBanner from '../banner/DynamicBanner';
-import styles from './QuickBookingsSection.module.css';
+import DynamicBanner from '@/app/components/banner/DynamicBanner';
+import styles from './QuickBookings.module.css';
 
 export default function QuickBookingsSection() {
   return (

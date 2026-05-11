@@ -1,6 +1,6 @@
-import Link from "next/link"
-import styles from "./page.module.css"
-import { profilePageCopy } from "./profileData"
+import Link from 'next/link';
+import styles from './page.module.css';
+import { profilePageCopy } from './profileData';
 
 export default function ProfilePage() {
   return (
@@ -13,5 +13,5 @@ export default function ProfilePage() {
         </Link>
       </div>
     </div>
-  )
+  );
 }
