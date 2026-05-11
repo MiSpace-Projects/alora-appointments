@@ -31,7 +31,8 @@
     "**/*.mts",
     "jest.config.ts",
     "jest.setup.ts",
-    "src/app/loyaltyView/page.module.css"
+    "src/app/loyaltyView/page.module.css",
+    "src/app/components/quickBookings/QuickBookings.module.css"
   ],
   "exclude": ["node_modules"]
 }
