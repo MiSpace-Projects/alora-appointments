@@ -1,18 +1,17 @@
-.landing {
-  padding: 2rem;
+.home {
   text-align: center;
   color: var(--foreground);
   background: var(--content-bg);
 }
 
-.landing h1 {
+.home h1 {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1rem;
   color: var(--foreground);
 }
 
-.landing p {
+.home p {
   font-size: 1.2rem;
   color: var(--foreground);
   opacity: 0.8;
