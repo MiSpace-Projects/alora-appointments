@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
-import { useTheme } from "@/app/contexts/ThemeContext"
-import styles from "./FloatingThemeToggle.module.css"
+import { useTheme } from '@/app/contexts/ThemeContext';
+import styles from './FloatingThemeToggle.module.css';
 
 export default function FloatingThemeToggle() {
-  const { theme, toggleTheme } = useTheme()
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <button
@@ -13,7 +13,7 @@ export default function FloatingThemeToggle() {
       onClick={toggleTheme}
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
     >
-      {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+      <span suppressHydrationWarning>{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
     </button>
-  )
+  );
 }
