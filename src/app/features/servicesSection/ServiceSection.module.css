@@ -76,7 +76,7 @@
 .headerText {
   font-size: var(--text-3xl);
   font-weight: 700;
-  font-family: var(--font-display);
+  font-family: var(--font-playfair-display), serif;
   text-align: left;
 }
 

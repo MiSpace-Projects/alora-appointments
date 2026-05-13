@@ -46,16 +46,18 @@ export default function Footer() {
           <span className={styles.colTitle}>Contact</span>
           <ul className={styles.links}>
             <li>
-              <span>hello@alora.co.za</span>
+              <span>alorabookings@gmail.com</span>
             </li>
             <li>
-              <span>+27 12 345 6789</span>
+              <span>+27(60) 639-7955</span>
             </li>
             <li>
-              <span>Johannesburg, SA</span>
+              <span>Bethlehem, Free State</span>
             </li>
             <li>
-              <span>@alora.beauty</span>
+              <span>
+                <link></link>
+              </span>
             </li>
           </ul>
         </div>

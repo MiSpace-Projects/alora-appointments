@@ -12,14 +12,10 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 function getInitialTheme(): Theme {
-  if (typeof window === 'undefined') {
-    return 'light';
-  }
+  if (typeof window === 'undefined') return 'light';
 
-  const savedTheme = window.localStorage.getItem('theme');
-  if (savedTheme === 'light' || savedTheme === 'dark') {
-    return savedTheme;
-  }
+  const saved = window.localStorage.getItem('theme');
+  if (saved === 'light' || saved === 'dark') return saved;
 
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
@@ -43,9 +39,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
+  const ctx = useContext(ThemeContext);
+  if (!ctx) throw new Error('useTheme must be used within ThemeProvider');
+  return ctx;
 }
