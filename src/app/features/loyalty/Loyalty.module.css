@@ -51,7 +51,7 @@
   justify-content: space-between;
   padding: 2rem;
   border-radius: 1.25rem;
-  background: rgba(46, 46, 46, 0.25);
+  background: rgba(197, 125, 116, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(12px);
   min-height: 180px;
@@ -77,6 +77,11 @@
   height: 42px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  flex-shrink: 0;
 }
 
 .cardBody {

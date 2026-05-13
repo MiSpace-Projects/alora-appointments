@@ -1,7 +1,10 @@
 .wrap {
   width: 100%;
+  align-items: center;
+  justify-self: center;
+  justify-content: center;
   box-sizing: border-box;
-  background: rgba(46, 46, 46, 0.25);
+  background: rgba(246, 237, 237, 0.25);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }

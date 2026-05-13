@@ -23,7 +23,7 @@
 }
 
 .title {
-  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-size: clamp(2rem, 5vw, 2.5rem);
   font-weight: 700;
   font-family: var(--font-playfair-display), serif;
   line-height: 1;
