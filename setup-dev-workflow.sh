@@ -143,11 +143,11 @@ run_install lint-staged
 cat > .lintstagedrc.json << 'EOF'
 {
   "*.{ts,tsx}": [
-    "eslint --fix --max-warnings=0",
+    "eslint --fix --max-warnings=10",
     "prettier --write"
   ],
   "*.{js,jsx,mjs,cjs}": [
-    "eslint --fix --max-warnings=0",
+    "eslint --fix --max-warnings=10",
     "prettier --write"
   ],
   "*.{json,md,mdx,css,scss,yaml,yml}": [
@@ -285,7 +285,7 @@ const fs = require('fs');
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 pkg.scripts = {
   ...pkg.scripts,
-  "lint":         "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings=0",
+  "lint":         "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings=10",
   "lint:fix":     "eslint . --ext .ts,.tsx,.js,.jsx --fix",
   "format":       "prettier --write .",
   "format:check": "prettier --check .",

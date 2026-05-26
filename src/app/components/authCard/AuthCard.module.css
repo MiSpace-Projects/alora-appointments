@@ -1,0 +1,45 @@
+.authCard {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logoSmall {
+  height: 28px;
+  width: auto;
+  filter: invert(71%) sepia(18%) saturate(494%) hue-rotate(354deg) brightness(92%) contrast(87%);
+}
+
+.brandName {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #ffffff;
+}
+
+@media (min-width: 640px) {
+  .authCard {
+    padding: 2.5rem 2rem;
+  }
+
+  .logoSmall {
+    height: 32px;
+  }
+
+  .brandName {
+    font-size: 1.5rem;
+  }
+}

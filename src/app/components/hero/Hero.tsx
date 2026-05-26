@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import ProtectedLink from '../protected/ProtectedLink';
 import { motion } from 'framer-motion';
 import styles from './Hero.module.css';
 import {
@@ -32,11 +33,19 @@ export default function Hero() {
         </motion.div>
 
         <motion.div className={styles.actions} variants={buttonGroupVariants}>
-          {heroActions.map((action) => (
-            <Link key={action.href} href={action.href} className={styles[action.variant]}>
-              {action.label}
-            </Link>
-          ))}
+          {heroActions.map((action) => {
+            const className = styles[action.variant as keyof typeof styles];
+            const isProtected = /book/i.test(action.label);
+            return isProtected ? (
+              <ProtectedLink key={action.href} href={action.href} className={className}>
+                {action.label}
+              </ProtectedLink>
+            ) : (
+              <Link key={action.href} href={action.href} className={className}>
+                {action.label}
+              </Link>
+            );
+          })}
         </motion.div>
 
         <motion.div className={styles.stats} variants={statsContainerVariants}>
