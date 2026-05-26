@@ -1,5 +1,6 @@
 import styles from './Footer.module.css';
 import Link from 'next/link';
+import ProtectedLink from '../protected/ProtectedLink';
 
 const bookUrl = 'https://preview--alora-glow-studio.base44.app/book';
 const dashUrl = 'https://preview--alora-glow-studio.base44.app/dashboard';
@@ -21,7 +22,7 @@ export default function Footer() {
           <ul className={styles.links}>
             {['Wig Care', 'Nail Art', 'Matric Farewell', 'Hair Styling', 'Makeup'].map((s) => (
               <li key={s}>
-                <Link href={bookUrl}>{s}</Link>
+                <ProtectedLink href={bookUrl}>{s}</ProtectedLink>
               </li>
             ))}
           </ul>
@@ -31,13 +32,13 @@ export default function Footer() {
           <span className={styles.colTitle}>Quick Links</span>
           <ul className={styles.links}>
             <li>
-              <Link href={bookUrl}>Book Appointment</Link>
+              <ProtectedLink href={bookUrl}>Book Appointment</ProtectedLink>
             </li>
             <li>
-              <Link href={dashUrl}>My Bookings</Link>
+              <ProtectedLink href={dashUrl}>My Bookings</ProtectedLink>
             </li>
             <li>
-              <Link href={dashUrl}>Loyalty Points</Link>
+              <ProtectedLink href={dashUrl}>Loyalty Points</ProtectedLink>
             </li>
           </ul>
         </div>

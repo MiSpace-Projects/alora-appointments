@@ -1,0 +1,78 @@
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #0a0a0a;
+  padding: 0.875rem 1rem;
+  font-size: 0.875rem;
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+  font-weight: 400;
+}
+
+.input.hasPassword {
+  padding-right: 3rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #d4c5b0;
+  background: #0a0a0a;
+  box-shadow: 0 0 0 3px rgba(212, 197, 176, 0.1);
+}
+
+.input:hover {
+  border-color: rgba(212, 197, 176, 0.3);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.passwordToggle:hover {
+  color: #d4c5b0;
+}
+
+.passwordToggle:focus {
+  outline: none;
+  color: #d4c5b0;
+}
+
+.error {
+  font-size: 0.7rem;
+  color: #e88;
+  margin-top: 0.25rem;
+}

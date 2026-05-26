@@ -2,17 +2,22 @@
 
 import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
-import FloatingThemeToggle from './components/FloatingThemeToggle';
+import { usePathname } from 'next/navigation';
 
+const AUTH_ROUTES = ['/login', '/register', '/forgot-password'];
 function ClientLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname() ?? '/';
+  const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+
+  if (isAuthRoute) {
+    return <>{children}</>;
+  }
+
   return (
     <>
       <Navbar />
-      <main>
-        <div className="app-content">{children}</div>
-      </main>
+      <main>{children}</main>
       <Footer />
-      <FloatingThemeToggle />
     </>
   );
 }

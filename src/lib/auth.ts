@@ -2,6 +2,10 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { prisma } from './prisma';
 
+const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
+const SESSION_REFRESH_SECONDS = 60 * 60 * 24;
+const COOKIE_CACHE_SECONDS = 60 * 5;
+
 const socialProviders = {
   ...(process.env.GITHUB_CLIENT_ID &&
     process.env.GITHUB_CLIENT_SECRET && {
@@ -31,58 +35,39 @@ const socialProviders = {
         clientSecret: process.env.DISCORD_CLIENT_SECRET,
       },
     }),
-  ...(process.env.SPOTIFY_CLIENT_ID &&
-    process.env.SPOTIFY_CLIENT_SECRET && {
-      spotify: {
-        clientId: process.env.SPOTIFY_CLIENT_ID,
-        clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-      },
-    }),
-  ...(process.env.TWITTER_CLIENT_ID &&
-    process.env.TWITTER_CLIENT_SECRET && {
-      twitter: {
-        clientId: process.env.TWITTER_CLIENT_ID,
-        clientSecret: process.env.TWITTER_CLIENT_SECRET,
-      },
-    }),
-  ...(process.env.MICROSOFT_CLIENT_ID &&
-    process.env.MICROSOFT_CLIENT_SECRET && {
-      microsoft: {
-        clientId: process.env.MICROSOFT_CLIENT_ID,
-        clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
-      },
-    }),
 };
-
-const ExpiryDays = 60 * 60 * 24 * 7;
-const RefreshLimit = 60 * 60 * 24;
-const ClientSideCache = 60 * 5;
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
   baseURL: process.env.BETTER_AUTH_URL!,
   secret: process.env.BETTER_AUTH_SECRET!,
-  emailAndPassword: { enabled: true },
+
+  emailAndPassword: {
+    enabled: true,
+  },
+
   session: {
-    expiresIn: ExpiryDays,
-    updateAge: RefreshLimit,
+    expiresIn: SESSION_TTL_SECONDS,
+    updateAge: SESSION_REFRESH_SECONDS,
     cookieCache: {
       enabled: true,
-      maxAge: ClientSideCache,
+      maxAge: COOKIE_CACHE_SECONDS,
     },
   },
+
   rateLimit: {
     enabled: true,
     window: 60,
     max: 20,
   },
-  trustedOrigins: [process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'],
-  advanced: {
-    database: {
-      generateId: false,
-    },
-  },
+
+  trustedOrigins: [process.env.BETTER_AUTH_URL ?? 'http://localhost:3000'].filter(
+    Boolean,
+  ) as string[],
+
   socialProviders,
 });
 
 export type Auth = typeof auth;
+export type Session = typeof auth.$Infer.Session;
+export type User = typeof auth.$Infer.Session.user;

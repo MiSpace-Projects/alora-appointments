@@ -41,7 +41,7 @@ export default function Services() {
           className={styles.featured}
           style={{
             backgroundImage:
-              "url('https://images.pexels.com/photos/3992874/pexels-photo-3992874.jpeg')",
+              "url('https://images.pexels.com/photos/14730865/pexels-photo-14730865.jpeg')",
           }}
           initial="hidden"
           whileInView="show"
@@ -59,19 +59,19 @@ export default function Services() {
           {[
             {
               title: 'Nail Art',
-              img: 'https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg',
+              img: 'https://images.pexels.com/photos/14016180/pexels-photo-14016180.jpeg',
             },
             {
               title: 'Matric Farewell',
-              img: 'https://images.pexels.com/photos/3065209/pexels-photo-3065209.jpeg',
+              img: 'https://images.pexels.com/photos/30482416/pexels-photo-30482416.jpeg',
             },
             {
               title: 'Hair Styling',
-              img: 'https://images.pexels.com/photos/3993320/pexels-photo-3993320.jpeg',
+              img: 'https://images.pexels.com/photos/7446913/pexels-photo-7446913.jpeg',
             },
             {
               title: 'Makeup',
-              img: 'https://images.pexels.com/photos/3762800/pexels-photo-3762800.jpeg',
+              img: 'https://images.pexels.com/photos/10698022/pexels-photo-10698022.jpeg',
             },
           ].map((item) => (
             <motion.div

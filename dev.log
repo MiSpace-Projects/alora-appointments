@@ -1,0 +1,18 @@
+Warning: Ignoring extra certs from `/usr/local/etc/ca-certificates/cert.pem`, load failed: error:80000002:system library::No such file or directory
+
+> alora-appointments@0.1.0 dev
+> next dev
+
+Warning: Ignoring extra certs from `/usr/local/etc/ca-certificates/cert.pem`, load failed: error:80000002:system library::No such file or directory
+Warning: Ignoring extra certs from `/usr/local/etc/ca-certificates/cert.pem`, load failed: error:80000002:system library::No such file or directory
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.24:3000
+- Environments: .env.local, .env
+
+✓ Starting...
+✓ Ready in 397ms
+Warning: Ignoring extra certs from `/usr/local/etc/ca-certificates/cert.pem`, load failed: error:80000002:system library::No such file or directory
+Warning: Ignoring extra certs from `/usr/local/etc/ca-certificates/cert.pem`, load failed: error:80000002:system library::No such file or directory
+Warning: Ignoring extra certs from `/usr/local/etc/ca-certificates/cert.pem`, load failed: error:80000002:system library::No such file or directory
+ GET / 200 in 2.5s (compile: 2.3s, render: 217ms)

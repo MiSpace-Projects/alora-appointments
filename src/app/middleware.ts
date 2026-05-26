@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const PUBLIC_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password'];
-const AUTH_ROUTES = ['/login', '/register'];
+const REDIRECT_IF_AUTHED = ['/login', '/register'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -19,15 +19,19 @@ export async function middleware(request: NextRequest) {
     request.cookies.get('__Secure-better-auth.session_token')?.value;
 
   const isPublicRoute = PUBLIC_ROUTES.some((r) => pathname.startsWith(r));
-  const isAuthRoute = AUTH_ROUTES.some((r) => pathname.startsWith(r));
+  const isRedirectIfAuthed = REDIRECT_IF_AUTHED.some((r) => pathname.startsWith(r));
 
-  if (sessionToken && isAuthRoute) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  if (sessionToken && isRedirectIfAuthed) {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   if (!sessionToken && !isPublicRoute) {
     const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('callbackUrl', pathname);
+
+    if (pathname.startsWith('/')) {
+      loginUrl.searchParams.set('callbackUrl', pathname);
+    }
+
     return NextResponse.redirect(loginUrl);
   }
 
