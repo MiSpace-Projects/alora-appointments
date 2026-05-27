@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { authClient } from '@/lib/auth-client';
 
 interface AuthClientWithMethods {
-  sendResetPassword?: (params: { email: string; redirectTo: string }) => Promise<unknown>;
-  forgotPassword?: (params: { email: string; redirectTo: string }) => Promise<unknown>;
+  requestPasswordReset?: (params: { email: string; redirectTo: string }) => Promise<unknown>;
   resetPassword?: (params: { newPassword: string; token: string }) => Promise<unknown>;
 }
 
@@ -19,13 +18,8 @@ export async function POST(request: NextRequest) {
     const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password`;
 
     try {
-      if (client.sendResetPassword) {
-        await client.sendResetPassword({
-          email,
-          redirectTo: redirectUrl,
-        });
-      } else if (client.forgotPassword) {
-        await client.forgotPassword({
+      if (client.requestPasswordReset) {
+        await client.requestPasswordReset({
           email,
           redirectTo: redirectUrl,
         });

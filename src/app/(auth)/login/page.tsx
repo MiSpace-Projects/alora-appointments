@@ -9,12 +9,16 @@ import { easeInOut, motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { signIn } from '@/lib/auth-client';
+import { authLogger } from '@/lib/auth-logger';
+import { classifyAuthError } from '@/lib/auth-errors';
 import { loginSchema, type LoginInput } from '@/lib/validation';
 import { AuthBackground } from '@/app/components/AuthBackground';
 import { AuthCard, AuthHeader } from '@/app/components/authCard/AuthCard';
 import { FormField } from '@/app/components/form/Form';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
 import { TabControl } from '@/app/components/AuthTabs/TabControl';
+import { SocialAuthButtons } from '@/app/components/socialAuthButtons/SocialAuthButtons';
+import { useAuth } from '@/app/contexts/AuthContext';
 import styles from '../shared.module.css';
 
 const containerVariants = {
@@ -38,10 +42,12 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const { refresh } = useAuth();
 
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
@@ -51,6 +57,9 @@ export default function LoginPage() {
       rememberMe: false,
     },
   });
+
+  const raw = searchParams.get('callbackUrl') ?? '/';
+  const destination = raw.startsWith('/') ? raw : '/';
 
   const onSubmit: SubmitHandler<LoginInput> = async (data) => {
     setLoading(true);
@@ -63,18 +72,44 @@ export default function LoginPage() {
       });
 
       if (result.error) {
-        toast.error(result.error.message ?? 'Invalid credentials.');
+        const classified = classifyAuthError(
+          new Error(result.error.message ?? ''),
+          result.error.code ?? result.error.status,
+        );
+
+        if (classified.category === 'UNKNOWN_USER') {
+          authLogger.loginUnknownUser(data.email);
+          toast.error('No account found with that email.', {
+            description: 'Check the address or create a new account.',
+            action: { label: 'Register', onClick: () => router.push('/register') },
+          });
+        } else {
+          authLogger.loginFailure(data.email, classified.raw, classified.userMessage);
+          toast.error(classified.userMessage);
+        }
         return;
       }
 
+      await refresh();
+      authLogger.loginSuccess(result.data?.user?.id ?? 'unknown');
       toast.success('Welcome back!');
-
-      const raw = searchParams.get('callbackUrl') ?? '/';
-      const destination = raw.startsWith('/') ? raw : '/';
       router.push(destination);
-      router.refresh();
-    } catch {
-      toast.error('Something went wrong. Please try again.');
+    } catch (err) {
+      const classified = classifyAuthError(err);
+
+      if (classified.category === 'NETWORK') {
+        authLogger.loginNetworkError(err instanceof Error ? err.message : undefined);
+        toast.error('Connection problem.', {
+          description: 'Check your internet connection and try again.',
+        });
+      } else {
+        authLogger.loginFailure(
+          data.email,
+          classified.raw,
+          err instanceof Error ? err.message : undefined,
+        );
+        toast.error(classified.userMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -117,6 +152,9 @@ export default function LoginPage() {
           Sign in <ArrowRight size={15} />
         </SubmitButton>
       </motion.div>
+
+      {/* Issue #8: Social sign-in */}
+      <SocialAuthButtons redirectTo={destination} onSuccess={refresh} />
     </form>
   );
 
