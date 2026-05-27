@@ -49,7 +49,6 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      // Option 1: Try using fetch to your API endpoint
       const response = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: {
