@@ -41,7 +41,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setError(null);
 
     try {
-      const session = await getSession();
+      const session = await getSession({ query: { disableCookieCache: true } } as Parameters<
+        typeof getSession
+      >[0]);
       setUser((session?.data?.user as AuthUser) ?? null);
     } catch {
       setUser(null);
@@ -52,12 +54,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const init = async () => {
-      await refresh();
+    let mounted = true;
+    getSession({ query: { disableCookieCache: true } } as Parameters<typeof getSession>[0])
+      .then((session) => {
+        if (mounted) setUser((session?.data?.user as AuthUser) ?? null);
+      })
+      .catch(() => {
+        if (mounted) {
+          setUser(null);
+          setError('Failed to load session.');
+        }
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+    return () => {
+      mounted = false;
     };
-
-    void init();
-  }, [refresh]);
+  }, []);
 
   const wrappedSignOut = useCallback(async () => {
     await _signOut();
