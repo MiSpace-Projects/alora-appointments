@@ -1,0 +1,214 @@
+.hero {
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  width: 100vw;
+  min-height: calc(110vh - 72px);
+  background: var(--background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(2.5rem, 10vw, 6rem) 2rem 4rem;
+}
+
+.content {
+  width: min(1080px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 2.75rem;
+  align-items: center;
+  text-align: center;
+}
+
+.textGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  align-items: center;
+  text-align: center;
+}
+
+.label {
+  color: var(--text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  line-height: 0.95;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.title span {
+  display: block;
+}
+
+.description {
+  max-width: 730px;
+  color: var(--foreground);
+  font-size: clamp(1rem, 1.1vw, 1.2rem);
+  line-height: 1.8;
+  opacity: 0.88;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1.25rem;
+  justify-content: center;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+  margin-top: 1rem;
+}
+
+.actions::-webkit-scrollbar {
+  height: 0.35rem;
+}
+
+.actions::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.3);
+  border-radius: 999px;
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+  padding: 0.95rem 1.5rem;
+  border-radius: 999px;
+  font-weight: 700;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+  white-space: nowrap;
+}
+
+.primaryButton {
+  color: var(--background);
+  background: var(--text-color);
+}
+
+.secondaryButton {
+  color: var(--text-color);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.primaryButton:hover,
+.secondaryButton:hover {
+  transform: translateY(-2px);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+  width: min(100%, 820px);
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 1.1rem;
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-width: 0;
+}
+
+.statValue {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.statLabel {
+  color: var(--foreground);
+  opacity: 0.85;
+  font-size: 0.95rem;
+}
+
+.scrollIndicator {
+  position: absolute;
+  left: 50%;
+  bottom: 6rem;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--foreground);
+  opacity: 0.1;
+}
+
+.scrollTrack {
+  width: 22px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 999px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 7px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.scrollDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-color);
+}
+
+@media (max-width: 840px) {
+  .title {
+    font-size: clamp(2.5rem, 10vw, 4rem);
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, minmax(160px, 1fr));
+    width: min(100%, 640px);
+  }
+}
+
+@media (max-width: 680px) {
+  .hero {
+    padding-top: 88px;
+    padding-bottom: 2rem;
+  }
+
+  .actions {
+    justify-content: flex-start;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    min-width: 130px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(3, minmax(160px, 1fr));
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 0.5rem;
+    width: 100%;
+  }
+
+  .statItem {
+    scroll-snap-align: start;
+    min-width: 160px;
+  }
+}
