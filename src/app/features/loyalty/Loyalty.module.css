@@ -1,0 +1,157 @@
+.page {
+  width: 100%;
+  padding: 5rem 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  color: var(--text);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.kicker {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.title {
+  font-weight: 700;
+  font-family: var(--font-playfair-display), serif;
+  line-height: 1;
+  text-align: left;
+}
+
+.subtitle {
+  opacity: 0.35;
+  line-height: 1.6;
+  max-width: 420px;
+  align-self: flex-end;
+  text-align: left;
+}
+
+.grid {
+  display: flex;
+  flex-direction: row;
+  gap: 2.25rem;
+}
+
+.card {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 2rem;
+  border-radius: 1.25rem;
+  background: rgba(197, 125, 116, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  min-height: 180px;
+  transition:
+    transform 0.25s ease,
+    border 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cardLeft {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.cardBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.tier {
+  font-family: var(--font-playfair-display), serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.points {
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+.detail {
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.level {
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  margin-top: 1rem;
+  align-self: flex-end;
+}
+
+.ctaWrap {
+  display: flex;
+  justify-content: center;
+}
+
+.cta {
+  font-size: 1.15rem;
+  padding: 1.1rem 2.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--text);
+  background: var(--text);
+  color: var(--bg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.cta:hover {
+  transform: translateY(-3px);
+  opacity: 0.85;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 3rem 1.5rem;
+  }
+
+  .subtitle {
+    align-self: flex-start;
+    max-width: 100%;
+  }
+
+  .grid {
+    flex-direction: column;
+  }
+
+  .card {
+    min-height: 120px;
+  }
+}
