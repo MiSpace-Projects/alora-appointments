@@ -3,9 +3,9 @@ import { createAuthClient } from 'better-auth/react';
 const baseURL = process.env.NEXT_PUBLIC_BETTER_AUTH_URL;
 
 if (!baseURL && process.env.NODE_ENV === 'production') {
-  throw new Error(
+  console.warn(
     '[auth-client] NEXT_PUBLIC_BETTER_AUTH_URL is not set. ' +
-      'Add it to your environment variables before deploying.',
+      'Auth requests will fail at runtime. Add it to your environment variables.',
   );
 }
 
