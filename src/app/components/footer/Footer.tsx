@@ -55,11 +55,6 @@ export default function Footer() {
             <li>
               <span>Bethlehem, Free State</span>
             </li>
-            <li>
-              <span>
-                <link></link>
-              </span>
-            </li>
           </ul>
         </div>
       </div>

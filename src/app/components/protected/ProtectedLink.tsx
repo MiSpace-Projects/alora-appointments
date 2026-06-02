@@ -9,16 +9,19 @@ export function ProtectedLink({
   href,
   children,
   className,
+  onClick,
 }: {
   href: string;
   children: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 }) {
   const { user } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   const handleClick = (e: React.MouseEvent) => {
+    onClick?.();
     if (!user) {
       e.preventDefault();
       router.push('/login?next=' + encodeURIComponent(pathname ?? '/'));
@@ -27,13 +30,11 @@ export function ProtectedLink({
 
   if (user)
     return (
-      <Link href={href} className={className}>
+      <Link href={href} className={className} onClick={onClick}>
         {children}
       </Link>
     );
   return (
-    // Render a link that intercepts clicks when not authenticated
-
     <a href={href} onClick={handleClick} className={className}>
       {children}
     </a>

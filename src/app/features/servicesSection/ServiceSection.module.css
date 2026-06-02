@@ -41,7 +41,7 @@
 }
 
 .services {
-  width: 100vw;
+  width: 100%;
   margin: 0 auto;
   padding: var(--space-9);
   display: flex;
@@ -175,6 +175,10 @@
 }
 
 @media (max-width: 900px) {
+  .services {
+    padding: 4rem 2.5rem;
+  }
+
   .content {
     grid-template-columns: 1fr;
   }
@@ -186,7 +190,7 @@
 
 @media (max-width: 600px) {
   .services {
-    padding: var(--space-5);
+    padding: 2.5rem 1.25rem;
   }
 
   .header {

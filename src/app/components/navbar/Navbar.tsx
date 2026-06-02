@@ -108,7 +108,12 @@ export default function Navbar() {
             const isBookNow = navItem.path === routes.bookNow.path;
             if (isBookNow) {
               return (
-                <ProtectedLink key={navItem.path} href={navItem.path} className={styles.navLink}>
+                <ProtectedLink
+                  key={navItem.path}
+                  href={navItem.path}
+                  className={styles.navLink}
+                  onClick={() => setMenuOpen(false)}
+                >
                   {navItem.label}
                 </ProtectedLink>
               );
