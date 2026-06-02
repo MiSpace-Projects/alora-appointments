@@ -70,11 +70,13 @@
 
 @media (max-width: 768px) {
   .banner {
-    padding: 4rem 1.5rem;
+    padding: 3rem 1.5rem;
+    align-items: stretch;
   }
 
   .cta {
     width: 100%;
+    justify-content: center;
     text-align: center;
   }
 }
