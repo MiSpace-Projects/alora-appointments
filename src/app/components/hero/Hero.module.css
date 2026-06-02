@@ -191,24 +191,37 @@
   }
 
   .actions {
-    justify-content: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow-x: unset;
+    padding-bottom: 0;
   }
 
   .primaryButton,
   .secondaryButton {
-    min-width: 130px;
+    min-width: 140px;
+    flex: 1 1 140px;
   }
 
   .stats {
-    grid-template-columns: repeat(3, minmax(160px, 1fr));
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 0.5rem;
+    grid-template-columns: repeat(2, 1fr);
+    overflow-x: unset;
+    scroll-snap-type: unset;
+    padding-bottom: 0;
+    gap: 0.75rem;
     width: 100%;
   }
 
   .statItem {
-    scroll-snap-align: start;
-    min-width: 160px;
+    scroll-snap-align: unset;
+    min-width: 0;
+  }
+
+  .statValue {
+    font-size: 1.25rem;
+  }
+
+  .statLabel {
+    font-size: 0.8rem;
   }
 }

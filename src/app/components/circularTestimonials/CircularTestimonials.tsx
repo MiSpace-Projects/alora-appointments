@@ -271,6 +271,8 @@ export const CircularTestimonials = ({
           height: 20rem;
           -webkit-perspective: 1000px;
           perspective: 1000px;
+          overflow: hidden;
+          border-radius: 1.25rem;
         }
         .ct-image {
           position: absolute;

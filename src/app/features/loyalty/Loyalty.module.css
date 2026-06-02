@@ -22,6 +22,7 @@
 }
 
 .title {
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
   font-weight: 700;
   font-family: var(--font-playfair-display), serif;
   line-height: 1;
@@ -137,6 +138,22 @@
   opacity: 0.85;
 }
 
+@media (max-width: 900px) {
+  .page {
+    padding: 3.5rem 2.5rem;
+  }
+
+  .grid {
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+
+  .card {
+    flex: 1 1 calc(50% - 0.625rem);
+    min-width: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .page {
     padding: 3rem 1.5rem;
@@ -149,9 +166,23 @@
 
   .grid {
     flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 1rem;
   }
 
   .card {
+    flex: none;
+    width: 100%;
     min-height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 2.5rem 1.25rem;
+  }
+
+  .tier {
+    font-size: 1.5rem;
   }
 }
