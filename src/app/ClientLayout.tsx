@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 
 const AUTH_ROUTES = ['/login', '/register', '/forgot-password'];
 function ClientLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname() ?? '/';
+  const pathname = usePathname() ?? '/home';
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
   if (isAuthRoute) {
