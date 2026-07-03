@@ -4,6 +4,7 @@ import './globals.css';
 
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { MotionProvider } from './components/MotionProvider';
 import { Toaster } from 'sonner';
 
 const geistSans = Geist({
@@ -76,8 +77,10 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable}`}>
         <AuthProvider>
           <ThemeProvider>
-            <Toaster />
-            {children}
+            <MotionProvider>
+              <Toaster />
+              {children}
+            </MotionProvider>
           </ThemeProvider>
         </AuthProvider>
       </body>
