@@ -160,31 +160,7 @@ export default function RegisterPage() {
     {
       id: 'signin',
       label: 'Sign in',
-      content: (
-        <>
-          <div className={styles.headingBlock}>
-            <h1 className={styles.title}>Welcome Back</h1>
-            <p className={styles.subtitle}>Sign in to access your account</p>
-          </div>
-          <div className={styles.form}>
-            <FormField type="email" placeholder="Email address" autoComplete="email" />
-            <FormField type="password" placeholder="Password" autoComplete="current-password" />
-            <div className={styles.submitArea}>
-              <Link href="/login" style={{ textDecoration: 'none' }}>
-                <SubmitButton>
-                  Sign in <ArrowRight size={15} />
-                </SubmitButton>
-              </Link>
-            </div>
-            <div className={styles.footer}>
-              Don&apos;t have an account?
-              <Link href="/register" className={styles.footerLink}>
-                Create one
-              </Link>
-            </div>
-          </div>
-        </>
-      ),
+      href: '/login',
     },
     {
       id: 'signup',

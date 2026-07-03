@@ -182,32 +182,7 @@ function LoginInner() {
     {
       id: 'signup',
       label: 'Sign up',
-      content: (
-        <>
-          <div className={styles.headingBlock}>
-            <h1 className={styles.title}>Create Account</h1>
-            <p className={styles.subtitle}>Join Alora and start earning loyalty rewards</p>
-          </div>
-          <div className={styles.form}>
-            <FormField type="text" placeholder="Full name" autoComplete="name" />
-            <FormField type="email" placeholder="Email address" autoComplete="email" />
-            <FormField type="password" placeholder="Password" autoComplete="new-password" />
-            <div className={styles.submitArea}>
-              <Link href="/register" style={{ textDecoration: 'none' }}>
-                <SubmitButton>
-                  Create account <ArrowRight size={15} />
-                </SubmitButton>
-              </Link>
-            </div>
-            <div className={styles.footer}>
-              Already have an account?{' '}
-              <Link href="/login" className={styles.footerLink}>
-                Sign in
-              </Link>
-            </div>
-          </div>
-        </>
-      ),
+      href: '/register',
     },
   ];
 
