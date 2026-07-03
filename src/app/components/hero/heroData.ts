@@ -6,7 +6,7 @@ export const heroCopy = {
 };
 
 export const heroActions = [
-  { label: 'Book Now', href: '/BookNow', variant: 'primaryButton' },
+  { label: 'Book Now', href: '/book', variant: 'primaryButton' },
   { label: 'Our Services', href: '/services', variant: 'secondaryButton' },
 ] as const;
 
