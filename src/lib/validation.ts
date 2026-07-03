@@ -34,6 +34,16 @@ export const forgotPasswordSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Please enter a valid email'),
 });
 
+export const createBookingSchema = z.object({
+  serviceId: z.string().min(1, 'Please choose a service'),
+  // Coerce so form strings and JSON payloads both validate to a real Date.
+  startsAt: z.coerce.date().refine((d) => d.getTime() > Date.now(), {
+    message: 'Choose a time in the future',
+  }),
+  notes: z.string().max(500, 'Notes are too long').optional(),
+});
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type CreateBookingInput = z.infer<typeof createBookingSchema>;
