@@ -1,2 +1,8 @@
-echo "🧪 Running tests before push..."
-npm test -- --passWithNoTests --watchAll=false
+echo "🔎 Readiness gate (production-readiness playbook, automated subset)..."
+node scripts/readiness-gate.mjs || {
+  echo "✗ Push blocked by readiness gate. Fix the ✗ items above."
+  exit 1
+}
+
+echo "✅ Validating (typecheck, lint, format, tests)..."
+npm run validate
