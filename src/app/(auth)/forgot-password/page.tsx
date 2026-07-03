@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { motion, AnimatePresence, easeInOut } from 'framer-motion';
-import { Mail, ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { authClient } from '@/lib/auth-client';
 import { forgotPasswordSchema, type ForgotPasswordInput } from '@/lib/validation';
@@ -49,21 +49,21 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: data.email }),
+      // Go straight through better-auth's own endpoint (which is CSRF-protected
+      // and does not disclose whether the address is registered). The previous
+      // hand-rolled /api/auth/forgot-password route bypassed both protections.
+      const { error } = await authClient.requestPasswordReset({
+        email: data.email,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to send reset email');
+      if (error) {
+        throw new Error(error.message ?? 'Failed to send reset email');
       }
 
       setSent(true);
-      toast.success('Reset link sent to your email!');
+      // Deliberately generic: never confirm or deny that an account exists.
+      toast.success('If an account exists for that email, a reset link is on its way.');
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : 'Something went wrong. Please try again.',

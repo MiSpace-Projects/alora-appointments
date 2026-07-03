@@ -60,10 +60,18 @@ function ResetPasswordInner() {
     setLoading(true);
 
     try {
-      await authClient.resetPassword({
+      // better-auth returns errors in the result object rather than throwing;
+      // check `error` explicitly so an expired/invalid token can't be reported
+      // to the user as a successful reset.
+      const { error } = await authClient.resetPassword({
         newPassword: data.password,
         token: token,
       });
+
+      if (error) {
+        toast.error(error.message ?? 'This reset link is invalid or has expired.');
+        return;
+      }
 
       setResetSuccess(true);
       toast.success('Password reset successfully!');

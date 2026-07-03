@@ -128,6 +128,13 @@ export const auth = betterAuth({
     },
   },
 
+  advanced: {
+    // Force the `Secure` attribute on session cookies in production regardless
+    // of how BETTER_AUTH_URL is written, so a misconfigured (http) URL can never
+    // downgrade cookie security on a deployed environment.
+    useSecureCookies: process.env.NODE_ENV === 'production',
+  },
+
   rateLimit: {
     enabled: true,
     window: 60,
