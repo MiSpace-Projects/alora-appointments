@@ -8,6 +8,7 @@ import {
   signOut as _signOut,
   signUp as _signUp,
 } from '@/lib/auth-client';
+import { sanitizeRedirect } from '@/lib/safe-redirect';
 
 export type AuthUser = {
   id: string;
@@ -107,7 +108,7 @@ export function useRequireAuth(redirectTo = '/login') {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push(`${redirectTo}?callbackUrl=${encodeURIComponent(pathname ?? '/')}`);
+      router.push(`${redirectTo}?callbackUrl=${encodeURIComponent(sanitizeRedirect(pathname))}`);
     }
   }, [user, loading, router, pathname, redirectTo]);
 

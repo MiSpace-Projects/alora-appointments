@@ -12,6 +12,7 @@ import { signIn } from '@/lib/auth-client';
 import { authLogger } from '@/lib/auth-logger';
 import { classifyAuthError } from '@/lib/auth-errors';
 import { loginSchema, type LoginInput } from '@/lib/validation';
+import { sanitizeRedirect } from '@/lib/safe-redirect';
 import { AuthBackground } from '@/app/components/AuthBackground';
 import { AuthCard, AuthHeader } from '@/app/components/authCard/AuthCard';
 import { FormField } from '@/app/components/form/Form';
@@ -47,7 +48,6 @@ function LoginInner() {
   const {
     register,
     handleSubmit,
-    getValues,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
@@ -58,8 +58,7 @@ function LoginInner() {
     },
   });
 
-  const raw = searchParams.get('callbackUrl') ?? '/';
-  const destination = raw.startsWith('/') ? raw : '/';
+  const destination = sanitizeRedirect(searchParams.get('callbackUrl'));
 
   const onSubmit: SubmitHandler<LoginInput> = async (data) => {
     setLoading(true);
@@ -77,16 +76,14 @@ function LoginInner() {
           result.error.code ?? result.error.status,
         );
 
-        if (classified.category === 'UNKNOWN_USER') {
-          authLogger.loginUnknownUser(data.email);
-          toast.error('No account found with that email.', {
-            description: 'Check the address or create a new account.',
-            action: { label: 'Register', onClick: () => router.push('/register') },
-          });
-        } else {
-          authLogger.loginFailure(data.email, classified.raw, classified.userMessage);
-          toast.error(classified.userMessage);
-        }
+        // Never reveal whether the email exists. Collapse "no such user" and
+        // "wrong password" into one generic message to prevent account
+        // enumeration; the distinction is still recorded server-side for ops.
+        const isCredentialError =
+          classified.category === 'UNKNOWN_USER' || classified.category === 'INVALID_CREDENTIALS';
+
+        authLogger.loginFailure(data.email, classified.raw, classified.userMessage);
+        toast.error(isCredentialError ? 'Invalid email or password.' : classified.userMessage);
         return;
       }
 

@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
+import { loginWithCallback } from '@/lib/safe-redirect';
 
 export function ProtectedLink({
   href,
@@ -24,7 +25,7 @@ export function ProtectedLink({
     onClick?.();
     if (!user) {
       e.preventDefault();
-      router.push('/login?next=' + encodeURIComponent(pathname ?? '/'));
+      router.push(loginWithCallback(pathname));
     }
   };
 
