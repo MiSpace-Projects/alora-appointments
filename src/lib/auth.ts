@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { haveIBeenPwned } from 'better-auth/plugins';
 import { prisma } from './prisma';
 
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
@@ -150,6 +151,17 @@ export const auth = betterAuth({
     .map((origin) => origin as string) as string[],
 
   socialProviders,
+
+  plugins: [
+    // NIST 800-63B: reject passwords known to be compromised. Checks sign-up,
+    // reset and change-password against the HaveIBeenPwned range API using
+    // k-anonymity (only a hash prefix leaves the server), enforced server-side
+    // so it can't be bypassed by a crafted client request.
+    haveIBeenPwned({
+      customPasswordCompromisedMessage:
+        'This password has appeared in a known data breach. Please choose a different one.',
+    }),
+  ],
 });
 
 export type Auth = typeof auth;
