@@ -3,14 +3,15 @@ import { getSessionCookie } from 'better-auth/cookies';
 import { loginWithCallback } from '@/lib/safe-redirect';
 
 /**
- * Edge middleware — the FIRST, optimistic auth gate.
+ * Edge proxy (formerly "middleware") — the FIRST, optimistic auth gate.
  *
- * This runs on the edge runtime and cannot touch the database, so it only does
- * a cheap cookie-presence check to steer navigation (bounce signed-in users off
- * /login, bounce signed-out users off protected pages). It is intentionally
- * NOT the security boundary: a cookie can be forged or stale. The real,
- * database-backed session check lives in `(protected)/layout.tsx`
- * (`auth.api.getSession`). Layered on purpose — this is UX speed, that is truth.
+ * Renamed to `proxy` per Next.js 16's convention. Runs on the edge runtime and
+ * cannot touch the database, so it only does a cheap cookie-presence check to
+ * steer navigation (bounce signed-in users off /login, bounce signed-out users
+ * off protected pages). It is intentionally NOT the security boundary: a cookie
+ * can be forged or stale. The real, database-backed session check lives in
+ * `(protected)/layout.tsx` (`auth.api.getSession`). Layered on purpose — this
+ * is UX speed, that is truth.
  */
 
 // Routes reachable without a session. `/` (marketing homepage) is public.
@@ -27,7 +28,7 @@ function isPublic(pathname: string): boolean {
   return PUBLIC_ROUTES.some((route) => route !== '/' && pathname.startsWith(route));
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const hasSession = Boolean(getSessionCookie(request));

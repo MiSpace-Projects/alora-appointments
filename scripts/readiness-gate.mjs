@@ -23,8 +23,12 @@ const check = (name, fn) => {
 
 const read = (p) => (existsSync(p) ? readFileSync(p, 'utf8') : '');
 
-// 3.1 — middleware must live where Next actually executes it, never under app/.
-check('Middleware at src/middleware.ts (executes)', () => existsSync('src/middleware.ts'));
+// 3.1 — the edge auth gate must live where Next actually executes it (src root,
+// as proxy.ts on Next 16+ or the legacy middleware.ts), never inert under app/.
+check(
+  'Edge auth gate at src root (proxy.ts / middleware.ts)',
+  () => existsSync('src/proxy.ts') || existsSync('src/middleware.ts'),
+);
 check('No inert middleware under src/app/', () => !existsSync('src/app/middleware.ts'));
 
 // 3.1 — server-side gate exists for protected routes.
