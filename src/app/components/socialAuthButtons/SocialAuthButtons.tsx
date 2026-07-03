@@ -51,12 +51,21 @@ const PROVIDERS: {
   id: SocialProvider;
   label: string;
   Icon: React.FC;
-  envKey: string;
 }[] = [
-  { id: 'google', label: 'Google', Icon: GoogleIcon, envKey: 'NEXT_PUBLIC_GOOGLE_ENABLED' },
-  { id: 'github', label: 'GitHub', Icon: GitHubIcon, envKey: 'NEXT_PUBLIC_GITHUB_ENABLED' },
-  { id: 'discord', label: 'Discord', Icon: DiscordIcon, envKey: 'NEXT_PUBLIC_DISCORD_ENABLED' },
+  { id: 'google', label: 'Google', Icon: GoogleIcon },
+  { id: 'github', label: 'GitHub', Icon: GitHubIcon },
+  { id: 'discord', label: 'Discord', Icon: DiscordIcon },
 ];
+
+// Next.js only inlines NEXT_PUBLIC_* vars accessed by their literal name — a
+// dynamic `process.env[key]` lookup resolves to undefined in the browser, which
+// is why these must be read statically. (This was the bug that kept every
+// social button hidden.)
+const PROVIDER_ENABLED: Record<SocialProvider, boolean> = {
+  google: process.env.NEXT_PUBLIC_GOOGLE_ENABLED === 'true',
+  github: process.env.NEXT_PUBLIC_GITHUB_ENABLED === 'true',
+  discord: process.env.NEXT_PUBLIC_DISCORD_ENABLED === 'true',
+};
 
 interface SocialAuthProps {
   redirectTo?: string;
@@ -66,7 +75,7 @@ interface SocialAuthProps {
 export function SocialAuthButtons({ redirectTo = '/', onSuccess }: SocialAuthProps) {
   const [loadingProvider, setLoadingProvider] = useState<SocialProvider | null>(null);
 
-  const activeProviders = PROVIDERS.filter((p) => process.env[p.envKey] === 'true');
+  const activeProviders = PROVIDERS.filter((p) => PROVIDER_ENABLED[p.id]);
 
   if (activeProviders.length === 0) return null;
 

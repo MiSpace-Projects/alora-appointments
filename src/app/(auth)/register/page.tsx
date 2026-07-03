@@ -63,7 +63,6 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
-    watch,
     control,
     formState: { errors },
   } = useForm<RegisterInput>({
@@ -91,9 +90,11 @@ export default function RegisterPage() {
         return;
       }
 
-      toast.success('Account created! Welcome aboard.');
-      router.push('/');
-      router.refresh();
+      // Email verification is required and auto-sign-in is off, so there is no
+      // session yet. Tell the user the truth (check your email) and send them to
+      // sign-in rather than pretending they're logged in and dropping them home.
+      toast.success('Account created! Check your email to verify, then sign in.');
+      router.push('/login');
     } catch {
       toast.error('Something went wrong.');
     } finally {
