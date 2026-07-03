@@ -18,6 +18,8 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  bookings      Booking[]
+  pointsLedger  PointsTransaction[]
 
   @@unique([email])
   @@map("user")
@@ -60,7 +62,7 @@ model Account {
 }
 
 model Verification {
-  id            String    @id @default(cuid()) 
+  id            String    @id @default(cuid())
   identifier String
   value      String
   expiresAt  DateTime
@@ -69,4 +71,84 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Domain: single-salon appointments + loyalty
+// ─────────────────────────────────────────────────────────────
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+// Ledger entry reasons — why points moved. Kept explicit so the append-only
+// history is self-describing during reconciliation.
+enum PointsReason {
+  EARNED_BOOKING
+  REDEEMED
+  SIGNUP_BONUS
+  ADJUSTMENT
+}
+
+// DB-driven service catalog. Editable without a deploy; prices are integer
+// cents (ZAR) to avoid floating-point money bugs.
+model Service {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  name            String
+  description     String?
+  priceCents      Int
+  durationMinutes Int
+  pointsAwarded   Int       @default(0)
+  imageUrl        String?
+  active          Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  bookings        Booking[]
+
+  @@index([active])
+  @@map("service")
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  userId        String
+  serviceId     String
+  startsAt      DateTime
+  status        BookingStatus @default(PENDING)
+  // Snapshot price/points at booking time so later catalog edits never rewrite
+  // a customer's historical booking or their earned points.
+  priceCents    Int
+  pointsAwarded Int
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  cancelledAt   DateTime?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+  @@index([userId, startsAt])
+  @@index([startsAt, status])
+  @@map("booking")
+}
+
+// Append-only loyalty ledger. Balance is derived as SUM(delta); rows are never
+// updated or deleted, which keeps the wallet auditable and reconcilable.
+model PointsTransaction {
+  id        String       @id @default(cuid())
+  userId    String
+  delta     Int
+  reason    PointsReason
+  bookingId String?
+  note      String?
+  createdAt DateTime     @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("points_transaction")
 }
