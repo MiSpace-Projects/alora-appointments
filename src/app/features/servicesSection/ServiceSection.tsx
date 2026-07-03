@@ -19,7 +19,7 @@ import { motion } from 'framer-motion';
 
 export default function Services() {
   return (
-    <div className={styles.services}>
+    <div id="services" className={styles.services}>
       <motion.div
         className={styles.header}
         initial="hidden"
