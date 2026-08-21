@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: calc(var(--navbar-height) + var(--breadcrumb-height) + 1rem) 1.5rem 2rem;
   background: #000000;
 }
 
@@ -69,6 +69,11 @@
   flex: 1;
   border-radius: 999px;
   transition: background 0.3s ease;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.strengthMet {
+  background: #d4c5b0;
 }
 
 .strengthChecks {
@@ -113,7 +118,7 @@
 
 @media (min-width: 640px) {
   .page {
-    padding: 2rem;
+    padding: calc(var(--navbar-height) + var(--breadcrumb-height) + 1rem) 2rem 2rem;
   }
 
   .title {

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import { auth } from '@/lib/auth';
+import { loginWithCallback, sanitizeRedirect } from '@/lib/safe-redirect';
 
 /**
  * The authoritative auth gate for everything under `(protected)`.
@@ -13,10 +14,12 @@ import { auth } from '@/lib/auth';
  * this is the security boundary.
  */
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const requestHeaders = await headers();
+  const session = await auth.api.getSession({ headers: requestHeaders });
 
   if (!session) {
-    redirect('/login');
+    const returnTo = sanitizeRedirect(requestHeaders.get('x-alora-return-to'));
+    redirect(loginWithCallback(returnTo));
   }
 
   return <>{children}</>;

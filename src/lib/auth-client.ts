@@ -1,16 +1,11 @@
 import { createAuthClient } from 'better-auth/react';
+import { twoFactorClient } from 'better-auth/client/plugins';
 
 const baseURL = process.env.NEXT_PUBLIC_BETTER_AUTH_URL;
 
-if (!baseURL && process.env.NODE_ENV === 'production') {
-  console.warn(
-    '[auth-client] NEXT_PUBLIC_BETTER_AUTH_URL is not set. ' +
-      'Auth requests will fail at runtime. Add it to your environment variables.',
-  );
-}
-
 export const authClient = createAuthClient({
-  baseURL: baseURL ?? 'http://localhost:3000',
+  ...(baseURL ? { baseURL } : {}),
+  plugins: [twoFactorClient({ twoFactorPage: '/two-factor' })],
 });
 
 export const { useSession, getSession, signIn, signOut, signUp } = authClient;

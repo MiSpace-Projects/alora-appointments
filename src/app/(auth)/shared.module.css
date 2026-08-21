@@ -1,11 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
-
 .page {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: calc(var(--navbar-height) + var(--breadcrumb-height) + 1rem) 1.5rem 2rem;
   background: #000000;
 }
 
@@ -35,7 +33,7 @@
 }
 
 .brandName {
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-playfair-display), serif;
   font-size: 1.25rem;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -50,7 +48,7 @@
 
 .title {
   margin: 0;
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-playfair-display), serif;
   font-size: 1.75rem;
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -145,6 +143,19 @@
   opacity: 0.7;
 }
 
+.textButton {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #d4c5b0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.textButton:hover {
+  opacity: 0.7;
+}
+
 .successBlock {
   text-align: center;
   padding: 1rem 0;
@@ -177,7 +188,7 @@
 
 @media (min-width: 640px) {
   .page {
-    padding: 2rem;
+    padding: calc(var(--navbar-height) + var(--breadcrumb-height) + 1rem) 2rem 2rem;
   }
 
   .title {

@@ -29,6 +29,10 @@ export function sanitizeRedirect(
   if (normalized.startsWith('//')) return fallback; // protocol-relative → off-origin
 
   try {
+    // Reject malformed percent escapes instead of allowing browsers to
+    // interpret them differently at a later redirect boundary.
+    decodeURI(normalized);
+
     // Resolve against a throwaway base. If the result leaves that origin, the
     // input encoded an absolute destination and must be rejected.
     const url = new URL(normalized, 'http://localhost');

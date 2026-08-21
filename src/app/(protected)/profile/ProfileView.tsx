@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import type { LoyaltyStanding } from '@/lib/loyalty-core';
 import { formatZar, formatBookingDate, formatBookingTime } from '@/lib/format';
 import ProtectedLink from '../../components/protected/ProtectedLink';
+import { SecuritySettings } from './SecuritySettings';
 import styles from './page.module.css';
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
@@ -33,6 +34,7 @@ export interface BookingView {
 export interface ProfileUser {
   name: string;
   email: string;
+  twoFactorEnabled?: boolean;
 }
 
 const statusClass: Record<BookingStatus, string> = {
@@ -188,6 +190,10 @@ export function ProfileView({
             ))
           )}
         </div>
+      </motion.div>
+
+      <motion.div variants={item}>
+        <SecuritySettings initialTwoFactorEnabled={Boolean(user.twoFactorEnabled)} />
       </motion.div>
     </motion.div>
   );

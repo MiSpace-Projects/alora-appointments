@@ -1,12 +1,25 @@
 import { betterAuth } from 'better-auth';
+import { APIError, createAuthMiddleware } from 'better-auth/api';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { haveIBeenPwned } from 'better-auth/plugins';
+import { captcha, haveIBeenPwned, twoFactor } from 'better-auth/plugins';
 import { prisma } from './prisma';
-import { sendEmail, verificationEmail, resetPasswordEmail } from './email';
+import {
+  newDeviceEmail,
+  passwordChangedEmail,
+  queueAuthEmail,
+  resetPasswordEmail,
+  verificationEmail,
+} from './email';
+import { authRuntimeConfig, getTrustedOrigins, isCaptchaConfigured } from './auth-config';
+import { hashPassword, verifyPassword } from './password';
+import { authSignUpSchema } from './validation';
+import { recordSecurityEvent, registerKnownDevice } from './security-events';
 
-const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
-const SESSION_REFRESH_SECONDS = 60 * 60 * 24;
-const COOKIE_CACHE_SECONDS = 60 * 5;
+const HOUR_SECONDS = 60 * 60;
+const SESSION_TTL_SECONDS = 7 * 24 * HOUR_SECONDS;
+const SESSION_FRESH_SECONDS = 10 * 60;
+const EMAIL_VERIFICATION_TTL_SECONDS = 24 * HOUR_SECONDS;
+const RESET_PASSWORD_TTL_SECONDS = HOUR_SECONDS;
 
 const socialProviders = {
   ...(process.env.GITHUB_CLIENT_ID &&
@@ -39,83 +52,261 @@ const socialProviders = {
     }),
 };
 
+const authPlugins = [
+  haveIBeenPwned({
+    customPasswordCompromisedMessage:
+      'This password has appeared in a known data breach. Please choose a different one.',
+  }),
+  twoFactor({
+    issuer: 'Alora',
+    twoFactorCookieMaxAge: 5 * 60,
+    trustDeviceMaxAge: 30 * 24 * HOUR_SECONDS,
+    skipVerificationOnEnable: false,
+    backupCodeOptions: {
+      amount: 10,
+      length: 12,
+      storeBackupCodes: 'encrypted',
+    },
+    accountLockout: {
+      enabled: true,
+      maxFailedAttempts: 5,
+      durationSeconds: 30 * 60,
+    },
+  }),
+  ...(isCaptchaConfigured()
+    ? [
+        captcha({
+          provider: 'cloudflare-turnstile',
+          secretKey: authRuntimeConfig.captcha.secretKey,
+          endpoints: [
+            '/sign-up/email',
+            '/sign-in/email',
+            '/request-password-reset',
+            '/send-verification-email',
+          ],
+          ...(authRuntimeConfig.captcha.allowedHostnames.length > 0
+            ? { allowedHostnames: authRuntimeConfig.captcha.allowedHostnames }
+            : {}),
+        }),
+      ]
+    : []),
+];
+
 export const auth = betterAuth({
+  appName: 'Alora',
   database: prismaAdapter(prisma, { provider: 'postgresql' }),
-  baseURL: process.env.BETTER_AUTH_URL!,
-  secret: process.env.BETTER_AUTH_SECRET!,
+  baseURL: authRuntimeConfig.baseUrl,
+  secret: authRuntimeConfig.secret,
 
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: true,
+    requireEmailVerification: false,
     autoSignIn: false,
+    minPasswordLength: 15,
+    maxPasswordLength: 128,
+    resetPasswordTokenExpiresIn: RESET_PASSWORD_TTL_SECONDS,
+    revokeSessionsOnPasswordReset: true,
+    password: {
+      hash: hashPassword,
+      verify: verifyPassword,
+    },
     sendResetPassword: async ({ user, url }) => {
-      const sent = await sendEmail({
+      const content = resetPasswordEmail(url);
+      await queueAuthEmail({
+        kind: 'PASSWORD_RESET',
         to: user.email,
         subject: 'Reset your Alora password',
-        html: resetPasswordEmail(url),
+        ...content,
+        tags: ['authentication', 'password-reset'],
       });
-      // If it couldn't be delivered (no key / send error), surface the link in
-      // the server log so local development isn't blocked.
-      if (sent) console.log(`[AUTH] Password reset email sent to ${user.email}`);
-      else console.log(`[AUTH] Password reset URL for ${user.email}: ${url}`);
+    },
+    onPasswordReset: async ({ user }, request) => {
+      const content = passwordChangedEmail();
+      await queueAuthEmail({
+        kind: 'PASSWORD_CHANGED',
+        to: user.email,
+        subject: 'Your Alora password was changed',
+        ...content,
+        tags: ['authentication', 'security-notice'],
+      });
+      await recordSecurityEvent({
+        event: 'PASSWORD_RESET_COMPLETED',
+        outcome: 'SUCCESS',
+        userId: user.id,
+        userAgent: request?.headers.get('user-agent'),
+      });
+    },
+    onExistingUserSignUp: async ({ user }, request) => {
+      await recordSecurityEvent({
+        event: 'DUPLICATE_SIGN_UP_ATTEMPT',
+        outcome: 'BLOCKED',
+        userId: user.id,
+        userAgent: request?.headers.get('user-agent'),
+      });
     },
   },
 
   emailVerification: {
     sendOnSignUp: true,
+    sendOnSignIn: false,
+    expiresIn: EMAIL_VERIFICATION_TTL_SECONDS,
     sendVerificationEmail: async ({ user, url }) => {
-      const sent = await sendEmail({
+      const content = verificationEmail(url);
+      await queueAuthEmail({
+        kind: 'EMAIL_VERIFICATION',
         to: user.email,
         subject: 'Verify your Alora email',
-        html: verificationEmail(url),
+        ...content,
+        tags: ['authentication', 'email-verification'],
       });
-      if (sent) console.log(`[AUTH] Verification email sent to ${user.email}`);
-      else console.log(`[AUTH] Email verification URL for ${user.email}: ${url}`);
+    },
+    afterEmailVerification: async (user, request) => {
+      await recordSecurityEvent({
+        event: 'EMAIL_VERIFIED',
+        outcome: 'SUCCESS',
+        userId: user.id,
+        userAgent: request?.headers.get('user-agent'),
+      });
     },
   },
 
   session: {
     expiresIn: SESSION_TTL_SECONDS,
-    updateAge: SESSION_REFRESH_SECONDS,
-    cookieCache: {
+    disableSessionRefresh: true,
+    freshAge: SESSION_FRESH_SECONDS,
+    cookieCache: { enabled: false },
+  },
+
+  verification: {
+    storeIdentifier: 'hashed',
+  },
+
+  account: {
+    encryptOAuthTokens: true,
+    accountLinking: {
       enabled: true,
-      maxAge: COOKIE_CACHE_SECONDS,
+      disableImplicitLinking: true,
+      allowDifferentEmails: false,
+      allowUnlinkingAll: false,
     },
   },
 
   advanced: {
-    // Force the `Secure` attribute on session cookies in production regardless
-    // of how BETTER_AUTH_URL is written, so a misconfigured (http) URL can never
-    // downgrade cookie security on a deployed environment.
     useSecureCookies: process.env.NODE_ENV === 'production',
+    ipAddress: {
+      ipAddressHeaders: authRuntimeConfig.ipAddressHeaders,
+      trustedProxies: authRuntimeConfig.trustedProxies,
+      ipv6Subnet: 64,
+    },
   },
 
   rateLimit: {
     enabled: true,
+    storage: 'database',
+    modelName: 'rateLimit',
     window: 60,
-    max: 20,
+    max: 30,
+    customRules: {
+      '/sign-in/email': { window: 60, max: 5 },
+      '/sign-up/email': { window: 60 * 60, max: 5 },
+      '/request-password-reset': { window: 60 * 60, max: 5 },
+      '/send-verification-email': { window: 60 * 60, max: 5 },
+      '/reset-password': { window: 60 * 60, max: 10 },
+      '/two-factor/*': { window: 10 * 60, max: 5 },
+    },
   },
 
-  trustedOrigins: [
-    process.env.NEXT_PUBLIC_APP_URL,
-    process.env.BETTER_AUTH_URL,
-    'http://localhost:3000',
-  ]
-    .filter(Boolean)
-    .map((origin) => origin as string) as string[],
-
+  trustedOrigins: getTrustedOrigins(),
   socialProviders,
+  plugins: authPlugins,
 
-  plugins: [
-    // NIST 800-63B: reject passwords known to be compromised. Checks sign-up,
-    // reset and change-password against the HaveIBeenPwned range API using
-    // k-anonymity (only a hash prefix leaves the server), enforced server-side
-    // so it can't be bypassed by a crafted client request.
-    haveIBeenPwned({
-      customPasswordCompromisedMessage:
-        'This password has appeared in a known data breach. Please choose a different one.',
+  hooks: {
+    before: createAuthMiddleware(async (context) => {
+      if (context.path !== '/sign-up/email') return;
+      const parsed = authSignUpSchema.safeParse(context.body);
+      if (!parsed.success) {
+        throw new APIError('BAD_REQUEST', {
+          message: parsed.error.issues[0]?.message ?? 'Invalid account details',
+        });
+      }
+      return {
+        context: {
+          ...context,
+          body: {
+            ...context.body,
+            name: parsed.data.name,
+            email: parsed.data.email,
+            password: parsed.data.password,
+          },
+        },
+      };
     }),
-  ],
+  },
+
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          await recordSecurityEvent({
+            event: 'ACCOUNT_CREATED',
+            outcome: 'SUCCESS',
+            userId: user.id,
+          });
+        },
+      },
+    },
+    session: {
+      create: {
+        after: async (session) => {
+          try {
+            const isNewDevice = await registerKnownDevice({
+              userId: session.userId,
+              ipAddress: session.ipAddress,
+              userAgent: session.userAgent,
+            });
+            await recordSecurityEvent({
+              event: isNewDevice ? 'NEW_DEVICE_SIGN_IN' : 'SESSION_CREATED',
+              outcome: 'SUCCESS',
+              userId: session.userId,
+              ipAddress: session.ipAddress,
+              userAgent: session.userAgent,
+            });
+
+            if (isNewDevice) {
+              const user = await prisma.user.findUnique({
+                where: { id: session.userId },
+                select: { email: true },
+              });
+              if (user) {
+                const content = newDeviceEmail();
+                await queueAuthEmail({
+                  kind: 'NEW_DEVICE',
+                  to: user.email,
+                  subject: 'New sign-in to your Alora account',
+                  ...content,
+                  tags: ['authentication', 'security-notice'],
+                });
+              }
+            }
+          } catch (error) {
+            console.error(
+              JSON.stringify({
+                level: 'error',
+                service: 'auth',
+                event: 'POST_SESSION_SECURITY_PROCESSING_FAILED',
+                errorName: error instanceof Error ? error.name : 'UnknownError',
+              }),
+            );
+            await recordSecurityEvent({
+              event: 'POST_SESSION_SECURITY_PROCESSING_FAILED',
+              outcome: 'FAILURE',
+              userId: session.userId,
+            });
+          }
+        },
+      },
+    },
+  },
 });
 
 export type Auth = typeof auth;

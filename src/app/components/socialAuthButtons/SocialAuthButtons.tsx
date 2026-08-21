@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { signIn } from '@/lib/auth-client';
-import { authLogger } from '@/lib/auth-logger';
+import { sanitizeRedirect } from '@/lib/safe-redirect';
 import styles from './SocialAuthButtons.module.css';
 
 function GoogleIcon() {
@@ -81,13 +81,14 @@ export function SocialAuthButtons({ redirectTo = '/', onSuccess }: SocialAuthPro
 
   const handleSocialLogin = async (provider: SocialProvider) => {
     setLoadingProvider(provider);
-    authLogger.socialLoginInitiated(provider);
 
     try {
-      const result = (await signIn.social({
+      const result = await signIn.social({
         provider,
-        callbackURL: redirectTo,
-      })) as { data?: { redirect?: boolean; url?: string } };
+        callbackURL: sanitizeRedirect(redirectTo),
+      });
+
+      if (result.error) throw new Error(result.error.message ?? 'Social sign-in failed.');
 
       if (result?.data?.redirect && typeof result.data.url === 'string') {
         window.location.assign(result.data.url);
@@ -95,9 +96,7 @@ export function SocialAuthButtons({ redirectTo = '/', onSuccess }: SocialAuthPro
       }
 
       await onSuccess?.();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Social sign-in failed.';
-      authLogger.socialLoginFailure(provider, msg);
+    } catch {
       toast.error(
         `${provider.charAt(0).toUpperCase() + provider.slice(1)} sign-in failed. Please try again.`,
       );

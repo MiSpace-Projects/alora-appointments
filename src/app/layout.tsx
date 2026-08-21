@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google';
 import './globals.css';
 
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { MotionProvider } from './components/MotionProvider';
+import { NavigationShell } from './components/navigation/NavigationShell';
 import { Toaster } from 'sonner';
+import 'sonner/dist/styles.css';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -64,22 +67,23 @@ const themeScript = `
   })();
 `;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable}`}>
         <AuthProvider>
           <ThemeProvider>
             <MotionProvider>
               <Toaster />
-              {children}
+              <NavigationShell>{children}</NavigationShell>
             </MotionProvider>
           </ThemeProvider>
         </AuthProvider>

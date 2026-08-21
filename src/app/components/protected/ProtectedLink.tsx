@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
 import { loginWithCallback } from '@/lib/safe-redirect';
 
@@ -18,17 +17,6 @@ export function ProtectedLink({
   onClick?: () => void;
 }) {
   const { user } = useAuth();
-  const router = useRouter();
-
-  const handleClick = (e: React.MouseEvent) => {
-    onClick?.();
-    if (!user) {
-      e.preventDefault();
-      // Send them to login, then back to where this link was taking them
-      // (the destination), not the page they clicked from.
-      router.push(loginWithCallback(href));
-    }
-  };
 
   if (user)
     return (
@@ -37,7 +25,7 @@ export function ProtectedLink({
       </Link>
     );
   return (
-    <a href={href} onClick={handleClick} className={className}>
+    <a href={loginWithCallback(href)} onClick={onClick} className={className}>
       {children}
     </a>
   );
