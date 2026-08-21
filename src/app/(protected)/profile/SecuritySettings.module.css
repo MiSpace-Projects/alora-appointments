@@ -1,0 +1,151 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(127, 127, 127, 0.2);
+}
+
+.headingRow,
+.groupHeading,
+.backupHeader,
+.row,
+.errorRow,
+.buttonRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.eyebrow,
+.group p,
+.row p,
+.muted,
+.errorRow p {
+  margin: 0;
+  opacity: 0.58;
+  font-size: 0.82rem;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.heading {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-playfair-display), serif;
+  font-size: 1.8rem;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem 0;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.16);
+}
+
+.groupHeading {
+  align-items: flex-start;
+}
+
+.group h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.inlineForm,
+.enrollment,
+.backupBlock,
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.inlineForm {
+  max-width: 30rem;
+}
+
+.qrCode {
+  width: fit-content;
+  padding: 0.75rem;
+  background: #ffffff;
+  border-radius: 6px;
+}
+
+.backupBlock {
+  padding: 1rem;
+  border: 1px solid rgba(127, 127, 127, 0.24);
+  border-radius: 6px;
+}
+
+.codeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.codeGrid code {
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.row {
+  min-height: 3.25rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(127, 127, 127, 0.12);
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.secondaryButton,
+.dangerButton,
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.25rem;
+  border: 1px solid rgba(127, 127, 127, 0.35);
+  border-radius: 6px;
+  padding: 0.5rem 0.8rem;
+  color: var(--text);
+  background: transparent;
+  cursor: pointer;
+}
+
+.dangerButton {
+  color: #e88;
+  border-color: rgba(238, 136, 136, 0.4);
+}
+
+.iconButton {
+  width: 2.25rem;
+  padding: 0;
+}
+
+.secondaryButton:disabled,
+.dangerButton:disabled,
+.iconButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+@media (max-width: 640px) {
+  .headingRow,
+  .groupHeading,
+  .errorRow,
+  .buttonRow {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .codeGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

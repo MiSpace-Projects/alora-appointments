@@ -3,11 +3,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
 import { routes } from '@/app/config/routes';
 import { navItems } from './navbarData';
 import ProtectedLink from '../protected/ProtectedLink';
 import { useAuth } from '../../contexts/AuthContext';
+import { toast } from 'sonner';
 import styles from './Navbar.module.css';
 
 function getInitials(name?: string | null): string {
@@ -24,12 +24,11 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropOpen, setDropOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
-  const router = useRouter();
-  const pathname = usePathname();
   const { user, loading, signOut } = useAuth();
 
   useEffect(() => {
@@ -57,8 +56,15 @@ export default function Navbar() {
 
   const handleSignOut = async () => {
     setDropOpen(false);
-    await signOut();
-    router.push('/');
+    setSigningOut(true);
+    try {
+      await signOut();
+      window.location.replace('/');
+    } catch {
+      toast.error('Could not sign out. Please try again.');
+    } finally {
+      setSigningOut(false);
+    }
   };
 
   const avatarContent = loading ? null : user ? (
@@ -156,7 +162,12 @@ export default function Navbar() {
               >
                 {routes.myProfile.label}
               </Link>
-              <button className={styles.dropdownItem} role="menuitem" onClick={handleSignOut}>
+              <button
+                className={styles.dropdownItem}
+                role="menuitem"
+                disabled={signingOut}
+                onClick={handleSignOut}
+              >
                 Sign out
               </button>
             </div>

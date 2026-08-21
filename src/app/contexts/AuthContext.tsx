@@ -18,6 +18,7 @@ export type AuthUser = {
   image?: string | null;
   createdAt: Date;
   updatedAt: Date;
+  twoFactorEnabled?: boolean;
 };
 
 type AuthContextType = {
@@ -75,7 +76,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const wrappedSignOut = useCallback(async () => {
-    await _signOut();
+    const result = await _signOut();
+    if (result.error) {
+      throw new Error(result.error.message ?? 'Sign out failed.');
+    }
     setUser(null);
   }, []);
 
@@ -108,7 +112,10 @@ export function useRequireAuth(redirectTo = '/login') {
 
   useEffect(() => {
     if (!loading && !user) {
-      router.push(`${redirectTo}?callbackUrl=${encodeURIComponent(sanitizeRedirect(pathname))}`);
+      const currentLocation = `${pathname}${window.location.search}${window.location.hash}`;
+      router.push(
+        `${redirectTo}?callbackUrl=${encodeURIComponent(sanitizeRedirect(currentLocation))}`,
+      );
     }
   }, [user, loading, router, pathname, redirectTo]);
 

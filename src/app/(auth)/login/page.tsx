@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +9,6 @@ import { easeInOut, motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { signIn } from '@/lib/auth-client';
-import { authLogger } from '@/lib/auth-logger';
 import { classifyAuthError } from '@/lib/auth-errors';
 import { loginSchema, type LoginInput } from '@/lib/validation';
 import { sanitizeRedirect } from '@/lib/safe-redirect';
@@ -19,6 +18,7 @@ import { FormField } from '@/app/components/form/Form';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
 import { TabControl } from '@/app/components/AuthTabs/TabControl';
 import { SocialAuthButtons } from '@/app/components/socialAuthButtons/SocialAuthButtons';
+import { TurnstileWidget } from '@/app/components/TurnstileWidget';
 import { useAuth } from '@/app/contexts/AuthContext';
 import styles from '../shared.module.css';
 
@@ -40,9 +40,10 @@ const itemVariants = {
 };
 
 function LoginInner() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaResetKey, setCaptchaResetKey] = useState(0);
   const { refresh } = useAuth();
 
   const {
@@ -61,13 +62,22 @@ function LoginInner() {
   const destination = sanitizeRedirect(searchParams.get('callbackUrl'));
 
   const onSubmit: SubmitHandler<LoginInput> = async (data) => {
+    const captchaRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+    if (captchaRequired && !captchaToken) {
+      toast.error('Complete the human verification before signing in.');
+      return;
+    }
     setLoading(true);
 
     try {
+      sessionStorage.setItem('auth:callback', destination);
       const result = await signIn.email({
         email: data.email,
         password: data.password,
         rememberMe: data.rememberMe,
+        fetchOptions: captchaToken
+          ? { headers: { 'x-captcha-response': captchaToken } }
+          : undefined,
       });
 
       if (result.error) {
@@ -82,31 +92,26 @@ function LoginInner() {
         const isCredentialError =
           classified.category === 'UNKNOWN_USER' || classified.category === 'INVALID_CREDENTIALS';
 
-        authLogger.loginFailure(data.email, classified.raw, classified.userMessage);
         toast.error(isCredentialError ? 'Invalid email or password.' : classified.userMessage);
+        setCaptchaToken(null);
+        setCaptchaResetKey((value) => value + 1);
         return;
       }
 
-      await refresh();
-      authLogger.loginSuccess(result.data?.user?.id ?? 'unknown');
       toast.success('Welcome back!');
-      router.push(destination);
+      window.location.replace(destination);
     } catch (err) {
       const classified = classifyAuthError(err);
 
       if (classified.category === 'NETWORK') {
-        authLogger.loginNetworkError(err instanceof Error ? err.message : undefined);
         toast.error('Connection problem.', {
           description: 'Check your internet connection and try again.',
         });
       } else {
-        authLogger.loginFailure(
-          data.email,
-          classified.raw,
-          err instanceof Error ? err.message : undefined,
-        );
         toast.error(classified.userMessage);
       }
+      setCaptchaToken(null);
+      setCaptchaResetKey((value) => value + 1);
     } finally {
       setLoading(false);
     }
@@ -145,6 +150,7 @@ function LoginInner() {
       </motion.div>
 
       <motion.div variants={itemVariants} className={styles.submitArea}>
+        <TurnstileWidget onToken={setCaptchaToken} resetKey={captchaResetKey} />
         <SubmitButton loading={loading}>
           Sign in <ArrowRight size={15} />
         </SubmitButton>
@@ -160,6 +166,10 @@ function LoginInner() {
       Don&apos;t have an account?{' '}
       <Link href="/register" className={styles.footerLink}>
         Create one
+      </Link>
+      {' · '}
+      <Link href="/verify-email" className={styles.footerLink}>
+        Resend verification
       </Link>
     </motion.p>
   );

@@ -37,6 +37,10 @@ describe('sanitizeRedirect', () => {
   it('honours a custom fallback', () => {
     expect(sanitizeRedirect('//evil.com', '/login')).toBe('/login');
   });
+
+  it('rejects malformed percent escapes', () => {
+    expect(sanitizeRedirect('/profile/%E0%A4%A')).toBe('/');
+  });
 });
 
 describe('loginWithCallback', () => {

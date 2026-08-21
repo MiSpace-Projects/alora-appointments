@@ -2,10 +2,8 @@
 
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import type { z } from 'zod';
 import { createBookingSchema, type CreateBookingInput } from '@/lib/validation';
@@ -59,10 +57,6 @@ export function BookingForm({ services }: { services: ServiceOption[] }) {
   return (
     <main className={styles.page}>
       <div className={styles.shell}>
-        <Link href="/profile" className={styles.backLink}>
-          <ArrowLeft size={14} /> Back to profile
-        </Link>
-
         <h1 className={styles.title}>Book an appointment</h1>
         <p className={styles.subtitle}>Choose a service and a time that suits you.</p>
 

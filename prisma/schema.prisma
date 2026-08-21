@@ -1,32 +1,34 @@
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  bookings      Booking[]
-  pointsLedger  PointsTransaction[]
+  id               String              @id @default(cuid())
+  name             String
+  email            String
+  emailVerified    Boolean             @default(false)
+  image            String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  twoFactorEnabled Boolean             @default(false)
+  sessions         Session[]
+  accounts         Account[]
+  twoFactors       TwoFactor[]
+  securityEvents   SecurityEvent[]
+  authDevices      AuthDevice[]
+  bookings         Booking[]
+  pointsLedger     PointsTransaction[]
 
   @@unique([email])
   @@map("user")
 }
 
 model Session {
-  id            String    @id @default(cuid())
+  id        String   @id @default(cuid())
   expiresAt DateTime
   token     String
   createdAt DateTime @default(now())
@@ -42,7 +44,7 @@ model Session {
 }
 
 model Account {
-  id            String    @id @default(cuid())
+  id                    String    @id @default(cuid())
   accountId             String
   providerId            String
   userId                String
@@ -57,12 +59,13 @@ model Account {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
+  @@unique([providerId, accountId])
   @@index([userId])
   @@map("account")
 }
 
 model Verification {
-  id            String    @id @default(cuid())
+  id         String   @id @default(cuid())
   identifier String
   value      String
   expiresAt  DateTime
@@ -71,6 +74,83 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model RateLimit {
+  id          String @id @default(cuid())
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+
+  @@map("rateLimit")
+}
+
+model TwoFactor {
+  id                      String    @id @default(cuid())
+  secret                  String
+  backupCodes             String
+  userId                  String
+  verified                Boolean   @default(true)
+  failedVerificationCount Int       @default(0)
+  lockedUntil             DateTime?
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([secret])
+  @@index([userId])
+  @@map("twoFactor")
+}
+
+model SecurityEvent {
+  id        String   @id @default(cuid())
+  event     String
+  outcome   String
+  userId    String?
+  actorHash String?
+  ipHash    String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([event, outcome, createdAt])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@map("security_event")
+}
+
+model AuthDevice {
+  id          String   @id @default(cuid())
+  userId      String
+  fingerprint String
+  userAgent   String?
+  ipHash      String?
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, fingerprint])
+  @@index([userId, lastSeenAt])
+  @@map("auth_device")
+}
+
+model EmailOutbox {
+  id                String    @id @default(uuid())
+  kind              String
+  encryptedPayload  String?
+  recipientHash     String
+  status            String    @default("PENDING")
+  attempts          Int       @default(0)
+  nextAttemptAt     DateTime  @default(now())
+  lockedAt          DateTime?
+  providerMessageId String?
+  lastErrorCode     String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  sentAt            DateTime?
+
+  @@index([status, nextAttemptAt])
+  @@index([recipientHash, createdAt])
+  @@map("email_outbox")
 }
 
 // ─────────────────────────────────────────────────────────────

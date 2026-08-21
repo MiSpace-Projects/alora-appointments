@@ -8,29 +8,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { z } from 'zod';
 import { authClient } from '@/lib/auth-client';
 import { AuthBackground } from '@/app/components/AuthBackground';
 import { AuthCard, AuthHeader } from '@/app/components/authCard/AuthCard';
 import { FormField } from '@/app/components/form/Form';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
+import { resetPasswordSchema, type ResetPasswordInput } from '@/lib/validation';
 import styles from '../shared.module.css';
-
-const resetPasswordSchema = z
-  .object({
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .regex(/[A-Z]/, 'Must contain at least one uppercase letter')
-      .regex(/[0-9]/, 'Must contain at least one number'),
-    confirmPassword: z.string().min(1, 'Please confirm your password'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'],
-  });
-
-type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 function ResetPasswordInner() {
   const router = useRouter();
@@ -82,7 +66,6 @@ function ResetPasswordInner() {
       }, 3000);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to reset password');
-      console.error('Reset password error:', error);
     } finally {
       setLoading(false);
     }

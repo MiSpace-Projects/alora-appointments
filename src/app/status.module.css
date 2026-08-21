@@ -10,7 +10,7 @@
   align-items: center;
   justify-content: center;
   gap: 1.25rem;
-  padding: 2rem 1.5rem;
+  padding: calc(var(--navbar-height) + var(--breadcrumb-height) + 1rem) 1.5rem 2rem;
   text-align: center;
   background: #000000;
   color: #ffffff;

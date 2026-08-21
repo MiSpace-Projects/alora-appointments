@@ -2,8 +2,8 @@
 
 import styles from './DynamicBanner.module.css';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 import { FiArrowUpRight } from 'react-icons/fi';
+import ProtectedLink from '../protected/ProtectedLink';
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -60,10 +60,10 @@ export default function DynamicBanner({
       )}
       {ctaLabel && ctaHref && (
         <motion.div variants={item}>
-          <Link href={ctaHref} className={styles.cta}>
+          <ProtectedLink href={ctaHref} className={styles.cta}>
             {ctaLabel}
             <FiArrowUpRight />
-          </Link>
+          </ProtectedLink>
         </motion.div>
       )}
     </motion.section>

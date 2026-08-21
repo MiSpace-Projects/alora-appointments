@@ -3,15 +3,9 @@ export const heroCopy = {
   label: 'Premium Beauty and Hair Services',
   description:
     'Wig care, nails, makeup & matric farewell looks — crafted with precision. Earn loyalty rewards with every visit.',
-};
+} as const;
 
 export const heroActions = [
-  { label: 'Book Now', href: '/book', variant: 'primaryButton' },
-  { label: 'Our Services', href: '/#services', variant: 'secondaryButton' },
-] as const;
-
-export const heroStats = [
-  { value: '50+', label: 'Clients' },
-  { value: '4.9★', label: 'Rating' },
-  { value: '10+', label: 'Bookings' },
+  { label: 'Book Now', href: '/book', variant: 'primaryButton', protected: true },
+  { label: 'Our Services', href: '/#services', variant: 'secondaryButton', protected: false },
 ] as const;

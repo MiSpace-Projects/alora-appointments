@@ -2,25 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from 'better-auth/cookies';
 import { loginWithCallback } from '@/lib/safe-redirect';
 
-/**
- * Edge proxy (formerly "middleware") — the FIRST, optimistic auth gate.
- *
- * Renamed to `proxy` per Next.js 16's convention. Runs on the edge runtime and
- * cannot touch the database, so it only does a cheap cookie-presence check to
- * steer navigation (bounce signed-in users off /login, bounce signed-out users
- * off protected pages). It is intentionally NOT the security boundary: a cookie
- * can be forged or stale. The real, database-backed session check lives in
- * `(protected)/layout.tsx` (`auth.api.getSession`). Layered on purpose — this
- * is UX speed, that is truth.
- */
-
-// Routes reachable without a session. `/` (marketing homepage) is public.
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/forgot-password', '/reset-password'];
-
-// Signed-in users have no reason to see these; send them home.
-const REDIRECT_IF_AUTHED = ['/login', '/register'];
-
-// Everything the app renders that is NOT public requires a session.
+const PUBLIC_ROUTES = [
+  '/',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/verify-email',
+  '/two-factor',
+];
 const PROTECTED_PREFIXES = ['/profile'];
 
 function isPublic(pathname: string): boolean {
@@ -28,27 +18,62 @@ function isPublic(pathname: string): boolean {
   return PUBLIC_ROUTES.some((route) => route !== '/' && pathname.startsWith(route));
 }
 
-export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+function buildCsp(nonce: string): string {
+  const developmentDirectives =
+    process.env.NODE_ENV === 'development' ? " 'unsafe-eval' ws: http:" : '';
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://challenges.cloudflare.com${developmentDirectives}`,
+    `style-src 'self' 'nonce-${nonce}'`,
+    "style-src-attr 'unsafe-inline'",
+    "img-src 'self' data: blob: https://images.pexels.com https://challenges.cloudflare.com",
+    "font-src 'self' data:",
+    `connect-src 'self' https://challenges.cloudflare.com${developmentDirectives}`,
+    'frame-src https://challenges.cloudflare.com',
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'",
+    "manifest-src 'self'",
+    "worker-src 'self' blob:",
+    'report-uri /api/security/csp-report',
+    'report-to csp-endpoint',
+    ...(process.env.NODE_ENV === 'production' ? ['upgrade-insecure-requests'] : []),
+  ].join('; ');
+}
 
+function applySecurityHeaders(response: NextResponse, csp: string): NextResponse {
+  response.headers.set('Content-Security-Policy', csp);
+  response.headers.set('Reporting-Endpoints', 'csp-endpoint="/api/security/csp-report"');
+  response.headers.set('Cache-Control', 'private, no-store');
+  return response;
+}
+
+export function proxy(request: NextRequest): NextResponse {
+  const nonce = btoa(crypto.randomUUID());
+  const csp = buildCsp(nonce);
+  const { pathname, search } = request.nextUrl;
+  const returnTo = `${pathname}${search}`;
   const hasSession = Boolean(getSessionCookie(request));
-
-  if (hasSession && REDIRECT_IF_AUTHED.some((route) => pathname.startsWith(route))) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
 
   const needsAuth =
     PROTECTED_PREFIXES.some((route) => pathname.startsWith(route)) || !isPublic(pathname);
 
   if (!hasSession && needsAuth) {
-    return NextResponse.redirect(new URL(loginWithCallback(pathname), request.url));
+    return applySecurityHeaders(
+      NextResponse.redirect(new URL(loginWithCallback(returnTo), request.url)),
+      csp,
+    );
   }
 
-  return NextResponse.next();
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-nonce', nonce);
+  requestHeaders.set('x-alora-return-to', returnTo);
+  requestHeaders.set('Content-Security-Policy', csp);
+
+  return applySecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }), csp);
 }
 
 export const config = {
-  // Skip API routes, Next internals and static assets — auth for API handlers is
-  // enforced by better-auth itself, not here.
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)'],
 };

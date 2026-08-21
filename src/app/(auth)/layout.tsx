@@ -1,6 +1,16 @@
-import React from 'react';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { auth } from '@/lib/auth';
+import { getAuthenticatedEntryRedirect } from '@/lib/auth-entry-redirect';
 
-//renders auth pages(folders in auth group)
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
+export default async function AuthLayout({ children }: { children: React.ReactNode }) {
+  const requestHeaders = await headers();
+  const destination = getAuthenticatedEntryRedirect(requestHeaders.get('x-alora-return-to'));
+
+  if (destination !== null) {
+    const session = await auth.api.getSession({ headers: requestHeaders });
+    if (session) redirect(destination);
+  }
+
   return <>{children}</>;
 }
