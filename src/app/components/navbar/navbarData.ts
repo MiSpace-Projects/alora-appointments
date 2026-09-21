@@ -1,5 +1,4 @@
 import { routes } from '@/app/config/routes';
-import { path } from 'framer-motion/client';
 
 export const navItems = [routes.services, routes.bookNow];
 
