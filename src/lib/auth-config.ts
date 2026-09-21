@@ -1,5 +1,3 @@
-import { createHash } from 'node:crypto';
-
 const DEVELOPMENT_ORIGIN = 'http://localhost:3000';
 const SECRET_BYTES = 32;
 
@@ -19,10 +17,6 @@ function validUrl(value: string | undefined): URL | null {
   } catch {
     return null;
   }
-}
-
-function validEmail(value: string | undefined): boolean {
-  return Boolean(value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value));
 }
 
 function decodeCanonicalBase64(
@@ -53,13 +47,11 @@ export const authRuntimeConfig = {
     secretKey: process.env.TURNSTILE_SECRET_KEY ?? '',
     allowedHostnames: csv(process.env.TURNSTILE_ALLOWED_HOSTNAMES),
   },
+  // Transactional email via Resend. `from` must be an address on a
+  // Resend-verified domain (e.g. "Alora <no-reply@alorastudios.co.za>").
   email: {
-    apiKey: process.env.BREVO_API_KEY ?? '',
-    senderEmail: process.env.BREVO_SENDER_EMAIL ?? '',
-    senderName: process.env.BREVO_SENDER_NAME ?? 'Alora',
-    outboxEncryptionKey: process.env.EMAIL_OUTBOX_ENCRYPTION_KEY ?? '',
-    workerToken: process.env.EMAIL_OUTBOX_WORKER_TOKEN ?? '',
-    webhookToken: process.env.BREVO_WEBHOOK_TOKEN ?? '',
+    apiKey: process.env.RESEND_API_KEY ?? '',
+    from: process.env.EMAIL_FROM ?? '',
   },
 } as const;
 
@@ -119,47 +111,20 @@ export function getProductionAuthConfigurationErrors(): string[] {
   if (csv(process.env.TURNSTILE_ALLOWED_HOSTNAMES).length === 0) {
     errors.push('TURNSTILE_ALLOWED_HOSTNAMES must list the production hostnames');
   }
-  if (!process.env.BREVO_API_KEY) errors.push('BREVO_API_KEY is required');
-  if (!validEmail(process.env.BREVO_SENDER_EMAIL)) {
-    errors.push('BREVO_SENDER_EMAIL must be a valid verified sender');
+  if (!process.env.RESEND_API_KEY) {
+    errors.push('RESEND_API_KEY is required');
   }
-  if (!decodeCanonicalBase64(process.env.EMAIL_OUTBOX_WORKER_TOKEN)) {
-    errors.push('EMAIL_OUTBOX_WORKER_TOKEN must be exactly 32 random bytes in canonical base64');
-  }
-  if (!decodeCanonicalBase64(process.env.BREVO_WEBHOOK_TOKEN)) {
-    errors.push('BREVO_WEBHOOK_TOKEN must be exactly 32 random bytes in canonical base64');
-  }
-
-  if (!decodeCanonicalBase64(process.env.EMAIL_OUTBOX_ENCRYPTION_KEY)) {
-    errors.push('EMAIL_OUTBOX_ENCRYPTION_KEY must be exactly 32 bytes in canonical base64');
+  if (!process.env.EMAIL_FROM) {
+    errors.push('EMAIL_FROM must be set to a Resend-verified sender address');
   }
 
   const configuredSecrets = [
     process.env.BETTER_AUTH_SECRET,
     process.env.AUTH_FINGERPRINT_SECRET,
-    process.env.EMAIL_OUTBOX_ENCRYPTION_KEY,
-    process.env.EMAIL_OUTBOX_WORKER_TOKEN,
-    process.env.BREVO_WEBHOOK_TOKEN,
   ].filter((value): value is string => Boolean(value));
   if (new Set(configuredSecrets).size !== configuredSecrets.length) {
-    errors.push('Authentication, fingerprint, outbox, worker, and webhook secrets must be unique');
+    errors.push('Authentication and fingerprint secrets must be unique');
   }
 
   return errors;
-}
-
-export function getEmailOutboxKey(): Buffer {
-  const configured = authRuntimeConfig.email.outboxEncryptionKey;
-  if (configured) {
-    const key = decodeCanonicalBase64(configured);
-    if (!key) throw new Error('EMAIL_OUTBOX_ENCRYPTION_KEY must be exactly 32 bytes in base64');
-    return key;
-  }
-
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('EMAIL_OUTBOX_ENCRYPTION_KEY is required in production');
-  }
-
-  const developmentSecret = authRuntimeConfig.secret || 'alora-development-only-secret';
-  return createHash('sha256').update(`alora-email-outbox:${developmentSecret}`).digest();
 }
