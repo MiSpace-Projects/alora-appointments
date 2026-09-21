@@ -133,26 +133,6 @@ model AuthDevice {
   @@map("auth_device")
 }
 
-model EmailOutbox {
-  id                String    @id @default(uuid())
-  kind              String
-  encryptedPayload  String?
-  recipientHash     String
-  status            String    @default("PENDING")
-  attempts          Int       @default(0)
-  nextAttemptAt     DateTime  @default(now())
-  lockedAt          DateTime?
-  providerMessageId String?
-  lastErrorCode     String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  sentAt            DateTime?
-
-  @@index([status, nextAttemptAt])
-  @@index([recipientHash, createdAt])
-  @@map("email_outbox")
-}
-
 // ─────────────────────────────────────────────────────────────
 // Domain: single-salon appointments + loyalty
 // ─────────────────────────────────────────────────────────────

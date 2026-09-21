@@ -6,7 +6,7 @@ import { prisma } from './prisma';
 import {
   newDeviceEmail,
   passwordChangedEmail,
-  queueAuthEmail,
+  sendAuthEmail,
   resetPasswordEmail,
   verificationEmail,
 } from './email';
@@ -112,7 +112,7 @@ export const auth = betterAuth({
     },
     sendResetPassword: async ({ user, url }) => {
       const content = resetPasswordEmail(url);
-      await queueAuthEmail({
+      await sendAuthEmail({
         kind: 'PASSWORD_RESET',
         to: user.email,
         subject: 'Reset your Alora password',
@@ -122,7 +122,7 @@ export const auth = betterAuth({
     },
     onPasswordReset: async ({ user }, request) => {
       const content = passwordChangedEmail();
-      await queueAuthEmail({
+      await sendAuthEmail({
         kind: 'PASSWORD_CHANGED',
         to: user.email,
         subject: 'Your Alora password was changed',
@@ -152,7 +152,7 @@ export const auth = betterAuth({
     expiresIn: EMAIL_VERIFICATION_TTL_SECONDS,
     sendVerificationEmail: async ({ user, url }) => {
       const content = verificationEmail(url);
-      await queueAuthEmail({
+      await sendAuthEmail({
         kind: 'EMAIL_VERIFICATION',
         to: user.email,
         subject: 'Verify your Alora email',
@@ -279,7 +279,7 @@ export const auth = betterAuth({
               });
               if (user) {
                 const content = newDeviceEmail();
-                await queueAuthEmail({
+                await sendAuthEmail({
                   kind: 'NEW_DEVICE',
                   to: user.email,
                   subject: 'New sign-in to your Alora account',
