@@ -1,0 +1,102 @@
+/* Booking flow — echoes the Alora design language (black canvas, #d4c5b0
+   accent, Playfair headings, soft cards) used across auth and profile. */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: calc(var(--navbar-height) + var(--breadcrumb-height) + 1.5rem) 1.5rem 4rem;
+  background: #000000;
+  color: #ffffff;
+}
+
+.shell {
+  width: 100%;
+  max-width: 34rem;
+}
+
+.title {
+  font-family: var(--font-playfair-display), serif;
+  font-size: clamp(1.6rem, 5vw, 2.1rem);
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.select,
+.input,
+.textarea {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 0.95rem;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.select:focus,
+.input:focus,
+.textarea:focus {
+  border-color: #d4c5b0;
+  background: rgba(212, 197, 176, 0.06);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 4.5rem;
+}
+
+.summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  background: rgba(212, 197, 176, 0.08);
+  border: 1px solid rgba(212, 197, 176, 0.2);
+  font-size: 0.9rem;
+}
+
+.summaryPrice {
+  color: #d4c5b0;
+  font-weight: 600;
+}
+
+.error {
+  color: #ff8f8f;
+  font-size: 0.8rem;
+}
+
+.emptyState {
+  padding: 2rem 0;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: center;
+}

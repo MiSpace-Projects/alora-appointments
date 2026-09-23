@@ -1,30 +1,34 @@
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+  id               String              @id @default(cuid())
+  name             String
+  email            String
+  emailVerified    Boolean             @default(false)
+  image            String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  twoFactorEnabled Boolean             @default(false)
+  sessions         Session[]
+  accounts         Account[]
+  twoFactors       TwoFactor[]
+  securityEvents   SecurityEvent[]
+  authDevices      AuthDevice[]
+  bookings         Booking[]
+  pointsLedger     PointsTransaction[]
 
   @@unique([email])
   @@map("user")
 }
 
 model Session {
-  id            String    @id @default(cuid())
+  id        String   @id @default(cuid())
   expiresAt DateTime
   token     String
   createdAt DateTime @default(now())
@@ -40,7 +44,7 @@ model Session {
 }
 
 model Account {
-  id            String    @id @default(cuid())
+  id                    String    @id @default(cuid())
   accountId             String
   providerId            String
   userId                String
@@ -55,12 +59,13 @@ model Account {
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
+  @@unique([providerId, accountId])
   @@index([userId])
   @@map("account")
 }
 
 model Verification {
-  id            String    @id @default(cuid()) 
+  id         String   @id @default(cuid())
   identifier String
   value      String
   expiresAt  DateTime
@@ -69,4 +74,141 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model RateLimit {
+  id          String @id @default(cuid())
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+
+  @@map("rateLimit")
+}
+
+model TwoFactor {
+  id                      String    @id @default(cuid())
+  secret                  String
+  backupCodes             String
+  userId                  String
+  verified                Boolean   @default(true)
+  failedVerificationCount Int       @default(0)
+  lockedUntil             DateTime?
+  user                    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([secret])
+  @@index([userId])
+  @@map("twoFactor")
+}
+
+model SecurityEvent {
+  id        String   @id @default(cuid())
+  event     String
+  outcome   String
+  userId    String?
+  actorHash String?
+  ipHash    String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([event, outcome, createdAt])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+  @@map("security_event")
+}
+
+model AuthDevice {
+  id          String   @id @default(cuid())
+  userId      String
+  fingerprint String
+  userAgent   String?
+  ipHash      String?
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, fingerprint])
+  @@index([userId, lastSeenAt])
+  @@map("auth_device")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Domain: single-salon appointments + loyalty
+// ─────────────────────────────────────────────────────────────
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+// Ledger entry reasons — why points moved. Kept explicit so the append-only
+// history is self-describing during reconciliation.
+enum PointsReason {
+  EARNED_BOOKING
+  REDEEMED
+  SIGNUP_BONUS
+  ADJUSTMENT
+}
+
+// DB-driven service catalog. Editable without a deploy; prices are integer
+// cents (ZAR) to avoid floating-point money bugs.
+model Service {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  name            String
+  description     String?
+  priceCents      Int
+  durationMinutes Int
+  pointsAwarded   Int       @default(0)
+  imageUrl        String?
+  active          Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  bookings        Booking[]
+
+  @@index([active])
+  @@map("service")
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  userId        String
+  serviceId     String
+  startsAt      DateTime
+  status        BookingStatus @default(PENDING)
+  // Snapshot price/points at booking time so later catalog edits never rewrite
+  // a customer's historical booking or their earned points.
+  priceCents    Int
+  pointsAwarded Int
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  cancelledAt   DateTime?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+  @@index([userId, startsAt])
+  @@index([startsAt, status])
+  @@map("booking")
+}
+
+// Append-only loyalty ledger. Balance is derived as SUM(delta); rows are never
+// updated or deleted, which keeps the wallet auditable and reconcilable.
+model PointsTransaction {
+  id        String       @id @default(cuid())
+  userId    String
+  delta     Int
+  reason    PointsReason
+  bookingId String?
+  note      String?
+  createdAt DateTime     @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("points_transaction")
 }

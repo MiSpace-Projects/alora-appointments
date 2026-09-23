@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { signIn } from '@/lib/auth-client';
-import { authLogger } from '@/lib/auth-logger';
+import { sanitizeRedirect } from '@/lib/safe-redirect';
 import styles from './SocialAuthButtons.module.css';
 
 function GoogleIcon() {
@@ -51,12 +51,21 @@ const PROVIDERS: {
   id: SocialProvider;
   label: string;
   Icon: React.FC;
-  envKey: string;
 }[] = [
-  { id: 'google', label: 'Google', Icon: GoogleIcon, envKey: 'NEXT_PUBLIC_GOOGLE_ENABLED' },
-  { id: 'github', label: 'GitHub', Icon: GitHubIcon, envKey: 'NEXT_PUBLIC_GITHUB_ENABLED' },
-  { id: 'discord', label: 'Discord', Icon: DiscordIcon, envKey: 'NEXT_PUBLIC_DISCORD_ENABLED' },
+  { id: 'google', label: 'Google', Icon: GoogleIcon },
+  { id: 'github', label: 'GitHub', Icon: GitHubIcon },
+  { id: 'discord', label: 'Discord', Icon: DiscordIcon },
 ];
+
+// Next.js only inlines NEXT_PUBLIC_* vars accessed by their literal name — a
+// dynamic `process.env[key]` lookup resolves to undefined in the browser, which
+// is why these must be read statically. (This was the bug that kept every
+// social button hidden.)
+const PROVIDER_ENABLED: Record<SocialProvider, boolean> = {
+  google: process.env.NEXT_PUBLIC_GOOGLE_ENABLED === 'true',
+  github: process.env.NEXT_PUBLIC_GITHUB_ENABLED === 'true',
+  discord: process.env.NEXT_PUBLIC_DISCORD_ENABLED === 'true',
+};
 
 interface SocialAuthProps {
   redirectTo?: string;
@@ -66,19 +75,20 @@ interface SocialAuthProps {
 export function SocialAuthButtons({ redirectTo = '/', onSuccess }: SocialAuthProps) {
   const [loadingProvider, setLoadingProvider] = useState<SocialProvider | null>(null);
 
-  const activeProviders = PROVIDERS.filter((p) => process.env[p.envKey] === 'true');
+  const activeProviders = PROVIDERS.filter((p) => PROVIDER_ENABLED[p.id]);
 
   if (activeProviders.length === 0) return null;
 
   const handleSocialLogin = async (provider: SocialProvider) => {
     setLoadingProvider(provider);
-    authLogger.socialLoginInitiated(provider);
 
     try {
-      const result = (await signIn.social({
+      const result = await signIn.social({
         provider,
-        callbackURL: redirectTo,
-      })) as { data?: { redirect?: boolean; url?: string } };
+        callbackURL: sanitizeRedirect(redirectTo),
+      });
+
+      if (result.error) throw new Error(result.error.message ?? 'Social sign-in failed.');
 
       if (result?.data?.redirect && typeof result.data.url === 'string') {
         window.location.assign(result.data.url);
@@ -86,9 +96,7 @@ export function SocialAuthButtons({ redirectTo = '/', onSuccess }: SocialAuthPro
       }
 
       await onSuccess?.();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Social sign-in failed.';
-      authLogger.socialLoginFailure(provider, msg);
+    } catch {
       toast.error(
         `${provider.charAt(0).toUpperCase() + provider.slice(1)} sign-in failed. Please try again.`,
       );

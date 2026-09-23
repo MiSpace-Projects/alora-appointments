@@ -2,27 +2,30 @@ import { z } from 'zod';
 
 export const loginSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Please enter a valid email'),
-  password: z
-    .string()
-    .min(1, 'Password is required')
-    .min(8, 'Password must be at least 8 characters'),
+  password: z.string().min(1, 'Password is required').max(128, 'Password is too long'),
   rememberMe: z.boolean().optional().default(false),
 });
 
-export const registerSchema = z
-  .object({
-    name: z
-      .string()
-      .min(1, 'Name is required')
-      .min(2, 'Name must be at least 2 characters')
-      .max(50, 'Name must be less than 50 characters'),
-    email: z.string().min(1, 'Email is required').email('Please enter a valid email'),
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .max(128, 'Password is too long')
-      .regex(/[A-Z]/, 'Must contain uppercase letter')
-      .regex(/[0-9]/, 'Must contain a number'),
+export const accountNameSchema = z
+  .string()
+  .trim()
+  .min(2, 'Name must be at least 2 characters')
+  .max(80, 'Name must be 80 characters or fewer')
+  .refine((name) => !/[\u0000-\u001f\u007f]/.test(name), 'Name contains invalid characters');
+
+export const newPasswordSchema = z
+  .string()
+  .min(15, 'Password must be at least 15 characters')
+  .max(128, 'Password is too long');
+
+export const authSignUpSchema = z.object({
+  name: accountNameSchema,
+  email: z.string().trim().toLowerCase().email('Please enter a valid email'),
+  password: newPasswordSchema,
+});
+
+export const registerSchema = authSignUpSchema
+  .extend({
     confirmPassword: z.string().min(1, 'Please confirm your password'),
   })
   .refine((d) => d.password === d.confirmPassword, {
@@ -31,9 +34,30 @@ export const registerSchema = z
   });
 
 export const forgotPasswordSchema = z.object({
-  email: z.string().min(1, 'Email is required').email('Please enter a valid email'),
+  email: z.string().trim().toLowerCase().email('Please enter a valid email'),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    password: newPasswordSchema,
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
+
+export const createBookingSchema = z.object({
+  serviceId: z.string().min(1, 'Please choose a service'),
+  // Coerce so form strings and JSON payloads both validate to a real Date.
+  startsAt: z.coerce.date().refine((d) => d.getTime() > Date.now(), {
+    message: 'Choose a time in the future',
+  }),
+  notes: z.string().max(500, 'Notes are too long').optional(),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+export type CreateBookingInput = z.infer<typeof createBookingSchema>;

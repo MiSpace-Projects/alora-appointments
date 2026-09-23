@@ -15,15 +15,11 @@ import { AuthCard, AuthHeader } from '@/app/components/authCard/AuthCard';
 import { FormField } from '@/app/components/form/Form';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
 import { TabControl } from '@/app/components/AuthTabs/TabControl';
+import { TurnstileWidget } from '@/app/components/TurnstileWidget';
 import styles from './page.module.css';
 
 function PasswordStrength({ password }: { password: string }) {
-  const checks = [
-    { label: '8+ characters', met: password.length >= 8 },
-    { label: 'Uppercase letter', met: /[A-Z]/.test(password) },
-    { label: 'Number', met: /[0-9]/.test(password) },
-  ];
-  const strength = checks.filter((c) => c.met).length;
+  const checks = [{ label: '15+ characters', met: password.length >= 15 }];
 
   if (!password) return null;
 
@@ -35,13 +31,9 @@ function PasswordStrength({ password }: { password: string }) {
       className={styles.strengthWrap}
     >
       <div className={styles.strengthBar}>
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className={styles.strengthSegment}
-            style={{ background: i < strength ? '#d4c5b0' : 'rgba(255,255,255,0.08)' }}
-          />
-        ))}
+        <div
+          className={`${styles.strengthSegment} ${password.length >= 15 ? styles.strengthMet : ''}`}
+        />
       </div>
 
       <div className={styles.strengthChecks}>
@@ -59,11 +51,12 @@ function PasswordStrength({ password }: { password: string }) {
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaResetKey, setCaptchaResetKey] = useState(0);
 
   const {
     register,
     handleSubmit,
-    watch,
     control,
     formState: { errors },
   } = useForm<RegisterInput>({
@@ -77,6 +70,11 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (data: RegisterInput) => {
+    const captchaRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
+    if (captchaRequired && !captchaToken) {
+      toast.error('Complete the human verification before creating an account.');
+      return;
+    }
     setLoading(true);
 
     try {
@@ -84,18 +82,25 @@ export default function RegisterPage() {
         name: data.name,
         email: data.email,
         password: data.password,
+        fetchOptions: captchaToken
+          ? { headers: { 'x-captcha-response': captchaToken } }
+          : undefined,
       });
 
       if (result.error) {
         toast.error(result.error.message ?? 'Failed to create account.');
+        setCaptchaToken(null);
+        setCaptchaResetKey((value) => value + 1);
         return;
       }
 
-      toast.success('Account created! Welcome aboard.');
-      router.push('/');
-      router.refresh();
+      // Auto-sign-in remains off. Verification is optional and can be completed later.
+      toast.success('Account created. You can sign in now and verify your email later.');
+      router.push('/login');
     } catch {
       toast.error('Something went wrong.');
+      setCaptchaToken(null);
+      setCaptchaResetKey((value) => value + 1);
     } finally {
       setLoading(false);
     }
@@ -139,6 +144,7 @@ export default function RegisterPage() {
       />
 
       <div className={styles.submitArea}>
+        <TurnstileWidget onToken={setCaptchaToken} resetKey={captchaResetKey} />
         <SubmitButton loading={loading}>
           Create account <ArrowRight size={15} />
         </SubmitButton>
@@ -159,31 +165,7 @@ export default function RegisterPage() {
     {
       id: 'signin',
       label: 'Sign in',
-      content: (
-        <>
-          <div className={styles.headingBlock}>
-            <h1 className={styles.title}>Welcome Back</h1>
-            <p className={styles.subtitle}>Sign in to access your account</p>
-          </div>
-          <div className={styles.form}>
-            <FormField type="email" placeholder="Email address" autoComplete="email" />
-            <FormField type="password" placeholder="Password" autoComplete="current-password" />
-            <div className={styles.submitArea}>
-              <Link href="/login" style={{ textDecoration: 'none' }}>
-                <SubmitButton>
-                  Sign in <ArrowRight size={15} />
-                </SubmitButton>
-              </Link>
-            </div>
-            <div className={styles.footer}>
-              Don&apos;t have an account?
-              <Link href="/register" className={styles.footerLink}>
-                Create one
-              </Link>
-            </div>
-          </div>
-        </>
-      ),
+      href: '/login',
     },
     {
       id: 'signup',

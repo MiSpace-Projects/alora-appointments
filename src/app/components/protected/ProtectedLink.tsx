@@ -2,8 +2,8 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../../contexts/AuthContext';
+import { loginWithCallback } from '@/lib/safe-redirect';
 
 export function ProtectedLink({
   href,
@@ -17,16 +17,6 @@ export function ProtectedLink({
   onClick?: () => void;
 }) {
   const { user } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const handleClick = (e: React.MouseEvent) => {
-    onClick?.();
-    if (!user) {
-      e.preventDefault();
-      router.push('/login?next=' + encodeURIComponent(pathname ?? '/'));
-    }
-  };
 
   if (user)
     return (
@@ -35,7 +25,7 @@ export function ProtectedLink({
       </Link>
     );
   return (
-    <a href={href} onClick={handleClick} className={className}>
+    <a href={loginWithCallback(href)} onClick={onClick} className={className}>
       {children}
     </a>
   );

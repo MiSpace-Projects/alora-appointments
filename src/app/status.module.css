@@ -1,0 +1,99 @@
+/* Shared styling for full-page status surfaces (error, not-found, loading).
+   Echoes the auth/marketing design language: black canvas, Playfair heading,
+   warm #d4c5b0 accent. Kept in one module so every status page stays visually
+   consistent and future states reuse it rather than reinventing the look. */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: calc(var(--navbar-height) + var(--breadcrumb-height) + 1rem) 1.5rem 2rem;
+  text-align: center;
+  background: #000000;
+  color: #ffffff;
+}
+
+.code {
+  font-family: var(--font-playfair-display), serif;
+  font-size: clamp(3rem, 12vw, 5rem);
+  font-weight: 700;
+  line-height: 1;
+  color: #d4c5b0;
+}
+
+.title {
+  font-family: var(--font-playfair-display), serif;
+  font-size: clamp(1.35rem, 4vw, 1.75rem);
+  font-weight: 600;
+}
+
+.body {
+  max-width: 30rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.4rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.primary {
+  background: #d4c5b0;
+  color: #000000;
+  border: none;
+}
+
+.secondary {
+  background: transparent;
+  color: #d4c5b0;
+  border: 1px solid rgba(212, 197, 176, 0.4);
+}
+
+.primary:hover,
+.secondary:hover {
+  opacity: 0.85;
+}
+
+/* Loading spinner */
+.spinner {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 3px solid rgba(212, 197, 176, 0.25);
+  border-top-color: #d4c5b0;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Respect users who ask for less motion (WCAG 2.3.3). */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2s;
+  }
+}

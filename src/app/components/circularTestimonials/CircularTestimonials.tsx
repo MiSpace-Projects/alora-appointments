@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react'
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import styles from './CircularTestimonials.module.css';
 
 interface Testimonial {
   quote: string;
@@ -169,9 +170,9 @@ export const CircularTestimonials = ({
   };
 
   return (
-    <div className="ct-container">
-      <div className="ct-grid">
-        <div className="ct-image-wrap" ref={imageContainerRef}>
+    <div className={styles.container}>
+      <div className={styles.grid}>
+        <div className={styles.imageWrap} ref={imageContainerRef}>
           {testimonials.map((t, index) => (
             <Image
               key={t.src}
@@ -179,7 +180,7 @@ export const CircularTestimonials = ({
               alt={t.name}
               fill
               sizes="(max-width: 768px) 100vw, 50vw"
-              className="ct-image"
+              className={styles.image}
               style={{
                 objectFit: 'cover',
                 ...getImageStyle(index),
@@ -188,7 +189,7 @@ export const CircularTestimonials = ({
           ))}
         </div>
 
-        <div className="ct-content">
+        <div className={styles.content}>
           <AnimatePresence mode="wait">
             <motion.div
               key={activeIndex}
@@ -198,16 +199,19 @@ export const CircularTestimonials = ({
               exit="exit"
               transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
-              <p className="ct-name" style={{ color: colorName, fontSize: fontSizeName }}>
+              <p className={styles.name} style={{ color: colorName, fontSize: fontSizeName }}>
                 {active.name}
               </p>
               <p
-                className="ct-designation"
+                className={styles.designation}
                 style={{ color: colorDesignation, fontSize: fontSizeDesignation }}
               >
                 {active.designation}
               </p>
-              <p className="ct-quote" style={{ color: colorTestimony, fontSize: fontSizeQuote }}>
+              <p
+                className={styles.quote}
+                style={{ color: colorTestimony, fontSize: fontSizeQuote }}
+              >
                 {active.quote.split(' ').map((word, i) => (
                   <motion.span
                     key={i}
@@ -223,9 +227,9 @@ export const CircularTestimonials = ({
             </motion.div>
           </AnimatePresence>
 
-          <div className="ct-arrows">
+          <div className={styles.arrows}>
             <button
-              className="ct-arrow"
+              className={styles.arrow}
               onClick={handlePrev}
               aria-label="Previous testimonial"
               style={{ backgroundColor: hoverPrev ? colorArrowHoverBg : colorArrowBg }}
@@ -235,7 +239,7 @@ export const CircularTestimonials = ({
               <FaArrowLeft size={20} color={colorArrowFg} />
             </button>
             <button
-              className="ct-arrow"
+              className={styles.arrow}
               onClick={handleNext}
               aria-label="Next testimonial"
               style={{ backgroundColor: hoverNext ? colorArrowHoverBg : colorArrowBg }}
@@ -247,127 +251,6 @@ export const CircularTestimonials = ({
           </div>
         </div>
       </div>
-
-      <style>{`
-        .ct-container {
-          width: 100%;
-          max-width: 56rem;
-          box-sizing: border-box;
-          padding: 1rem 0;
-        }
-        .ct-grid {
-          display: -webkit-box;
-          display: -ms-flexbox;
-          display: flex;
-          -webkit-box-orient: vertical;
-          -webkit-box-direction: normal;
-          -ms-flex-direction: column;
-          flex-direction: column;
-          gap: 3rem;
-        }
-        .ct-image-wrap {
-          position: relative;
-          width: 100%;
-          height: 20rem;
-          -webkit-perspective: 1000px;
-          perspective: 1000px;
-          overflow: hidden;
-          border-radius: 1.25rem;
-        }
-        .ct-image {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          -o-object-fit: cover;
-          object-fit: cover;
-          border-radius: 1.25rem;
-          -webkit-box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-          box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .ct-content {
-          display: -webkit-box;
-          display: -ms-flexbox;
-          display: flex;
-          -webkit-box-orient: vertical;
-          -webkit-box-direction: normal;
-          -ms-flex-direction: column;
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-        .ct-name {
-          font-weight: 700;
-          margin: 0 0 0.1rem;
-          line-height: 1.3;
-        }
-        .ct-designation {
-          margin: 0 0 1.25rem;
-          line-height: 1.4;
-        }
-        .ct-quote {
-          line-height: 1.75;
-          margin: 0;
-          word-break: break-word;
-        }
-        .ct-arrows {
-          display: -webkit-box;
-          display: -ms-flexbox;
-          display: flex;
-          gap: 1rem;
-          padding-top: 2rem;
-        }
-        .ct-arrow {
-          width: 2.6rem;
-          height: 2.6rem;
-          border-radius: 50%;
-          display: -webkit-inline-box;
-          display: -ms-inline-flexbox;
-          display: inline-flex;
-          -webkit-box-align: center;
-          -ms-flex-align: center;
-          align-items: center;
-          -webkit-box-pack: center;
-          -ms-flex-pack: center;
-          justify-content: center;
-          cursor: pointer;
-          border: none;
-          -webkit-appearance: none;
-          appearance: none;
-          -webkit-transition: background-color 0.25s ease;
-          transition: background-color 0.25s ease;
-          -ms-flex-negative: 0;
-          flex-shrink: 0;
-        }
-        @media (min-width: 768px) {
-          .ct-grid {
-            -webkit-box-orient: horizontal;
-            -webkit-box-direction: normal;
-            -ms-flex-direction: row;
-            flex-direction: row;
-            -webkit-box-align: center;
-            -ms-flex-align: center;
-            align-items: center;
-            gap: 4rem;
-          }
-          .ct-image-wrap {
-            height: 24rem;
-            -ms-flex: 1 1 0;
-            -webkit-box-flex: 1;
-            flex: 1 1 0;
-            min-width: 0;
-          }
-          .ct-content {
-            -ms-flex: 1 1 0;
-            -webkit-box-flex: 1;
-            flex: 1 1 0;
-            min-width: 0;
-          }
-          .ct-arrows {
-            padding-top: 2rem;
-          }
-        }
-      `}</style>
     </div>
   );
 };
