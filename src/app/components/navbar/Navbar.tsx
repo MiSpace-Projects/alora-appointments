@@ -138,19 +138,26 @@ export default function Navbar() {
         </nav>
 
         <div className={styles.avatarWrapper} ref={dropdownRef}>
-          <button
-            type="button"
-            className={styles.avatarButton}
-            aria-haspopup="true"
-            aria-expanded={dropOpen}
-            aria-label="Open account menu"
-            disabled={!user}
-            onClick={() => {
-              if (user) setDropOpen((prev) => !prev);
-            }}
-          >
-            <span className={styles.avatarCircle}>{avatarContent}</span>
-          </button>
+          {loading ? (
+            <span className={styles.avatarButton} aria-hidden="true">
+              <span className={styles.avatarCircle}>{avatarContent}</span>
+            </span>
+          ) : user ? (
+            <button
+              type="button"
+              className={styles.avatarButton}
+              aria-haspopup="true"
+              aria-expanded={dropOpen}
+              aria-label="Open account menu"
+              onClick={() => setDropOpen((prev) => !prev)}
+            >
+              <span className={styles.avatarCircle}>{avatarContent}</span>
+            </button>
+          ) : (
+            <Link href="/login" className={styles.avatarButton} aria-label="Sign in">
+              <span className={styles.avatarCircle}>{avatarContent}</span>
+            </Link>
+          )}
 
           {dropOpen && user && (
             <div className={styles.dropdown} role="menu">
