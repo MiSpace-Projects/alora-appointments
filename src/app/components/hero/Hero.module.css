@@ -128,108 +128,6 @@
   filter: contrast(1.07);
 }
 
-.markerLayer {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  right: 0;
-  width: auto;
-  height: min(calc(100svh - 72px), 100vw);
-  aspect-ratio: 1;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-  transform: translateY(-50%);
-}
-
-.marker {
-  position: absolute;
-  left: var(--marker-x);
-  top: var(--marker-y);
-  width: 0;
-  height: 0;
-  color: #ffffff;
-}
-
-.markerPoint {
-  position: absolute;
-  z-index: 2;
-  width: 18px;
-  height: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.94);
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.18);
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
-  transform: translate(-50%, -50%);
-}
-
-.markerPoint::after {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: currentColor;
-  content: '';
-  transform: translate(-50%, -50%);
-}
-
-.markerLine {
-  position: absolute;
-  left: 7px;
-  top: 0;
-  width: var(--line-length);
-  height: 1px;
-  background: rgba(255, 255, 255, 0.88);
-  box-shadow: 0 0 1px rgba(0, 0, 0, 0.55);
-  transform: rotate(var(--line-angle));
-  transform-origin: left center;
-}
-
-.markerLabel {
-  position: absolute;
-  left: var(--label-x);
-  top: var(--label-y);
-  padding: 0.34rem 0.58rem;
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 999px;
-  color: #ffffff;
-  background: rgba(17, 17, 17, 0.88);
-  font-size: 0.68rem;
-  font-weight: 600;
-  line-height: 1;
-  white-space: nowrap;
-  transform: translateY(-50%);
-}
-
-.wigCareMarker {
-  --marker-x: 29%;
-  --marker-y: 45%;
-  --line-length: 8.25rem;
-  --line-angle: -23deg;
-  --label-x: 8rem;
-  --label-y: -3.25rem;
-}
-
-.wigInstallationsMarker {
-  --marker-x: 52%;
-  --marker-y: 52%;
-  --line-length: 8.75rem;
-  --line-angle: -18deg;
-  --label-x: 8.85rem;
-  --label-y: -2.7rem;
-}
-
-.makeupMarker {
-  --marker-x: 66%;
-  --marker-y: 63%;
-  --line-length: 7.5rem;
-  --line-angle: 17deg;
-  --label-x: 7.75rem;
-  --label-y: 2.2rem;
-}
-
 :global([data-theme='dark']) .lightPortrait {
   display: none;
 }
@@ -238,78 +136,47 @@
   display: block;
 }
 
-:global([data-theme='dark']) .markerLayer {
-  height: min(calc(100svh - 72px), 125vw);
-  aspect-ratio: 4 / 5;
-}
-
-:global([data-theme='dark']) .wigCareMarker {
-  --marker-x: 32%;
-  --marker-y: 50%;
-  --line-length: 8.75rem;
-  --line-angle: 155deg;
-  --label-x: -14.1rem;
-  --label-y: 3.7rem;
-}
-
-:global([data-theme='dark']) .wigInstallationsMarker {
-  --marker-x: 59%;
-  --marker-y: 17%;
-  --line-length: 5rem;
-  --line-angle: -22deg;
-  --label-x: 5.5rem;
-  --label-y: -3.05rem;
-}
-
-:global([data-theme='dark']) .makeupMarker {
-  --marker-x: 48%;
-  --marker-y: 21%;
-  --line-length: 8.1rem;
-  --line-angle: -157deg;
-  --label-x: -14rem;
-  --label-y: -3.2rem;
-}
-
-@media (min-width: 761px) and (max-width: 840px) {
-  :global([data-theme='dark']) .makeupMarker {
-    --line-length: 5rem;
-    --line-angle: -157deg;
-    --label-x: -6.8rem;
-    --label-y: -2rem;
-  }
-}
-
+/* ── Mobile: large title with the portrait layered in front ──
+   The title sits behind (z1), the portrait overlaps it (z2), and the
+   description + actions flow below the image (z3). Offsets are viewport-
+   relative so the overlap scales with the title. */
 @media (max-width: 760px) {
   .hero {
-    display: flex;
-    min-height: auto;
-    flex-direction: column;
+    position: relative;
+    display: block;
+    min-height: 100svh;
     padding-top: 64px;
+    overflow: hidden;
   }
 
   .content {
+    position: relative;
+    z-index: 1;
     width: 100%;
-    padding: 3rem 1.25rem 1.5rem;
+    padding: 2.25rem 1.25rem 2.75rem;
     margin: 0;
   }
 
   .title {
-    font-size: clamp(6rem, 28vw, 8rem);
-  }
-
-  .description {
-    max-width: 340px;
-    margin-top: 1.5rem;
+    position: relative;
+    z-index: 1;
+    margin-top: 0.5rem;
+    font-size: clamp(5rem, 30vw, 8.5rem);
+    line-height: 0.82;
   }
 
   .portrait {
-    --hero-bleed: 4rem;
-    --hero-fade: 7rem;
+    --hero-bleed: 0;
 
-    position: relative;
-    inset: auto;
+    position: absolute;
+    z-index: 2;
+    inset: auto 0 auto 0;
+    top: clamp(11rem, 44vw, 16rem);
+    height: clamp(16rem, 66vw, 23rem);
     width: 100%;
-    aspect-ratio: 4 / 5;
+    translate: 0 0;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
   .portraitImage {
@@ -317,97 +184,22 @@
     object-position: center;
   }
 
-  .markerLayer {
-    top: 50%;
-    right: 0;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1;
+  .description {
+    position: relative;
+    z-index: 3;
+    max-width: 100%;
+    margin-top: clamp(16rem, 62vw, 21rem);
   }
 
-  :global([data-theme='dark']) .markerLayer {
-    top: 0;
-    width: 100%;
-    height: 100%;
-    aspect-ratio: auto;
-    transform: none;
-  }
-
-  .markerPoint {
-    width: 16px;
-    height: 16px;
-  }
-
-  .markerLabel {
-    padding: 0.3rem 0.5rem;
-    font-size: 0.62rem;
-  }
-
-  .wigCareMarker {
-    --marker-x: 33%;
-    --marker-y: 50%;
-    --line-length: 5.3rem;
-    --line-angle: -145deg;
-    --label-x: -7.2rem;
-    --label-y: -3.1rem;
-  }
-
-  .wigInstallationsMarker {
-    --marker-x: 55%;
-    --marker-y: 35%;
-    --line-length: 5.9rem;
-    --line-angle: -155deg;
-    --label-x: -11.9rem;
-    --label-y: -2.65rem;
-  }
-
-  .makeupMarker {
-    --marker-x: 69%;
-    --marker-y: 52%;
-    --line-length: 5rem;
-    --line-angle: 145deg;
-    --label-x: -9.7rem;
-    --label-y: 3rem;
-  }
-
-  :global([data-theme='dark']) .wigCareMarker {
-    --marker-x: 36%;
-    --marker-y: 52%;
-    --line-length: 5.3rem;
-    --line-angle: -25deg;
-    --label-x: 5.6rem;
-    --label-y: -2.25rem;
-  }
-
-  :global([data-theme='dark']) .wigInstallationsMarker {
-    --marker-x: 58%;
-    --marker-y: 22%;
-    --line-length: 5.9rem;
-    --line-angle: 150deg;
-    --label-x: -12.2rem;
-    --label-y: 3.1rem;
-  }
-
-  :global([data-theme='dark']) .makeupMarker {
-    --marker-x: 49%;
-    --marker-y: 18%;
-    --line-length: 5rem;
-    --line-angle: -30deg;
-    --label-x: 4.7rem;
-    --label-y: -2.5rem;
-  }
-}
-
-@media (max-width: 600px) {
-  .portrait {
-    --hero-bleed: 2.5rem;
-    --hero-fade: 6rem;
+  .actions {
+    position: relative;
+    z-index: 3;
   }
 }
 
 @media (max-width: 390px) {
   .title {
-    font-size: clamp(5.3rem, 27vw, 6.5rem);
+    font-size: clamp(4.4rem, 27vw, 6.5rem);
   }
 }
 
