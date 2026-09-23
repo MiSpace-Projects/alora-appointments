@@ -9,12 +9,6 @@ import styles from './Hero.module.css';
 import { heroVariants, textBlockVariants, visualVariants } from './heroAnimations';
 import { heroActions, heroCopy } from './heroData';
 
-const heroMarkers = [
-  { label: 'Makeup', className: styles.makeupMarker },
-  { label: 'Wig care', className: styles.wigCareMarker },
-  { label: 'Wig installations', className: styles.wigInstallationsMarker },
-] as const;
-
 export default function Hero() {
   return (
     <motion.section
@@ -68,16 +62,6 @@ export default function Hero() {
           sizes="(max-width: 760px) 100vw, 60vw"
           className={`${styles.portraitImage} ${styles.darkPortrait}`}
         />
-
-        <ul className={styles.markerLayer}>
-          {heroMarkers.map((marker) => (
-            <li key={marker.label} className={`${styles.marker} ${marker.className}`}>
-              <span className={styles.markerPoint} aria-hidden="true" />
-              <span className={styles.markerLine} aria-hidden="true" />
-              <span className={styles.markerLabel}>{marker.label}</span>
-            </li>
-          ))}
-        </ul>
       </motion.div>
     </motion.section>
   );
