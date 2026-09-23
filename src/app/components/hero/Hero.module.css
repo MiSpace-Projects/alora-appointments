@@ -2,108 +2,92 @@
   position: relative;
   left: 50%;
   right: 50%;
+  width: 100vw;
+  min-height: 100svh;
   margin-left: -50vw;
   margin-right: -50vw;
-  width: 100vw;
-  min-height: calc(110vh - 72px);
-  background: var(--background);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: clamp(2.5rem, 10vw, 6rem) 2rem 4rem;
+  overflow: visible;
+  color: #171717;
+  background: #ffffff;
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+}
+
+:global([data-theme='dark']) .hero {
+  color: #ffffff;
+  background: #000000;
 }
 
 .content {
-  width: min(1080px, 100%);
-  display: flex;
-  flex-direction: column;
-  gap: 2.75rem;
-  align-items: center;
-  text-align: center;
-}
-
-.textGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
-  align-items: center;
-  text-align: center;
+  position: relative;
+  z-index: 2;
+  width: min(42vw, 560px);
+  padding-top: clamp(10rem, 22vh, 14rem);
+  margin-left: clamp(1.5rem, 5vw, 5rem);
 }
 
 .label {
-  color: var(--text-color);
-  text-transform: uppercase;
-  letter-spacing: 0.35em;
-  font-size: 0.85rem;
+  margin: 0;
+  color: currentColor;
+  font-size: 0.72rem;
   font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  opacity: 0.68;
 }
 
 .title {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  font-size: clamp(3rem, 6vw, 5.5rem);
-  line-height: 0.95;
-  color: var(--foreground);
-  margin: 0;
-}
-
-.title span {
-  display: block;
+  margin: 0.75rem 0 0;
+  font-family: var(--font-playfair-display), serif;
+  font-size: clamp(7rem, 13vw, 13rem);
+  font-weight: 400;
+  line-height: 0.82;
+  letter-spacing: 0;
 }
 
 .description {
-  max-width: 730px;
-  color: var(--foreground);
-  font-size: clamp(1rem, 1.1vw, 1.2rem);
-  line-height: 1.8;
-  opacity: 0.88;
+  max-width: 430px;
+  margin: clamp(1.8rem, 4vh, 3rem) 0 0;
+  font-size: clamp(0.92rem, 1.05vw, 1.05rem);
+  line-height: 1.65;
+  opacity: 0.76;
 }
 
 .actions {
   display: flex;
-  flex-wrap: nowrap;
-  gap: 1.25rem;
-  justify-content: center;
-  overflow-x: auto;
-  padding-bottom: 0.75rem;
-  margin-top: 1rem;
-}
-
-.actions::-webkit-scrollbar {
-  height: 0.35rem;
-}
-
-.actions::-webkit-scrollbar-thumb {
-  background: rgba(100, 100, 100, 0.3);
-  border-radius: 999px;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
 }
 
 .primaryButton,
 .secondaryButton {
   display: inline-flex;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
-  min-width: 140px;
-  padding: 0.95rem 1.5rem;
-  border-radius: 999px;
-  font-weight: 700;
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease,
-    color 0.2s ease;
-  white-space: nowrap;
+  gap: 0.55rem;
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-radius: 0;
+  font-size: 0.78rem;
+  font-weight: 650;
+  transition: transform 180ms ease;
 }
 
 .primaryButton {
-  color: var(--background);
-  background: var(--text-color);
+  color: #ffffff;
+  background: #171717;
+}
+
+:global([data-theme='dark']) .primaryButton {
+  color: #171717;
+  background: #ffffff;
 }
 
 .secondaryButton {
-  color: var(--text-color);
+  color: currentColor;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 .primaryButton:hover,
@@ -111,117 +95,325 @@
   transform: translateY(-2px);
 }
 
-.stats {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(180px, 1fr));
-  gap: 1.25rem;
-  margin-top: 1rem;
-  width: min(100%, 820px);
-}
+.portrait {
+  --hero-bleed: 7rem;
+  --hero-fade: 9rem;
 
-.statItem {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding: 1rem 1.1rem;
-  border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  min-width: 0;
-}
-
-.statValue {
-  font-size: 1.45rem;
-  font-weight: 700;
-  color: var(--foreground);
-}
-
-.statLabel {
-  color: var(--foreground);
-  opacity: 0.85;
-  font-size: 0.95rem;
-}
-
-.scrollIndicator {
   position: absolute;
-  left: 50%;
-  bottom: 6rem;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--foreground);
-  opacity: 0.1;
+  z-index: 1;
+  inset: 72px 0 0;
+  pointer-events: none;
+  translate: 0 var(--hero-bleed);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 calc(100% - var(--hero-fade)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 calc(100% - var(--hero-fade)),
+    transparent 100%
+  );
 }
 
-.scrollTrack {
-  width: 22px;
-  height: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  border-radius: 999px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 7px;
-  background: rgba(255, 255, 255, 0.08);
+.portraitImage {
+  object-fit: contain;
+  object-position: right center;
 }
 
-.scrollDot {
-  width: 8px;
-  height: 8px;
+.darkPortrait {
+  display: none;
+  filter: contrast(1.07);
+}
+
+.markerLayer {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 0;
+  width: auto;
+  height: min(calc(100svh - 72px), 100vw);
+  aspect-ratio: 1;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  transform: translateY(-50%);
+}
+
+.marker {
+  position: absolute;
+  left: var(--marker-x);
+  top: var(--marker-y);
+  width: 0;
+  height: 0;
+  color: #ffffff;
+}
+
+.markerPoint {
+  position: absolute;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.94);
   border-radius: 50%;
-  background: var(--text-color);
+  background: rgba(0, 0, 0, 0.18);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
+  transform: translate(-50%, -50%);
 }
 
-@media (max-width: 840px) {
-  .title {
-    font-size: clamp(2.5rem, 10vw, 4rem);
-  }
+.markerPoint::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  content: '';
+  transform: translate(-50%, -50%);
+}
 
-  .stats {
-    grid-template-columns: repeat(2, minmax(160px, 1fr));
-    width: min(100%, 640px);
+.markerLine {
+  position: absolute;
+  left: 7px;
+  top: 0;
+  width: var(--line-length);
+  height: 1px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.55);
+  transform: rotate(var(--line-angle));
+  transform-origin: left center;
+}
+
+.markerLabel {
+  position: absolute;
+  left: var(--label-x);
+  top: var(--label-y);
+  padding: 0.34rem 0.58rem;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgba(17, 17, 17, 0.88);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translateY(-50%);
+}
+
+.wigCareMarker {
+  --marker-x: 29%;
+  --marker-y: 45%;
+  --line-length: 8.25rem;
+  --line-angle: -23deg;
+  --label-x: 8rem;
+  --label-y: -3.25rem;
+}
+
+.wigInstallationsMarker {
+  --marker-x: 52%;
+  --marker-y: 52%;
+  --line-length: 8.75rem;
+  --line-angle: -18deg;
+  --label-x: 8.85rem;
+  --label-y: -2.7rem;
+}
+
+.makeupMarker {
+  --marker-x: 66%;
+  --marker-y: 63%;
+  --line-length: 7.5rem;
+  --line-angle: 17deg;
+  --label-x: 7.75rem;
+  --label-y: 2.2rem;
+}
+
+:global([data-theme='dark']) .lightPortrait {
+  display: none;
+}
+
+:global([data-theme='dark']) .darkPortrait {
+  display: block;
+}
+
+:global([data-theme='dark']) .markerLayer {
+  height: min(calc(100svh - 72px), 125vw);
+  aspect-ratio: 4 / 5;
+}
+
+:global([data-theme='dark']) .wigCareMarker {
+  --marker-x: 32%;
+  --marker-y: 50%;
+  --line-length: 8.75rem;
+  --line-angle: 155deg;
+  --label-x: -14.1rem;
+  --label-y: 3.7rem;
+}
+
+:global([data-theme='dark']) .wigInstallationsMarker {
+  --marker-x: 59%;
+  --marker-y: 17%;
+  --line-length: 5rem;
+  --line-angle: -22deg;
+  --label-x: 5.5rem;
+  --label-y: -3.05rem;
+}
+
+:global([data-theme='dark']) .makeupMarker {
+  --marker-x: 48%;
+  --marker-y: 21%;
+  --line-length: 8.1rem;
+  --line-angle: -157deg;
+  --label-x: -14rem;
+  --label-y: -3.2rem;
+}
+
+@media (min-width: 761px) and (max-width: 840px) {
+  :global([data-theme='dark']) .makeupMarker {
+    --line-length: 5rem;
+    --line-angle: -157deg;
+    --label-x: -6.8rem;
+    --label-y: -2rem;
   }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 760px) {
   .hero {
-    padding-top: 88px;
-    padding-bottom: 2rem;
+    display: flex;
+    min-height: auto;
+    flex-direction: column;
+    padding-top: 64px;
   }
 
-  .actions {
-    flex-wrap: wrap;
-    justify-content: center;
-    overflow-x: unset;
-    padding-bottom: 0;
+  .content {
+    width: 100%;
+    padding: 3rem 1.25rem 1.5rem;
+    margin: 0;
   }
 
+  .title {
+    font-size: clamp(6rem, 28vw, 8rem);
+  }
+
+  .description {
+    max-width: 340px;
+    margin-top: 1.5rem;
+  }
+
+  .portrait {
+    --hero-bleed: 4rem;
+    --hero-fade: 7rem;
+
+    position: relative;
+    inset: auto;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+  }
+
+  .portraitImage {
+    object-fit: contain;
+    object-position: center;
+  }
+
+  .markerLayer {
+    top: 50%;
+    right: 0;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  :global([data-theme='dark']) .markerLayer {
+    top: 0;
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    transform: none;
+  }
+
+  .markerPoint {
+    width: 16px;
+    height: 16px;
+  }
+
+  .markerLabel {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.62rem;
+  }
+
+  .wigCareMarker {
+    --marker-x: 33%;
+    --marker-y: 50%;
+    --line-length: 5.3rem;
+    --line-angle: -145deg;
+    --label-x: -7.2rem;
+    --label-y: -3.1rem;
+  }
+
+  .wigInstallationsMarker {
+    --marker-x: 55%;
+    --marker-y: 35%;
+    --line-length: 5.9rem;
+    --line-angle: -155deg;
+    --label-x: -11.9rem;
+    --label-y: -2.65rem;
+  }
+
+  .makeupMarker {
+    --marker-x: 69%;
+    --marker-y: 52%;
+    --line-length: 5rem;
+    --line-angle: 145deg;
+    --label-x: -9.7rem;
+    --label-y: 3rem;
+  }
+
+  :global([data-theme='dark']) .wigCareMarker {
+    --marker-x: 36%;
+    --marker-y: 52%;
+    --line-length: 5.3rem;
+    --line-angle: -25deg;
+    --label-x: 5.6rem;
+    --label-y: -2.25rem;
+  }
+
+  :global([data-theme='dark']) .wigInstallationsMarker {
+    --marker-x: 58%;
+    --marker-y: 22%;
+    --line-length: 5.9rem;
+    --line-angle: 150deg;
+    --label-x: -12.2rem;
+    --label-y: 3.1rem;
+  }
+
+  :global([data-theme='dark']) .makeupMarker {
+    --marker-x: 49%;
+    --marker-y: 18%;
+    --line-length: 5rem;
+    --line-angle: -30deg;
+    --label-x: 4.7rem;
+    --label-y: -2.5rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .portrait {
+    --hero-bleed: 2.5rem;
+    --hero-fade: 6rem;
+  }
+}
+
+@media (max-width: 390px) {
+  .title {
+    font-size: clamp(5.3rem, 27vw, 6.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
   .primaryButton,
   .secondaryButton {
-    min-width: 140px;
-    flex: 1 1 140px;
-  }
-
-  .stats {
-    grid-template-columns: repeat(2, 1fr);
-    overflow-x: unset;
-    scroll-snap-type: unset;
-    padding-bottom: 0;
-    gap: 0.75rem;
-    width: 100%;
-  }
-
-  .statItem {
-    scroll-snap-align: unset;
-    min-width: 0;
-  }
-
-  .statValue {
-    font-size: 1.25rem;
-  }
-
-  .statLabel {
-    font-size: 0.8rem;
+    transition: none;
   }
 }

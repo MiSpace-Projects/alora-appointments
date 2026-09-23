@@ -1,9 +1,8 @@
 import styles from './Footer.module.css';
-import Link from 'next/link';
 import ProtectedLink from '../protected/ProtectedLink';
 
-const bookUrl = 'https://preview--alora-glow-studio.base44.app/book';
-const dashUrl = 'https://preview--alora-glow-studio.base44.app/dashboard';
+const bookUrl = '/book';
+const dashUrl = '/profile';
 
 export default function Footer() {
   return (
