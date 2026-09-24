@@ -1,11 +1,11 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ProtectedLink from '../protected/ProtectedLink';
 import styles from './Hero.module.css';
+import { HeroPortrait } from './HeroPortrait';
 import { heroVariants, textBlockVariants, visualVariants } from './heroAnimations';
 import { heroActions, heroCopy } from './heroData';
 
@@ -46,21 +46,17 @@ export default function Hero() {
       </motion.div>
 
       <motion.div className={styles.portrait} variants={visualVariants}>
-        <Image
-          src="/hero/alora-afro-cutout-v2.png"
+        <HeroPortrait
+          desktopSrc="/hero/alora-afro-cutout-v2.png"
+          mobileSrc="/hero/alora-afro-mobile-light-cutout.png"
           alt="Monochrome side-profile portrait of a woman with natural hair"
-          fill
-          priority
-          sizes="(max-width: 760px) 100vw, 60vw"
-          className={`${styles.portraitImage} ${styles.lightPortrait}`}
+          themeClassName={styles.lightPortrait}
         />
-        <Image
-          src="/hero/alora-braided-cutout-v2.png"
-          alt="Monochrome portrait of a woman with long braids"
-          fill
-          priority
-          sizes="(max-width: 760px) 100vw, 60vw"
-          className={`${styles.portraitImage} ${styles.darkPortrait}`}
+        <HeroPortrait
+          desktopSrc="/hero/alora-braided-cutout-v2.png"
+          mobileSrc="/hero/alora-seated-mobile-dark-cutout.png"
+          alt="Monochrome portrait of a seated woman with natural hair, face lifted"
+          themeClassName={styles.darkPortrait}
         />
       </motion.div>
     </motion.section>
