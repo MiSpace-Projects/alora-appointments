@@ -123,9 +123,13 @@
   object-position: right center;
 }
 
+/* Cutout effect: the photos have solid backgrounds, so we blend the background
+   INTO the hero — multiply drops the white bg on the light theme, screen drops
+   the black bg on the dark theme. The subject then reads as a true cutout in
+   front of the wordmark, with the letters showing behind it (GrandPool style). */
 .darkPortrait {
   display: none;
-  filter: brightness(1.7) contrast(1.28);
+  filter: contrast(1.12) brightness(1.05);
 }
 
 :global([data-theme='dark']) .lightPortrait {
@@ -134,6 +138,15 @@
 
 :global([data-theme='dark']) .darkPortrait {
   display: block;
+}
+
+/* Blend on the CONTAINER so it composites against the wordmark + hero bg. */
+.portrait {
+  mix-blend-mode: multiply;
+}
+
+:global([data-theme='dark']) .portrait {
+  mix-blend-mode: screen;
 }
 
 /* ── Mobile: large title with the portrait layered in front ──
@@ -195,12 +208,22 @@
     object-position: center top;
   }
 
+  /* The light photo has more headroom above the subject than the dark one, so
+     lift it so the afro rises into the wordmark like the dark portrait does. */
+  :global([data-theme='light']) .portrait {
+    translate: -50% -17vw;
+  }
+
   /* Description tucks directly under the portrait — no dead gap. */
   .description {
     position: relative;
     z-index: 3;
     max-width: 100%;
     margin-top: clamp(13.5rem, 70vw, 23rem);
+  }
+
+  :global([data-theme='light']) .description {
+    margin-top: clamp(10.5rem, 54vw, 18rem);
   }
 
   .actions {
