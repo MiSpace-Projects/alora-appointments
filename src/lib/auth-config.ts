@@ -42,11 +42,6 @@ export const authRuntimeConfig = {
       ? csv(process.env.AUTH_IP_ADDRESS_HEADERS)
       : ['x-real-ip'],
   trustedProxies: csv(process.env.AUTH_TRUSTED_PROXIES),
-  captcha: {
-    siteKey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '',
-    secretKey: process.env.TURNSTILE_SECRET_KEY ?? '',
-    allowedHostnames: csv(process.env.TURNSTILE_ALLOWED_HOSTNAMES),
-  },
   // Transactional email via Resend. `from` must be an address on a
   // Resend-verified domain (e.g. "Alora <no-reply@alorastudios.co.za>").
   email: {
@@ -54,10 +49,6 @@ export const authRuntimeConfig = {
     from: process.env.EMAIL_FROM ?? '',
   },
 } as const;
-
-export function isCaptchaConfigured(): boolean {
-  return Boolean(authRuntimeConfig.captcha.siteKey && authRuntimeConfig.captcha.secretKey);
-}
 
 export function getTrustedOrigins(): string[] {
   const origins = new Set<string>();
@@ -104,12 +95,6 @@ export function getProductionAuthConfigurationErrors(): string[] {
   }
   if (!decodeCanonicalBase64(process.env.AUTH_FINGERPRINT_SECRET)) {
     errors.push('AUTH_FINGERPRINT_SECRET must be exactly 32 random bytes in canonical base64');
-  }
-  if (!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || !process.env.TURNSTILE_SECRET_KEY) {
-    errors.push('Cloudflare Turnstile site and secret keys are required');
-  }
-  if (csv(process.env.TURNSTILE_ALLOWED_HOSTNAMES).length === 0) {
-    errors.push('TURNSTILE_ALLOWED_HOSTNAMES must list the production hostnames');
   }
   if (!process.env.RESEND_API_KEY) {
     errors.push('RESEND_API_KEY is required');

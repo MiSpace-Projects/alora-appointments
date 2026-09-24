@@ -18,7 +18,6 @@ import { FormField } from '@/app/components/form/Form';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
 import { TabControl } from '@/app/components/AuthTabs/TabControl';
 import { SocialAuthButtons } from '@/app/components/socialAuthButtons/SocialAuthButtons';
-import { TurnstileWidget } from '@/app/components/TurnstileWidget';
 import { useAuth } from '@/app/contexts/AuthContext';
 import styles from '../shared.module.css';
 
@@ -42,8 +41,6 @@ const itemVariants = {
 function LoginInner() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaResetKey, setCaptchaResetKey] = useState(0);
   const { refresh } = useAuth();
 
   const {
@@ -62,11 +59,6 @@ function LoginInner() {
   const destination = sanitizeRedirect(searchParams.get('callbackUrl'));
 
   const onSubmit: SubmitHandler<LoginInput> = async (data) => {
-    const captchaRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
-    if (captchaRequired && !captchaToken) {
-      toast.error('Complete the human verification before signing in.');
-      return;
-    }
     setLoading(true);
 
     try {
@@ -75,9 +67,6 @@ function LoginInner() {
         email: data.email,
         password: data.password,
         rememberMe: data.rememberMe,
-        fetchOptions: captchaToken
-          ? { headers: { 'x-captcha-response': captchaToken } }
-          : undefined,
       });
 
       if (result.error) {
@@ -93,8 +82,6 @@ function LoginInner() {
           classified.category === 'UNKNOWN_USER' || classified.category === 'INVALID_CREDENTIALS';
 
         toast.error(isCredentialError ? 'Invalid email or password.' : classified.userMessage);
-        setCaptchaToken(null);
-        setCaptchaResetKey((value) => value + 1);
         return;
       }
 
@@ -110,8 +97,6 @@ function LoginInner() {
       } else {
         toast.error(classified.userMessage);
       }
-      setCaptchaToken(null);
-      setCaptchaResetKey((value) => value + 1);
     } finally {
       setLoading(false);
     }
@@ -150,7 +135,6 @@ function LoginInner() {
       </motion.div>
 
       <motion.div variants={itemVariants} className={styles.submitArea}>
-        <TurnstileWidget onToken={setCaptchaToken} resetKey={captchaResetKey} />
         <SubmitButton loading={loading}>
           Sign in <ArrowRight size={15} />
         </SubmitButton>

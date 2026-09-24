@@ -95,20 +95,17 @@ describe('production auth configuration', () => {
     );
   });
 
-  it('returns configured origins and reports configured CAPTCHA', async () => {
+  it('returns configured trusted origins', async () => {
     Object.assign(process.env, {
       BETTER_AUTH_URL: 'https://auth.alora.example.com/path',
       NEXT_PUBLIC_APP_URL: 'https://alora.example.com/another-path',
-      NEXT_PUBLIC_TURNSTILE_SITE_KEY: 'site-key',
-      TURNSTILE_SECRET_KEY: 'secret-key',
     });
-    const { getTrustedOrigins, isCaptchaConfigured } = await import('@/lib/auth-config');
+    const { getTrustedOrigins } = await import('@/lib/auth-config');
 
     expect(getTrustedOrigins()).toEqual([
       'https://alora.example.com',
       'https://auth.alora.example.com',
     ]);
-    expect(isCaptchaConfigured()).toBe(true);
   });
 
   it('rejects forwarded chains as the custom client-address source', async () => {

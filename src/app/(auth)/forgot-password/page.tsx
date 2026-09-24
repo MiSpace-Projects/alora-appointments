@@ -13,7 +13,6 @@ import { AuthBackground } from '@/app/components/AuthBackground';
 import { AuthCard, AuthHeader } from '@/app/components/authCard/AuthCard';
 import { FormField } from '@/app/components/form/Form';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
-import { TurnstileWidget } from '@/app/components/TurnstileWidget';
 import styles from '../shared.module.css';
 
 const containerVariants = {
@@ -36,8 +35,6 @@ const itemVariants = {
 export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaResetKey, setCaptchaResetKey] = useState(0);
 
   const {
     register,
@@ -48,11 +45,6 @@ export default function ForgotPasswordPage() {
   });
 
   const onSubmit = async (data: ForgotPasswordInput) => {
-    const captchaRequired = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY);
-    if (captchaRequired && !captchaToken) {
-      toast.error('Complete the human verification before continuing.');
-      return;
-    }
     setLoading(true);
 
     try {
@@ -62,9 +54,6 @@ export default function ForgotPasswordPage() {
       const { error } = await authClient.requestPasswordReset({
         email: data.email,
         redirectTo: `${window.location.origin}/reset-password`,
-        fetchOptions: captchaToken
-          ? { headers: { 'x-captcha-response': captchaToken } }
-          : undefined,
       });
 
       if (error) {
@@ -78,8 +67,6 @@ export default function ForgotPasswordPage() {
       toast.error(
         error instanceof Error ? error.message : 'Something went wrong. Please try again.',
       );
-      setCaptchaToken(null);
-      setCaptchaResetKey((value) => value + 1);
     } finally {
       setLoading(false);
     }
@@ -141,9 +128,6 @@ export default function ForgotPasswordPage() {
                         autoComplete="email"
                         {...register('email')}
                       />
-
-                      <TurnstileWidget onToken={setCaptchaToken} resetKey={captchaResetKey} />
-
                       <div className={styles.submitArea}>
                         <SubmitButton loading={loading}>
                           Send reset link <ArrowRight size={15} />
