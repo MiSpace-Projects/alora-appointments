@@ -47,7 +47,7 @@ export default function Hero() {
 
       <motion.div className={styles.portrait} variants={visualVariants}>
         <Image
-          src="/hero/alora-afro-profile-light-fitted.jpg"
+          src="/hero/alora-afro-cutout-v2.png"
           alt="Monochrome side-profile portrait of a woman with natural hair"
           fill
           priority
@@ -55,7 +55,7 @@ export default function Hero() {
           className={`${styles.portraitImage} ${styles.lightPortrait}`}
         />
         <Image
-          src="/hero/alora-braided-model-dark.jpg"
+          src="/hero/alora-braided-cutout-v2.png"
           alt="Monochrome portrait of a woman with long braids"
           fill
           priority
