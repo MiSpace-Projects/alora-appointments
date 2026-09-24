@@ -27,11 +27,16 @@
   --logo-filter: brightness(0) invert(1);
 }
 
+/* `clip` (with `hidden` as the fallback for older engines) stops horizontal
+   overflow without turning <body> into its own scroll container. iOS Safari
+   treats `overflow-x: hidden` here as a nested scroller, which lets the page
+   keep scrolling past the footer. */
 html,
 body {
   width: 100%;
   max-width: 100vw;
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {

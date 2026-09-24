@@ -1,24 +1,48 @@
+/* Quiet, icon-only theme switch. Sits in the corner at reduced opacity and
+   only comes forward on hover/focus so it never competes with page content. */
 .floatingToggle {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
   z-index: 1000;
-  background: var(--navbar-bg);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid rgba(128, 128, 128, 0.32);
+  border-radius: 999px;
+  background: var(--content-bg, #000);
   color: var(--text-color);
-  padding: 0.75rem 1.5rem;
-  border-radius: 2rem;
-  font-size: 0.9rem;
-  font-weight: 500;
-  font-family: sans-serif;
+  opacity: 0.55;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  appearance: none;
+  transition:
+    opacity 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
-.floatingToggle:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+.floatingToggle:hover,
+.floatingToggle:focus-visible {
+  opacity: 1;
+  border-color: rgba(212, 197, 176, 0.6);
+  transform: translateY(-1px);
+}
+
+.floatingToggle:focus-visible {
+  outline: 2px solid #d4c5b0;
+  outline-offset: 2px;
+}
+
+.icon {
+  display: inline-flex;
+  line-height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floatingToggle {
+    transition: none;
+  }
 }
