@@ -23,13 +23,12 @@ function buildCsp(nonce: string): string {
     process.env.NODE_ENV === 'development' ? " 'unsafe-eval' ws: http:" : '';
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://challenges.cloudflare.com${developmentDirectives}`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${developmentDirectives}`,
     `style-src 'self' 'nonce-${nonce}'`,
     "style-src-attr 'unsafe-inline'",
-    "img-src 'self' data: blob: https://images.pexels.com https://challenges.cloudflare.com",
+    "img-src 'self' data: blob: https://images.pexels.com",
     "font-src 'self' data:",
-    `connect-src 'self' https://challenges.cloudflare.com${developmentDirectives}`,
-    'frame-src https://challenges.cloudflare.com',
+    `connect-src 'self'${developmentDirectives}`,
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",
