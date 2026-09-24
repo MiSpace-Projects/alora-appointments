@@ -125,7 +125,7 @@
 
 .darkPortrait {
   display: none;
-  filter: contrast(1.07);
+  filter: brightness(1.7) contrast(1.28);
 }
 
 :global([data-theme='dark']) .lightPortrait {
