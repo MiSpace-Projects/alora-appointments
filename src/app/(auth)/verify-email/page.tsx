@@ -12,14 +12,11 @@ import { AuthBackground } from '@/app/components/AuthBackground';
 import { AuthCard, AuthHeader } from '@/app/components/authCard/AuthCard';
 import { FormField } from '@/app/components/form/Form';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
-import { TurnstileWidget } from '@/app/components/TurnstileWidget';
 import styles from '../shared.module.css';
 
 export default function VerifyEmailPage() {
   const [loading, setLoading] = useState(false);
   const [complete, setComplete] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaResetKey, setCaptchaResetKey] = useState(0);
   const {
     register,
     handleSubmit,
@@ -27,18 +24,11 @@ export default function VerifyEmailPage() {
   } = useForm<ForgotPasswordInput>({ resolver: zodResolver(forgotPasswordSchema) });
 
   const onSubmit = async (data: ForgotPasswordInput) => {
-    if (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && !captchaToken) {
-      toast.error('Complete the human verification before continuing.');
-      return;
-    }
     setLoading(true);
     try {
       const { error } = await authClient.sendVerificationEmail({
         email: data.email,
         callbackURL: '/login',
-        fetchOptions: captchaToken
-          ? { headers: { 'x-captcha-response': captchaToken } }
-          : undefined,
       });
 
       if (error) throw new Error(error.message ?? 'The request could not be completed.');
@@ -46,8 +36,6 @@ export default function VerifyEmailPage() {
       toast.success('Verification request accepted.');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'The request could not be completed.');
-      setCaptchaToken(null);
-      setCaptchaResetKey((value) => value + 1);
     } finally {
       setLoading(false);
     }
@@ -76,8 +64,7 @@ export default function VerifyEmailPage() {
                   error={errors.email?.message}
                   autoComplete="email"
                   {...register('email')}
-                />
-                <TurnstileWidget onToken={setCaptchaToken} resetKey={captchaResetKey} />
+                />{' '}
                 <SubmitButton loading={loading}>Send verification email</SubmitButton>
               </form>
             )}
