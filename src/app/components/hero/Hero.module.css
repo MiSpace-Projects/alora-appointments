@@ -139,83 +139,99 @@
   display: block;
 }
 
-/* ── Mobile: large title with the portrait layered in front ──
-   The title sits behind (z1), the portrait overlaps it (z2), and the
-   description + actions flow below the image (z3). Offsets are viewport-
-   relative so the overlap scales with the title. */
+/* ── Mobile: full-viewport hero, wordmark spanning the width, cutout in front ──
+   The hero becomes a flex column that fills the viewport. `.content` is
+   flattened with `display: contents` so label, title, portrait, description
+   and actions are all direct flex items and can be re-ordered: the portrait
+   slots between title and description, grows to absorb the remaining height,
+   and is pulled up over the lower half of the wordmark with a negative
+   margin. Letter tops stay clear so "Alora" remains readable on both sides
+   of the subject (GrandPool treatment). */
 @media (max-width: 760px) {
   .hero {
+    --hero-title-size: clamp(4.5rem, 35vw, 9rem);
+    --hero-inline-pad: 1.25rem;
+
     position: relative;
-    display: block;
+    display: flex;
+    flex-direction: column;
     min-height: 100svh;
-    padding-top: 64px;
+    padding: calc(var(--navbar-height, 64px) + 1.25rem) var(--hero-inline-pad)
+      max(1.5rem, env(safe-area-inset-bottom));
     overflow: hidden;
   }
 
   .content {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    padding: 1.75rem 1.25rem 2.5rem;
-    margin: 0;
+    display: contents;
   }
 
   .label {
     position: relative;
     z-index: 3;
+    order: 1;
   }
 
-  /* Wordmark is the full-width backdrop layer; the portrait rises in front,
-     so the letters read on BOTH sides of the subject (GrandPool style). */
+  /* Sized so the five letters span the full inline width. */
   .title {
     position: relative;
     z-index: 1;
+    order: 2;
     margin: 0.35rem 0 0;
-    font-size: clamp(5rem, 31vw, 9rem);
+    font-size: var(--hero-title-size);
     line-height: 0.9;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.005em;
+    white-space: nowrap;
   }
 
-  /* The cutout subject sits IN FRONT of the wordmark (z2 over z1), positioned
-     so it rises up through the letters: its top lands mid-wordmark, occluding
-     the lower half, while the letters stay readable around it. */
+  /* In-flow, grows to fill the leftover viewport height, and overlaps the
+     bottom ~45% of the wordmark. `contain` + top anchoring keeps the subject's
+     head in the letters regardless of how tall the leftover space is. */
   .portrait {
     --hero-bleed: 0;
 
-    position: absolute;
+    position: relative;
     z-index: 2;
+    order: 3;
     inset: auto;
-    left: 55%;
-    top: clamp(9.25rem, 37vw, 14.5rem);
-    width: min(60%, 18rem);
-    height: clamp(18rem, 74vw, 27rem);
-    translate: -50% 0;
+    flex: 1 1 auto;
+    width: 100%;
+    height: auto;
+    min-height: 13rem;
+    margin-top: calc(var(--hero-title-size) * -0.42);
+    translate: none;
     -webkit-mask-image: none;
     mask-image: none;
   }
 
   .portraitImage {
     object-fit: contain;
-    object-position: center top;
+    object-position: 76% top;
   }
 
-  /* Description tucks directly under the subject — no dead gap. */
+  /* The afro profile is a wide head-and-shoulders crop, so it is height-
+     limited. Widen its box past the left edge and anchor the face right: the
+     afro bleeds off-canvas while the face lands on the closing letters. */
+  .lightPortrait {
+    object-position: right top;
+  }
+
+  :global(html:not([data-theme='dark'])) .portrait {
+    width: calc(100% + 22vw);
+    margin-left: -22vw;
+  }
+
   .description {
     position: relative;
     z-index: 3;
+    order: 4;
     max-width: 100%;
-    margin-top: clamp(13rem, 62vw, 21rem);
+    margin-top: 1.25rem;
   }
 
   .actions {
     position: relative;
     z-index: 3;
-  }
-}
-
-@media (max-width: 390px) {
-  .title {
-    font-size: clamp(4.4rem, 27vw, 6.5rem);
+    order: 5;
   }
 }
 
