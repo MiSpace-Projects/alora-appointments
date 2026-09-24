@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
+import { User, LogOut, ArrowUpRight } from 'lucide-react';
 import { routes } from '@/app/config/routes';
 import { navItems } from './navbarData';
 import ProtectedLink from '../protected/ProtectedLink';
@@ -70,19 +71,13 @@ export default function Navbar() {
   const avatarContent = loading ? null : user ? (
     getInitials(user.name)
   ) : (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 12c2.761 0 5-2.239 5-5s-2.239-5-5-5-5 2.239-5 5 2.239 5 5 5z"
-        fill="currentColor"
-      />
-      <path d="M3 20c0-3.866 3.582-7 9-7s9 3.134 9 7v1H3v-1z" fill="currentColor" />
-    </svg>
+    <User size={18} strokeWidth={1.8} aria-hidden="true" />
   );
 
   return (
     <header className={`${styles.header}${scrolled ? ` ${styles.scrolled}` : ''}`}>
       <div className={styles.container}>
-        <Link href={routes.home.path} className={styles.logo}>
+        <Link href={routes.home.path} className={styles.logo} onClick={() => setMenuOpen(false)}>
           <Image
             src="/alora-hair.png"
             alt="Alora"
@@ -97,12 +92,14 @@ export default function Navbar() {
 
         <button
           type="button"
-          className={styles.menuButton}
+          className={`${styles.menuButton}${menuOpen ? ` ${styles.menuButtonOpen}` : ''}`}
           aria-expanded={menuOpen}
           aria-label="Toggle navigation menu"
           onClick={() => setMenuOpen((prev) => !prev)}
         >
-          {menuOpen ? 'Close' : 'Menu'}
+          <span className={styles.menuBar} />
+          <span className={styles.menuBar} />
+          <span className={styles.menuBar} />
         </button>
 
         <nav
@@ -117,10 +114,11 @@ export default function Navbar() {
                 <ProtectedLink
                   key={navItem.path}
                   href={navItem.path}
-                  className={styles.navLink}
+                  className={styles.navCta}
                   onClick={() => setMenuOpen(false)}
                 >
                   {navItem.label}
+                  <ArrowUpRight size={15} strokeWidth={2} aria-hidden="true" />
                 </ProtectedLink>
               );
             }
@@ -161,21 +159,28 @@ export default function Navbar() {
 
           {dropOpen && user && (
             <div className={styles.dropdown} role="menu">
+              <div className={styles.dropdownHeader}>
+                <span className={styles.dropdownName}>{user.name}</span>
+                <span className={styles.dropdownEmail}>{user.email}</span>
+              </div>
+              <div className={styles.dropdownDivider} />
               <Link
                 href={routes.myProfile.path}
                 className={styles.dropdownItem}
                 role="menuitem"
                 onClick={() => setDropOpen(false)}
               >
+                <User size={16} strokeWidth={1.8} aria-hidden="true" />
                 {routes.myProfile.label}
               </Link>
               <button
-                className={styles.dropdownItem}
+                className={`${styles.dropdownItem} ${styles.dropdownSignOut}`}
                 role="menuitem"
                 disabled={signingOut}
                 onClick={handleSignOut}
               >
-                Sign out
+                <LogOut size={16} strokeWidth={1.8} aria-hidden="true" />
+                {signingOut ? 'Signing out…' : 'Sign out'}
               </button>
             </div>
           )}
