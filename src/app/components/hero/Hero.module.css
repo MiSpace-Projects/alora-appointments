@@ -164,10 +164,16 @@
     display: contents;
   }
 
+  /* The eyebrow does not sit over the wordmark on mobile: the wordmark and
+     portrait stand alone at the top, and the eyebrow heads the copy block. */
   .label {
     position: relative;
     z-index: 3;
-    order: 1;
+    order: 4;
+    margin-top: 1.25rem;
+    font-size: 0.66rem;
+    letter-spacing: 0.2em;
+    opacity: 0.55;
   }
 
   /* Sized so the five letters span the full inline width. */
@@ -175,7 +181,7 @@
     position: relative;
     z-index: 1;
     order: 2;
-    margin: 0.35rem 0 0;
+    margin: 0;
     font-size: var(--hero-title-size);
     line-height: 0.9;
     letter-spacing: 0.005em;
@@ -222,15 +228,15 @@
   .description {
     position: relative;
     z-index: 3;
-    order: 4;
+    order: 5;
     max-width: 100%;
-    margin-top: 1.25rem;
+    margin-top: 0.6rem;
   }
 
   .actions {
     position: relative;
     z-index: 3;
-    order: 5;
+    order: 6;
   }
 }
 
