@@ -86,8 +86,10 @@
 }
 
 @media (max-width: 768px) {
+  /* Extra bottom padding keeps the copyright line clear of the fixed
+     theme toggle (and the home indicator on notched phones). */
   .footer {
-    padding: 3rem 1.5rem 2rem;
+    padding: 3rem 1.5rem calc(4rem + env(safe-area-inset-bottom));
   }
 
   .top {
