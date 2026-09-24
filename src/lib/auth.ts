@@ -1,7 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { APIError, createAuthMiddleware } from 'better-auth/api';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { captcha, haveIBeenPwned, twoFactor } from 'better-auth/plugins';
+import { haveIBeenPwned, twoFactor } from 'better-auth/plugins';
 import { prisma } from './prisma';
 import {
   newDeviceEmail,
@@ -10,7 +10,7 @@ import {
   resetPasswordEmail,
   verificationEmail,
 } from './email';
-import { authRuntimeConfig, getTrustedOrigins, isCaptchaConfigured } from './auth-config';
+import { authRuntimeConfig, getTrustedOrigins } from './auth-config';
 import { hashPassword, verifyPassword } from './password';
 import { authSignUpSchema } from './validation';
 import { recordSecurityEvent, registerKnownDevice } from './security-events';
@@ -73,23 +73,6 @@ const authPlugins = [
       durationSeconds: 30 * 60,
     },
   }),
-  ...(isCaptchaConfigured()
-    ? [
-        captcha({
-          provider: 'cloudflare-turnstile',
-          secretKey: authRuntimeConfig.captcha.secretKey,
-          endpoints: [
-            '/sign-up/email',
-            '/sign-in/email',
-            '/request-password-reset',
-            '/send-verification-email',
-          ],
-          ...(authRuntimeConfig.captcha.allowedHostnames.length > 0
-            ? { allowedHostnames: authRuntimeConfig.captcha.allowedHostnames }
-            : {}),
-        }),
-      ]
-    : []),
 ];
 
 export const auth = betterAuth({
