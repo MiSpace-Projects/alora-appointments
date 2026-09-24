@@ -123,13 +123,12 @@
   object-position: right center;
 }
 
-/* Cutout effect: the photos have solid backgrounds, so we blend the background
-   INTO the hero — multiply drops the white bg on the light theme, screen drops
-   the black bg on the dark theme. The subject then reads as a true cutout in
-   front of the wordmark, with the letters showing behind it (GrandPool style). */
+/* The portraits are real transparent cutouts (public/hero/*-cutout.png), so
+   the subject is OPAQUE and sits in front of the wordmark, occluding the
+   letters where it overlaps them — exactly the GrandPool treatment. No blend. */
 .darkPortrait {
   display: none;
-  filter: contrast(1.12) brightness(1.05);
+  filter: contrast(1.1) brightness(1.08);
 }
 
 :global([data-theme='dark']) .lightPortrait {
@@ -138,15 +137,6 @@
 
 :global([data-theme='dark']) .darkPortrait {
   display: block;
-}
-
-/* Blend on the CONTAINER so it composites against the wordmark + hero bg. */
-.portrait {
-  mix-blend-mode: multiply;
-}
-
-:global([data-theme='dark']) .portrait {
-  mix-blend-mode: screen;
 }
 
 /* ── Mobile: large title with the portrait layered in front ──
@@ -186,18 +176,19 @@
     letter-spacing: -0.01em;
   }
 
-  /* Narrower than the wordmark and centered, overlapping the lower half of the
-     letters and rising up through them — the word stays legible around it. */
+  /* The cutout subject sits IN FRONT of the wordmark (z2 over z1), positioned
+     so it rises up through the letters: its top lands mid-wordmark, occluding
+     the lower half, while the letters stay readable around it. */
   .portrait {
     --hero-bleed: 0;
 
     position: absolute;
     z-index: 2;
     inset: auto;
-    left: 50%;
-    top: clamp(9.5rem, 38vw, 15rem);
-    width: min(66%, 20rem);
-    height: clamp(19rem, 80vw, 29rem);
+    left: 55%;
+    top: clamp(9.25rem, 37vw, 14.5rem);
+    width: min(60%, 18rem);
+    height: clamp(18rem, 74vw, 27rem);
     translate: -50% 0;
     -webkit-mask-image: none;
     mask-image: none;
@@ -208,22 +199,12 @@
     object-position: center top;
   }
 
-  /* The light photo has more headroom above the subject than the dark one, so
-     lift it so the afro rises into the wordmark like the dark portrait does. */
-  :global([data-theme='light']) .portrait {
-    translate: -50% -17vw;
-  }
-
-  /* Description tucks directly under the portrait — no dead gap. */
+  /* Description tucks directly under the subject — no dead gap. */
   .description {
     position: relative;
     z-index: 3;
     max-width: 100%;
-    margin-top: clamp(13.5rem, 70vw, 23rem);
-  }
-
-  :global([data-theme='light']) .description {
-    margin-top: clamp(10.5rem, 54vw, 18rem);
+    margin-top: clamp(13rem, 62vw, 21rem);
   }
 
   .actions {
