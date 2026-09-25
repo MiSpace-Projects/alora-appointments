@@ -6,7 +6,7 @@ import { routes } from '@/app/config/routes';
 import { featuredCategory, serviceCategories } from './servicesData';
 import styles from './ServiceSection.module.css';
 
-const PRICING_ANCHOR = routes.pricing.path;
+const STYLES_ANCHOR = routes.styles.path;
 
 /**
  * Service families with a line of copy each; every tile links to the price
@@ -27,8 +27,8 @@ export default function Services() {
         </div>
 
         <div className={styles.headerRight}>
-          <Link href={PRICING_ANCHOR} className={styles.viewAll}>
-            See prices →
+          <Link href={STYLES_ANCHOR} className={styles.viewAll}>
+            See styles &amp; prices →
           </Link>
         </div>
       </motion.div>
@@ -46,8 +46,8 @@ export default function Services() {
             <span className={styles.badge}>Featured</span>
             <h3 className={styles.cardTitle}>{featuredCategory.title}</h3>
             <p>{featuredCategory.description}</p>
-            <Link href={PRICING_ANCHOR} className={styles.cardLink}>
-              View prices →
+            <Link href={STYLES_ANCHOR} className={styles.cardLink}>
+              View styles →
             </Link>
           </div>
         </motion.div>
@@ -70,8 +70,8 @@ export default function Services() {
               <div className={styles.cardBody}>
                 <h3 className={styles.cardTitle}>{item.title}</h3>
                 <p className={styles.cardDesc}>{item.description}</p>
-                <Link href={PRICING_ANCHOR} className={styles.cardLink}>
-                  View prices →
+                <Link href={STYLES_ANCHOR} className={styles.cardLink}>
+                  View styles →
                 </Link>
               </div>
             </motion.div>

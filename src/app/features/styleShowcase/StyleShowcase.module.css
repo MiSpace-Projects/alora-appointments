@@ -1,0 +1,334 @@
+/* Style showcase — the inspo's composition (script eyebrow inside a drawn
+   ring, oversized name, cutout standing in front, price panel) rebuilt in
+   Alora's language: black/white canvas, Playfair, #d4c5b0 hairlines, no
+   colour blocks. Three compositions per screen on desktop. */
+
+.section {
+  --showcase-gap: 2rem;
+  --per-view: 3;
+
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5rem 0 5.5rem;
+  color: var(--text);
+  background: var(--background);
+  text-align: left;
+  scroll-margin-top: var(--navbar-height, 72px);
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 7rem;
+  margin-bottom: 2.5rem;
+}
+
+.section .kicker {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.arrow {
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.arrow:hover:not(:disabled),
+.arrow:focus-visible {
+  border-color: #d4c5b0;
+  background: rgba(212, 197, 176, 0.12);
+}
+
+.arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* ── Track ── */
+/* The viewport carries the page gutters and clips, so exactly N slides are
+   visible and nothing peeks in the gutter. */
+.viewport {
+  padding: 0 7rem;
+}
+
+.track {
+  display: flex;
+  gap: var(--showcase-gap);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.slide {
+  flex: 0 0 calc((100% - var(--showcase-gap) * (var(--per-view) - 1)) / var(--per-view));
+  min-width: 0;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Composition ── */
+.stage {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 1.5rem;
+  overflow: hidden;
+}
+
+.ring {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 78%;
+  height: auto;
+  transform: translateX(-50%) rotate(-5deg);
+  fill: none;
+  stroke: #d4c5b0;
+  stroke-width: 1.2;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+.section .eyebrow {
+  position: relative;
+  z-index: 2;
+  margin: 0 0 0.35rem;
+  font-family: var(--font-playfair-display), serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+  color: #d4c5b0;
+}
+
+.name {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 0 0.5rem;
+  font-family: var(--font-playfair-display), serif;
+  font-size: clamp(2.6rem, 4.4vw, 4.4rem);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Until artwork is supplied a style keeps the ring + name and a shorter
+   stage, so the composition never reads as a missing image. The slide still
+   stretches so the price panels of a page line up. */
+.stageNoArt {
+  aspect-ratio: auto;
+  flex: 1 1 auto;
+  min-height: 12rem;
+  justify-content: flex-start;
+}
+
+/* Cutout stands in front of the name, feet at the panel edge. */
+.portrait {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 0;
+  width: 90%;
+  height: 78%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.portraitImage {
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+/* ── Price panel (the inspo's colour block, as a hairline strip) ── */
+.panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid rgba(212, 197, 176, 0.35);
+  border-radius: 1rem;
+  background: rgba(212, 197, 176, 0.06);
+}
+
+.panelText {
+  min-width: 0;
+}
+
+.section .description {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text);
+  opacity: 0.85;
+}
+
+.section .meta {
+  display: flex;
+  gap: 0.9rem;
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.buy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.price {
+  font-family: var(--font-playfair-display), serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #d4c5b0;
+  white-space: nowrap;
+}
+
+.book {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0.55rem 1.3rem;
+  border-radius: 999px;
+  background: #d4c5b0;
+  color: #171717;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.book:hover,
+.book:focus-visible {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+/* ── Dots ── */
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 2.25rem;
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(128, 128, 128, 0.35);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.dotActive {
+  background: #d4c5b0;
+  transform: scale(1.3);
+}
+
+.section .empty {
+  padding: 3rem 7rem;
+  color: var(--muted);
+}
+
+@media (max-width: 1024px) {
+  .section {
+    --per-view: 2;
+  }
+
+  .topBar,
+  .viewport {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    --per-view: 1;
+    --showcase-gap: 1.25rem;
+    padding: 3.5rem 0 4rem;
+  }
+
+  .topBar,
+  .viewport {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .name {
+    font-size: clamp(2.6rem, 13vw, 3.6rem);
+  }
+
+  .panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .buy {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .section .empty {
+    padding: 2rem 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    scroll-behavior: auto;
+  }
+
+  .arrow,
+  .book,
+  .dot {
+    transition: none;
+  }
+}

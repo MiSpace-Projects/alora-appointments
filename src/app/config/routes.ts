@@ -1,7 +1,7 @@
 export const routes = {
   home: { label: 'Alora', path: '/' },
   services: { label: 'Services', path: '/#services' },
-  pricing: { label: 'Prices', path: '/#pricing' },
+  styles: { label: 'Styles', path: '/#styles' },
   bookNow: { label: 'Book Now', path: '/book' },
   myProfile: { label: 'My Profile', path: '/profile' },
   privacy: { label: 'Privacy Policy', path: '/privacy-policy' },
