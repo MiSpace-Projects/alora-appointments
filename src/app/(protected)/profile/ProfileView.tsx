@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import type { LoyaltyStanding } from '@/lib/loyalty-core';
 import { formatZar, formatBookingDate, formatBookingTime } from '@/lib/format';
@@ -34,7 +35,12 @@ export interface BookingView {
   pointsAwarded: number;
   paymentMethod: 'PAY_NOW' | 'PAY_IN_SALON';
   paidAt: Date | string | null;
-  payments: { status: PaymentStatus; amountCents: number; refundedCents: number }[];
+  payments: {
+    reference: string;
+    status: PaymentStatus;
+    amountCents: number;
+    refundedCents: number;
+  }[];
   service: { name: string };
 }
 
@@ -218,6 +224,19 @@ export function ProfileView({
                     {paymentLabel(booking).text}
                   </p>
                   <p className={styles.bookingPoints}>+{booking.pointsAwarded} loyalty points</p>
+                  {(() => {
+                    const settled = booking.payments.find((p) =>
+                      ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED'].includes(p.status),
+                    );
+                    return settled ? (
+                      <Link
+                        href={`/book/payment/receipt/${encodeURIComponent(settled.reference)}`}
+                        className={styles.receiptLink}
+                      >
+                        View receipt →
+                      </Link>
+                    ) : null;
+                  })()}
                 </div>
                 {isUpcoming(booking) && (
                   <BookingActions
