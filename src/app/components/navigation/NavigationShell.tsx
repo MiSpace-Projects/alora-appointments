@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import Navbar from '../navbar/Navbar';
-import Footer, { type FooterServiceLink } from '../footer/Footer';
+import Footer from '../footer/Footer';
 import FloatingThemeToggle from '../FloatingThemeToggle';
 import { Breadcrumbs } from './Breadcrumbs';
 
@@ -19,11 +19,9 @@ const AUTH_ROUTE_PREFIXES = [
 
 interface NavigationShellProps {
   children: ReactNode;
-  /** Live service catalog for the footer, resolved once in the root layout. */
-  footerServices: FooterServiceLink[];
 }
 
-export function NavigationShell({ children, footerServices }: NavigationShellProps) {
+export function NavigationShell({ children }: NavigationShellProps) {
   const pathname = usePathname() ?? '/';
   const isAuthRoute = AUTH_ROUTE_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 
@@ -34,7 +32,7 @@ export function NavigationShell({ children, footerServices }: NavigationShellPro
       {children}
       {!isAuthRoute && (
         <>
-          <Footer services={footerServices} />
+          <Footer />
           <FloatingThemeToggle />
         </>
       )}
