@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
+import { getServiceFamily } from '@/app/features/servicesSection/servicesData';
 import styles from './Breadcrumbs.module.css';
 
 interface BreadcrumbItem {
@@ -33,6 +34,10 @@ function titleFromSegment(segment: string): string {
 function breadcrumbsFor(pathname: string): BreadcrumbItem[] {
   const configured = routeBreadcrumbs[pathname];
   if (configured) return configured;
+
+  const familyMatch = pathname.match(/^\/services\/([a-z0-9-]+)$/);
+  const family = familyMatch ? getServiceFamily(familyMatch[1]) : undefined;
+  if (family) return [{ label: 'Services', href: '/services' }, { label: family.title }];
 
   const segments = pathname.split('/').filter(Boolean);
   return segments.map((segment, index) => {

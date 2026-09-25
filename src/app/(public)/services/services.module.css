@@ -1,0 +1,446 @@
+/* Service family pages — a descriptive editorial piece: full-bleed image
+   hero, numbered "what's included" rows, the family's styles as a compact
+   menu strip (thumbnail · name · duration · price · book), prep notes, CTA.
+   Same canvas, Playfair headings, #d4c5b0 hairlines and accent. */
+
+.page {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: calc(var(--navbar-height) + var(--breadcrumb-height)) 0 5rem;
+  color: var(--text-color);
+  background: var(--content-bg);
+  text-align: left;
+}
+
+/* ── Hero ── */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 0;
+  min-height: 34rem;
+}
+
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 4rem 3rem 4rem 7rem;
+}
+
+.kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-playfair-display), serif;
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+}
+
+.intro {
+  max-width: 34rem;
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  opacity: 0.82;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.heroImage {
+  position: relative;
+  min-height: 24rem;
+  overflow: hidden;
+}
+
+.heroImage img {
+  object-fit: cover;
+}
+
+.heroImage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, var(--content-bg) 0%, transparent 28%);
+  pointer-events: none;
+}
+
+/* ── Shared section frame ── */
+.section {
+  padding: 4.5rem 7rem 0;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-playfair-display), serif;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+/* ── Numbered includes ── */
+.includes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.include {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 0 1rem;
+  padding: 1.4rem 0;
+  border-top: 1px solid rgba(128, 128, 128, 0.22);
+  counter-increment: step;
+}
+
+.include::before {
+  content: counter(step, decimal-leading-zero);
+  font-family: var(--font-playfair-display), serif;
+  font-size: 1.1rem;
+  color: #d4c5b0;
+}
+
+.includeTitle {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  font-weight: 650;
+}
+
+.includeBody {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  opacity: 0.78;
+}
+
+/* ── Menu strip ── */
+.strip {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid rgba(128, 128, 128, 0.22);
+}
+
+.stripRow {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr) auto auto auto;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.16);
+}
+
+.thumb {
+  position: relative;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(212, 197, 176, 0.12);
+}
+
+.thumb img {
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+.stripName {
+  margin: 0;
+  font-family: var(--font-playfair-display), serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.stripDesc {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  opacity: 0.65;
+}
+
+.stripMeta {
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  opacity: 0.6;
+}
+
+.stripPrice {
+  font-family: var(--font-playfair-display), serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #d4c5b0;
+  white-space: nowrap;
+}
+
+.stripBook,
+.primary,
+.secondary {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 1.2rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.stripBook,
+.primary {
+  background: #d4c5b0;
+  color: #171717;
+  border: 0;
+}
+
+.secondary {
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  color: var(--text-color);
+  background: transparent;
+}
+
+.stripBook:hover,
+.primary:hover,
+.stripBook:focus-visible,
+.primary:focus-visible {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.secondary:hover,
+.secondary:focus-visible {
+  border-color: #d4c5b0;
+}
+
+.stripEmpty {
+  padding: 1.5rem 0;
+  border-top: 1px solid rgba(128, 128, 128, 0.22);
+  font-size: 0.95rem;
+  opacity: 0.7;
+}
+
+/* ── Prep notes ── */
+.prep {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem 2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.prepItem {
+  padding: 1rem 1.1rem;
+  border-left: 2px solid #d4c5b0;
+  background: rgba(212, 197, 176, 0.06);
+  border-radius: 0 0.75rem 0.75rem 0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  opacity: 0.88;
+}
+
+/* ── CTA band ── */
+.cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin: 5rem 7rem 0;
+  padding: 2rem 2.25rem;
+  border: 1px solid rgba(212, 197, 176, 0.35);
+  border-radius: 1.25rem;
+}
+
+.ctaTitle {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-playfair-display), serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.ctaBody {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+/* ── Index page ── */
+.indexGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 1.5rem;
+  padding: 3rem 7rem 0;
+}
+
+.indexItem {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 18rem;
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  color: #fff;
+  text-decoration: none;
+}
+
+.indexItem img {
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.indexItem:hover img {
+  transform: scale(1.04);
+}
+
+.indexItem::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.82), rgba(0, 0, 0, 0.2));
+}
+
+.indexCopy {
+  position: relative;
+  z-index: 1;
+}
+
+.indexTitle {
+  margin: 0 0 0.3rem;
+  font-family: var(--font-playfair-display), serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.indexDesc {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #fff;
+  opacity: 0.85;
+}
+
+@media (max-width: 1024px) {
+  .heroCopy {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+
+  .section,
+  .indexGrid {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+
+  .cta {
+    margin-left: 2.5rem;
+    margin-right: 2.5rem;
+  }
+
+  .includes {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .heroImage {
+    order: -1;
+    min-height: 16rem;
+  }
+
+  .heroImage::after {
+    background: linear-gradient(to top, var(--content-bg) 0%, transparent 40%);
+  }
+
+  .heroCopy {
+    padding: 1.5rem 1.25rem 2.5rem;
+  }
+
+  .section,
+  .indexGrid {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .section {
+    padding-top: 3rem;
+  }
+
+  .stripRow {
+    grid-template-columns: 3rem minmax(0, 1fr) auto;
+    grid-template-areas:
+      'thumb name price'
+      'thumb meta book';
+    row-gap: 0.4rem;
+  }
+
+  .stripRow > :nth-child(1) {
+    grid-area: thumb;
+  }
+
+  .stripRow > :nth-child(2) {
+    grid-area: name;
+  }
+
+  .stripRow > :nth-child(3) {
+    grid-area: meta;
+  }
+
+  .stripRow > :nth-child(4) {
+    grid-area: price;
+    justify-self: end;
+  }
+
+  .stripRow > :nth-child(5) {
+    grid-area: book;
+    justify-self: end;
+  }
+
+  .cta {
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 3.5rem 1.25rem 0;
+    padding: 1.5rem 1.25rem;
+  }
+}
