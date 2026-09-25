@@ -1,6 +1,6 @@
 import { routes } from '@/app/config/routes';
 
-export const navItems = [routes.services, routes.pricing, routes.bookNow];
+export const navItems = [routes.services, routes.styles, routes.bookNow];
 
 export const avatarMenuItems = [
   {
