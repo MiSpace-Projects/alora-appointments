@@ -1,4 +1,5 @@
 import { listActiveServices } from '@/lib/data/services';
+import { isPaystackConfigured } from '@/lib/payments/paystack';
 import { BookingForm, type ServiceOption } from './BookingForm';
 
 // Auth-gated and reads the live catalog from the DB per request — never
@@ -29,5 +30,11 @@ export default async function BookPage({
     pointsAwarded: s.pointsAwarded,
   }));
 
-  return <BookingForm services={options} preselectedServiceId={preselectedId} />;
+  return (
+    <BookingForm
+      services={options}
+      preselectedServiceId={preselectedId}
+      onlinePaymentAvailable={isPaystackConfigured()}
+    />
+  );
 }

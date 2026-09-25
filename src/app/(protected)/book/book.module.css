@@ -90,6 +90,10 @@
   font-weight: 600;
 }
 
+.optional {
+  opacity: 0.5;
+}
+
 .error {
   color: #ff8f8f;
   font-size: 0.8rem;
@@ -99,4 +103,166 @@
   padding: 2rem 0;
   color: rgba(255, 255, 255, 0.55);
   text-align: center;
+}
+
+/* ── Payment choice (ECTA s43: customer picks how to settle before confirming) ── */
+.choiceGroup {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.choice {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.choice:has(input:checked) {
+  border-color: #d4c5b0;
+  background: rgba(212, 197, 176, 0.08);
+}
+
+.choice input {
+  margin-top: 0.2rem;
+  accent-color: #d4c5b0;
+}
+
+.choiceTitle {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.choiceHint {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.45;
+}
+
+/* ── Review step ── */
+.review {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.1rem 1.15rem;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 197, 176, 0.25);
+  background: rgba(212, 197, 176, 0.06);
+}
+
+.reviewRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.92rem;
+}
+
+.reviewRow dt {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.reviewRow dd {
+  margin: 0;
+  text-align: right;
+}
+
+.reviewTotal {
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(212, 197, 176, 0.25);
+  font-weight: 600;
+}
+
+.reviewTotal dd {
+  color: #d4c5b0;
+}
+
+.legalNote {
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.legalNote a {
+  color: #d4c5b0;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.primaryLink,
+.secondaryLink,
+.secondaryButton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.primaryLink {
+  color: #000;
+  background: #fff;
+  border: 0;
+}
+
+.primaryLink:hover {
+  background: #d4c5b0;
+  transform: translateY(-1px);
+}
+
+.secondaryLink,
+.secondaryButton {
+  color: #fff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.secondaryLink:hover,
+.secondaryButton:hover {
+  border-color: #d4c5b0;
+}
+
+.reference {
+  margin: -1rem 0 1.5rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.reference code {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* <fieldset> reuses .field; strip the UA chrome so it lays out like a plain group. */
+fieldset.field {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+fieldset.field legend {
+  padding: 0;
+  margin-bottom: 0.5rem;
 }
