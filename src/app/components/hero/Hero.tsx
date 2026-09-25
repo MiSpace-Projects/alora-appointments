@@ -53,9 +53,9 @@ export default function Hero() {
           themeClassName={styles.lightPortrait}
         />
         <HeroPortrait
-          desktopSrc="/hero/alora-braided-cutout-v2.png"
+          desktopSrc="/hero/alora-afro-pose-dark-cutout.png"
           mobileSrc="/hero/alora-seated-mobile-dark-cutout.png"
-          alt="Monochrome portrait of a seated woman with natural hair, face lifted"
+          alt="Portrait of a woman with natural hair, one arm raised over her head"
           themeClassName={styles.darkPortrait}
         />
       </motion.div>
