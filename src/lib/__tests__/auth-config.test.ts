@@ -33,24 +33,6 @@ describe('production auth configuration', () => {
     expect(getProductionAuthConfigurationErrors()).toEqual([]);
   });
 
-  it('rejects PAYMENTS_MOCK in production', async () => {
-    Object.assign(process.env, {
-      BETTER_AUTH_SECRET: Buffer.alloc(32, 1).toString('base64'),
-      BETTER_AUTH_URL: 'https://alora.example.com',
-      NEXT_PUBLIC_APP_URL: 'https://alora.example.com',
-      NEXT_PUBLIC_BETTER_AUTH_URL: 'https://alora.example.com',
-      AUTH_IP_ADDRESS_HEADERS: 'cf-connecting-ip',
-      AUTH_FINGERPRINT_SECRET: Buffer.alloc(32, 2).toString('base64'),
-      RESEND_API_KEY: 're_test_key',
-      EMAIL_FROM: 'Alora <no-reply@alora.example.com>',
-      PAYMENTS_MOCK: 'true',
-    });
-    const { getProductionAuthConfigurationErrors } = await import('@/lib/auth-config');
-    expect(getProductionAuthConfigurationErrors()).toContain(
-      'PAYMENTS_MOCK must not be enabled in production',
-    );
-  });
-
   it('requires Resend email configuration', async () => {
     Object.assign(process.env, {
       BETTER_AUTH_SECRET: Buffer.alloc(32, 1).toString('base64'),

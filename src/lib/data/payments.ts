@@ -14,14 +14,8 @@ import {
   isMockReference,
   MOCK_REFERENCE_PREFIX,
 } from '@/lib/payments/provider';
-import { businessContact } from '@/app/config/business';
-
 /** How long after a successful payment the return page still greets it as fresh. */
 const FRESH_PAYMENT_WINDOW_MS = 15 * 60_000;
-
-function appOrigin(): string {
-  return (process.env.NEXT_PUBLIC_APP_URL ?? businessContact.website).replace(/\/$/, '');
-}
 
 /**
  * Payment DAL. Every mutation is idempotent on the provider reference so the
@@ -73,11 +67,13 @@ export async function startBookingPayment(
 
   let init: { authorizationUrl: string; reference: string };
   if (provider === 'mock') {
-    // Fake hosted checkout inside this app; never reachable in production.
+    // Fake hosted checkout inside this app. Relative URL so it stays on the
+    // origin the customer is actually on (localhost in dev, the deployed
+    // domain otherwise) — never a hardcoded origin.
     const reference = `${MOCK_REFERENCE_PREFIX}${booking.id}_${Date.now().toString(36)}`;
     init = {
       reference,
-      authorizationUrl: `${appOrigin()}/book/payment/mock?reference=${encodeURIComponent(reference)}`,
+      authorizationUrl: `/book/payment/mock?reference=${encodeURIComponent(reference)}`,
     };
   } else {
     const reference = buildPaymentReference(booking.id);
@@ -343,4 +339,51 @@ export async function recordProviderRefund(input: {
       lastEventAt: new Date(),
     },
   });
+}
+
+export interface ReceiptData {
+  reference: string;
+  status: PaymentStatus;
+  amountCents: number;
+  refundedCents: number;
+  currency: string;
+  channel: string | null;
+  paidAt: Date | null;
+  createdAt: Date;
+  serviceName: string;
+  startsAt: Date;
+  customerName: string;
+  customerEmail: string;
+}
+
+/**
+ * Receipt for one of the acting user's own payments. Ownership is enforced in
+ * the query, and only a settled (or refunded) payment yields a receipt.
+ */
+export async function getReceiptByReference(
+  userId: string,
+  reference: string,
+  customer: { name: string; email: string },
+): Promise<ReceiptData | null> {
+  const payment = await prisma.payment.findFirst({
+    where: { reference, userId },
+    include: { booking: { include: { service: { select: { name: true } } } } },
+  });
+  if (!payment) return null;
+  if (payment.status === 'PENDING' || payment.status === 'FAILED') return null;
+
+  return {
+    reference: payment.reference,
+    status: payment.status,
+    amountCents: payment.amountCents,
+    refundedCents: payment.refundedCents,
+    currency: payment.currency,
+    channel: payment.channel,
+    paidAt: payment.paidAt,
+    createdAt: payment.createdAt,
+    serviceName: payment.booking.service.name,
+    startsAt: payment.booking.startsAt,
+    customerName: customer.name,
+    customerEmail: customer.email,
+  };
 }

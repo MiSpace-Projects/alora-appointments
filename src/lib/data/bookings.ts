@@ -16,7 +16,13 @@ export function listUserBookings(userId: string) {
       service: { select: { name: true, slug: true } },
       payments: {
         orderBy: { createdAt: 'desc' },
-        select: { status: true, amountCents: true, refundedCents: true, channel: true },
+        select: {
+          reference: true,
+          status: true,
+          amountCents: true,
+          refundedCents: true,
+          channel: true,
+        },
       },
     },
   });

@@ -1,0 +1,248 @@
+/* Receipt — a clean document on the dark canvas, and a plain black-on-white
+   sheet when printed. */
+.page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: calc(var(--navbar-height) + var(--breadcrumb-height) + 1.5rem) 1.25rem 4rem;
+  background: var(--content-bg);
+  color: var(--text-color);
+}
+
+.receipt {
+  width: 100%;
+  max-width: 40rem;
+  padding: 2.25rem;
+  border: 1px solid rgba(128, 128, 128, 0.24);
+  border-radius: 1rem;
+  background: var(--background);
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.22);
+}
+
+.brand {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-playfair-display), serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.brandMeta {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  opacity: 0.7;
+}
+
+.brandMeta a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.docLabel {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.receiptWord {
+  display: block;
+  font-family: var(--font-playfair-display), serif;
+  font-size: 1.5rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.status {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.statusPaid {
+  background: rgba(74, 222, 128, 0.14);
+  color: #3ea76a;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.statusRefunded {
+  background: rgba(212, 197, 176, 0.16);
+  color: #b08d57;
+  border: 1px solid rgba(212, 197, 176, 0.4);
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.1rem 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.meta dt {
+  margin-bottom: 0.2rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+
+.meta dd {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.mono {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.82rem;
+  word-break: break-all;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.table th {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.3);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  text-align: left;
+}
+
+.table td {
+  padding: 0.9rem 0;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.16);
+  vertical-align: top;
+  font-size: 0.92rem;
+}
+
+.right {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.itemName {
+  display: block;
+  font-weight: 600;
+}
+
+.itemSub {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.refundRow td {
+  color: #b08d57;
+}
+
+.totalLabel {
+  padding-top: 1rem;
+  font-weight: 600;
+}
+
+.totalValue {
+  padding-top: 1rem;
+  font-family: var(--font-playfair-display), serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #d4c5b0;
+}
+
+.note {
+  margin: 1.5rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  opacity: 0.62;
+}
+
+.note a {
+  color: #d4c5b0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.75rem;
+}
+
+.printButton {
+  min-height: 44px;
+  padding: 0.65rem 1.4rem;
+  border: 0;
+  border-radius: 999px;
+  background: #d4c5b0;
+  color: #171717;
+  font-size: 0.82rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.printButton:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.backLink {
+  font-size: 0.85rem;
+  color: var(--text-color);
+  opacity: 0.7;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* Print: a plain white sheet, no app chrome. */
+@media print {
+  .page {
+    padding: 0;
+    background: #fff;
+    color: #000;
+  }
+
+  .receipt {
+    max-width: none;
+    border: 0;
+    border-radius: 0;
+    background: #fff;
+    color: #000;
+    padding: 0;
+  }
+
+  .actions {
+    display: none;
+  }
+
+  .totalValue {
+    color: #000;
+  }
+
+  .brandMeta,
+  .note {
+    opacity: 1;
+    color: #333;
+  }
+}

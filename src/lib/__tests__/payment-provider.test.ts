@@ -41,12 +41,29 @@ describe('getPaymentProvider', () => {
     expect(dev.isOnlinePaymentAvailable()).toBe(false);
   });
 
-  it('never enables the mock in production, even if the flag is set', async () => {
+  it('is off in production by default, on with an explicit flag (pre-launch WIP)', async () => {
+    process.env = { ...ORIGINAL_ENV, NODE_ENV: 'production' };
+    delete process.env.PAYSTACK_SECRET_KEY;
+    delete process.env.PAYMENTS_MOCK;
+    const off = await import('@/lib/payments/provider');
+    expect(off.getPaymentProvider()).toBeNull();
+
+    jest.resetModules();
     process.env = { ...ORIGINAL_ENV, NODE_ENV: 'production', PAYMENTS_MOCK: 'true' };
     delete process.env.PAYSTACK_SECRET_KEY;
-    const prod = await import('@/lib/payments/provider');
-    expect(prod.getPaymentProvider()).toBeNull();
-    expect(prod.isMockPaymentsEnabled()).toBe(false);
+    const on = await import('@/lib/payments/provider');
+    expect(on.getPaymentProvider()).toBe('mock');
+  });
+
+  it('lets a real Paystack key win over the mock flag', async () => {
+    process.env = {
+      ...ORIGINAL_ENV,
+      NODE_ENV: 'production',
+      PAYMENTS_MOCK: 'true',
+      PAYSTACK_SECRET_KEY: 'sk_live_x',
+    };
+    const { getPaymentProvider } = await import('@/lib/payments/provider');
+    expect(getPaymentProvider()).toBe('paystack');
   });
 
   it('recognises mock references', async () => {

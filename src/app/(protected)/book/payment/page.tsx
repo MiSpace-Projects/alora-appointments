@@ -81,7 +81,22 @@ export default async function PaymentReturnPage({ searchParams }: PageProps) {
           </p>
         )}
         <div className={styles.actions}>
-          <Link href={routes.myProfile.path} className={styles.primaryLink}>
+          {reference && (outcome === 'PAID' || outcome === 'ALREADY_PAID') && (
+            <Link
+              href={`/book/payment/receipt/${encodeURIComponent(reference)}`}
+              className={styles.primaryLink}
+            >
+              View receipt
+            </Link>
+          )}
+          <Link
+            href={routes.myProfile.path}
+            className={
+              reference && (outcome === 'PAID' || outcome === 'ALREADY_PAID')
+                ? styles.secondaryLink
+                : styles.primaryLink
+            }
+          >
             Go to my bookings
           </Link>
           {outcome === 'FAILED' && (

@@ -494,3 +494,18 @@
     width: 100%;
   }
 }
+
+.receiptLink {
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #d4c5b0;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.receiptLink:hover,
+.receiptLink:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}

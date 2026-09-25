@@ -103,9 +103,9 @@ export function getProductionAuthConfigurationErrors(): string[] {
   if (!decodeCanonicalBase64(process.env.AUTH_FINGERPRINT_SECRET)) {
     errors.push('AUTH_FINGERPRINT_SECRET must be exactly 32 random bytes in canonical base64');
   }
-  if (process.env.PAYMENTS_MOCK === 'true') {
-    errors.push('PAYMENTS_MOCK must not be enabled in production');
-  }
+  // PAYMENTS_MOCK is allowed in production for a pre-launch WIP (the mock
+  // checkout is clearly labelled "Test mode" and charges nothing); a real
+  // Paystack key always takes precedence over it, so this is not a hard error.
   if (!process.env.RESEND_API_KEY) {
     errors.push('RESEND_API_KEY is required');
   }
