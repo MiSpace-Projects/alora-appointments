@@ -1,7 +1,7 @@
 import styles from './page.module.css';
 import Hero from '../components/hero/Hero';
 import Services from '../features/servicesSection/ServiceSection';
-import { PriceList } from '../features/priceList/PriceList';
+import { StyleShowcase } from '../features/styleShowcase/StyleShowcase';
 import { listActiveServices } from '@/lib/data/services';
 import LoyaltyPage from '../features/loyalty/Loyalty';
 import QuickBookingsSection from '../features/quickBookings/QuickBookings';
@@ -40,7 +40,17 @@ export default async function Home() {
       <Hero />
       <div className={styles.home}>
         <Services />
-        <PriceList services={services} />
+        <StyleShowcase
+          items={services.map((s) => ({
+            slug: s.slug,
+            name: s.name,
+            description: s.description,
+            priceCents: s.priceCents,
+            durationMinutes: s.durationMinutes,
+            pointsAwarded: s.pointsAwarded,
+            imageUrl: s.imageUrl,
+          }))}
+        />
         <LoyaltyPage />
         <QuickBookingsSection />
         <Testimonials />
