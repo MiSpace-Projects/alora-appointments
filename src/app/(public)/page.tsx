@@ -1,6 +1,8 @@
 import styles from './page.module.css';
 import Hero from '../components/hero/Hero';
 import Services from '../features/servicesSection/ServiceSection';
+import { PriceList } from '../features/priceList/PriceList';
+import { listActiveServices } from '@/lib/data/services';
 import LoyaltyPage from '../features/loyalty/Loyalty';
 import QuickBookingsSection from '../features/quickBookings/QuickBookings';
 import Testimonials from '../features/testimonials/Testimonials';
@@ -21,7 +23,14 @@ const localBusinessSchema = {
   currenciesAccepted: 'ZAR',
 };
 
-export default function Home() {
+export default async function Home() {
+  // Public menu straight from the catalog; a DB hiccup renders the empty state
+  // rather than taking the homepage down.
+  const services = await listActiveServices().catch((error: unknown) => {
+    console.error('[home] failed to load the service catalog', error);
+    return [];
+  });
+
   return (
     <>
       <script
@@ -31,6 +40,7 @@ export default function Home() {
       <Hero />
       <div className={styles.home}>
         <Services />
+        <PriceList services={services} />
         <LoyaltyPage />
         <QuickBookingsSection />
         <Testimonials />

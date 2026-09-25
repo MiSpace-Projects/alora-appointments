@@ -166,16 +166,55 @@
 .cardTitle {
   position: relative;
   z-index: 2;
+  margin: 0;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--text-lg);
   color: #ffffff;
 }
 
+.cardBody {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  text-align: left;
+}
+
+.cardDesc {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.cardLink {
+  align-self: flex-start;
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #d4c5b0;
+  text-decoration: none;
+}
+
+.cardLink:hover,
+.cardLink:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(46, 46, 46, 0.65);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.82) 0%,
+    rgba(0, 0, 0, 0.45) 55%,
+    rgba(0, 0, 0, 0.25) 100%
+  );
 }
 
 @media (max-width: 900px) {
