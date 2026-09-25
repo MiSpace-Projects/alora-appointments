@@ -6,6 +6,7 @@ import { listActiveServices } from '@/lib/data/services';
 import LoyaltyPage from '../features/loyalty/Loyalty';
 import QuickBookingsSection from '../features/quickBookings/QuickBookings';
 import Testimonials from '../features/testimonials/Testimonials';
+import { Lookbook } from '../features/lookbook/Lookbook';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
@@ -52,6 +53,7 @@ export default async function Home() {
           }))}
         />
         <LoyaltyPage />
+        <Lookbook />
         <QuickBookingsSection />
         <Testimonials />
       </div>

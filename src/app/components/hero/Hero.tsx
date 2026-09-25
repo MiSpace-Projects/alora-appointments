@@ -47,15 +47,15 @@ export default function Hero() {
 
       <motion.div className={styles.portrait} variants={visualVariants}>
         <HeroPortrait
-          desktopSrc="/hero/alora-afro-cutout-v2.png"
-          mobileSrc="/hero/alora-afro-mobile-light-cutout.png"
-          alt="Monochrome side-profile portrait of a woman with natural hair"
+          desktopSrc="/hero/alora-light-hero-cutout.webp"
+          mobileSrc="/hero/alora-light-hero-cutout.webp"
+          alt="Portrait of a woman with a natural afro and white editorial face art"
           themeClassName={styles.lightPortrait}
         />
         <HeroPortrait
-          desktopSrc="/hero/alora-afro-pose-dark-cutout.png"
-          mobileSrc="/hero/alora-seated-mobile-dark-cutout.png"
-          alt="Portrait of a woman with natural hair, one arm raised over her head"
+          desktopSrc="/hero/alora-dark-desktop-cutout.webp"
+          mobileSrc="/hero/alora-dark-mobile-cutout.webp"
+          alt="Portrait of a woman with a natural afro, hand resting at her temple"
           themeClassName={styles.darkPortrait}
         />
       </motion.div>
