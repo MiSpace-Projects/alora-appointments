@@ -9,7 +9,6 @@ import { MotionProvider } from './components/MotionProvider';
 import { ConsentProvider } from './components/consent/ConsentContext';
 import { CookieNotice } from './components/consent/CookieNotice';
 import { NavigationShell } from './components/navigation/NavigationShell';
-import { listActiveServices } from '@/lib/data/services';
 import { Toaster } from 'sonner';
 import 'sonner/dist/styles.css';
 
@@ -76,11 +75,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const nonce = (await headers()).get('x-nonce') ?? undefined;
-  // Footer service links come from the live catalog; a DB hiccup must never
-  // take the whole shell down, so fall back to an empty list.
-  const footerServices = await listActiveServices()
-    .then((services) => services.map(({ slug, name }) => ({ slug, name })))
-    .catch(() => []);
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -92,7 +86,7 @@ export default async function RootLayout({
             <MotionProvider>
               <ConsentProvider>
                 <Toaster />
-                <NavigationShell footerServices={footerServices}>{children}</NavigationShell>
+                <NavigationShell>{children}</NavigationShell>
                 <CookieNotice />
               </ConsentProvider>
             </MotionProvider>

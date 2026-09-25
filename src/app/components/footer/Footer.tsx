@@ -1,22 +1,13 @@
 import Link from 'next/link';
 import { routes } from '@/app/config/routes';
 import { businessContact } from '@/app/config/business';
+import { serviceFamilies } from '@/app/features/servicesSection/servicesData';
 import ProtectedLink from '../protected/ProtectedLink';
 import styles from './Footer.module.css';
 
-export interface FooterServiceLink {
-  slug: string;
-  name: string;
-}
-
-interface FooterProps {
-  /** Live catalog from the DB; each entry deep-links into the booking form. */
-  services: FooterServiceLink[];
-}
-
 const legalLinks = [routes.privacy, routes.cookies, routes.terms, routes.paia] as const;
 
-export default function Footer({ services }: FooterProps) {
+export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
@@ -30,20 +21,16 @@ export default function Footer({ services }: FooterProps) {
           </p>
         </div>
 
-        {services.length > 0 && (
-          <div className={styles.col}>
-            <span className={styles.colTitle}>Services</span>
-            <ul className={styles.links}>
-              {services.map((service) => (
-                <li key={service.slug}>
-                  <ProtectedLink href={`${routes.bookNow.path}?service=${service.slug}`}>
-                    {service.name}
-                  </ProtectedLink>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <div className={styles.col}>
+          <span className={styles.colTitle}>Services</span>
+          <ul className={styles.links}>
+            {serviceFamilies.map((family) => (
+              <li key={family.slug}>
+                <Link href={`${routes.servicesIndex.path}/${family.slug}`}>{family.title}</Link>
+              </li>
+            ))}
+          </ul>
+        </div>
 
         <div className={styles.col}>
           <span className={styles.colTitle}>Quick Links</span>

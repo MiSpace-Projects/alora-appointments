@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import styles from './Loyalty.module.css';
 import { motion } from 'framer-motion';
 import { CiStar, CiTrophy, CiGift } from 'react-icons/ci';
@@ -67,25 +68,41 @@ const tiers: {
 export default function LoyaltyPage() {
   return (
     <div className={styles.page}>
-      <motion.section
-        className={styles.header}
-        initial="hidden"
-        animate="show"
-        variants={container}
-      >
-        <motion.span className={styles.kicker} variants={item}>
-          Rewards
-        </motion.span>
+      <motion.section className={styles.intro} initial="hidden" animate="show" variants={container}>
+        <div className={styles.header}>
+          <motion.span className={styles.kicker} variants={item}>
+            Rewards
+          </motion.span>
 
-        <motion.h1 className={styles.title} variants={item}>
-          Loyalty
-          <br />
-          Programme
-        </motion.h1>
+          <motion.h1 className={styles.title} variants={item}>
+            Loyalty
+            <br />
+            Programme
+          </motion.h1>
 
-        <motion.p className={styles.subtitle} variants={item}>
-          Every visit earns points. Climb the tiers and unlock exclusive perks.
-        </motion.p>
+          <motion.p className={styles.subtitle} variants={item}>
+            Every visit earns points. Climb the tiers and unlock exclusive perks.
+          </motion.p>
+        </div>
+
+        {/* Theme-matched portrait: light-background shot in light mode, dark in dark,
+            so the photo's own backdrop dissolves into the section. */}
+        <motion.div className={styles.portrait} variants={item} aria-hidden="true">
+          <Image
+            src="/features/face-art.webp"
+            alt=""
+            fill
+            sizes="(max-width: 900px) 0px, 26vw"
+            className={`${styles.portraitImg} ${styles.portraitLight}`}
+          />
+          <Image
+            src="/features/raised-arm.webp"
+            alt=""
+            fill
+            sizes="(max-width: 900px) 0px, 26vw"
+            className={`${styles.portraitImg} ${styles.portraitDark}`}
+          />
+        </motion.div>
       </motion.section>
 
       <motion.section
