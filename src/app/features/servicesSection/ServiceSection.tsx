@@ -1,24 +1,17 @@
 'use client';
 
-import styles from './ServiceSection.module.css';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import ProtectedLink from '@/app/components/protected/ProtectedLink';
 import { routes } from '@/app/config/routes';
+import { featuredCategory, serviceCategories } from './servicesData';
+import styles from './ServiceSection.module.css';
 
-// const reveal = {
-//   hidden: { opacity: 0, y: 30 },
-//   show: {
-//     opacity: 1,
-//     y: 0,
-//     transition: {
-//       type: 'spring',
-//       stiffness: 90,
-//       damping: 18,
-//       mass: 0.9,
-//     },
-//   },
-// };
+const PRICING_ANCHOR = routes.pricing.path;
 
+/**
+ * Service families with a line of copy each; every tile links to the price
+ * list, which holds the concrete menu and prices from the database.
+ */
 export default function Services() {
   return (
     <div id="services" className={styles.services}>
@@ -34,19 +27,16 @@ export default function Services() {
         </div>
 
         <div className={styles.headerRight}>
-          <ProtectedLink href={routes.bookNow.path} className={styles.viewAll}>
-            Book a service →
-          </ProtectedLink>
+          <Link href={PRICING_ANCHOR} className={styles.viewAll}>
+            See prices →
+          </Link>
         </div>
       </motion.div>
 
       <div className={styles.content}>
         <motion.div
           className={styles.featured}
-          style={{
-            backgroundImage:
-              "url('https://images.pexels.com/photos/14730865/pexels-photo-14730865.jpeg')",
-          }}
+          style={{ backgroundImage: `url('${featuredCategory.img}')` }}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.35 }}
@@ -54,30 +44,16 @@ export default function Services() {
           <div className={styles.overlay} />
           <div className={styles.featuredContent}>
             <span className={styles.badge}>Featured</span>
-            <h3 className={styles.cardTitle}>Wig Care</h3>
-            <p>Professional washing, styling, and maintenance to keep your crown flawless.</p>
+            <h3 className={styles.cardTitle}>{featuredCategory.title}</h3>
+            <p>{featuredCategory.description}</p>
+            <Link href={PRICING_ANCHOR} className={styles.cardLink}>
+              View prices →
+            </Link>
           </div>
         </motion.div>
 
         <div className={styles.grid}>
-          {[
-            {
-              title: 'Nail Art',
-              img: 'https://images.pexels.com/photos/14016180/pexels-photo-14016180.jpeg',
-            },
-            {
-              title: 'Matric Farewell',
-              img: 'https://images.pexels.com/photos/30482416/pexels-photo-30482416.jpeg',
-            },
-            {
-              title: 'Hair Styling',
-              img: 'https://images.pexels.com/photos/7446913/pexels-photo-7446913.jpeg',
-            },
-            {
-              title: 'Makeup',
-              img: 'https://images.pexels.com/photos/10698022/pexels-photo-10698022.jpeg',
-            },
-          ].map((item) => (
+          {serviceCategories.map((item) => (
             <motion.div
               key={item.title}
               className={styles.card}
@@ -91,7 +67,13 @@ export default function Services() {
               }}
             >
               <div className={styles.overlay} />
-              <span className={styles.cardTitle}>{item.title}</span>
+              <div className={styles.cardBody}>
+                <h3 className={styles.cardTitle}>{item.title}</h3>
+                <p className={styles.cardDesc}>{item.description}</p>
+                <Link href={PRICING_ANCHOR} className={styles.cardLink}>
+                  View prices →
+                </Link>
+              </div>
             </motion.div>
           ))}
         </div>

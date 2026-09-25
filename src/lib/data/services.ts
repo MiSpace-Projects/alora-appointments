@@ -9,7 +9,7 @@ import { prisma } from '@/lib/prisma';
 export function listActiveServices() {
   return prisma.service.findMany({
     where: { active: true },
-    orderBy: { priceCents: 'asc' },
+    orderBy: [{ category: 'asc' }, { sortOrder: 'asc' }, { priceCents: 'asc' }],
   });
 }
 
