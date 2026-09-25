@@ -5,12 +5,13 @@ export type PaymentProvider = 'paystack' | 'mock';
 
 /**
  * Which online-payment provider is active.
- *   - 'paystack' when PAYSTACK_SECRET_KEY is set
- *   - 'mock'     when PAYMENTS_MOCK=true outside production: a fake hosted
- *                checkout for demos and local development, never live money
- *   - null       online payment is not offered (pay-at-salon only)
+ *   - 'paystack' when PAYSTACK_SECRET_KEY is set (real gateway; any environment)
+ *   - 'mock'     a fake hosted checkout for demos and local development —
+ *                on by default outside production so the pay-now journey is
+ *                always visible in `npm run dev`, never live money
+ *   - null       only in production with no real key: pay-at-salon only
  * The mock can never activate in production; the production validator also
- * refuses to boot with PAYMENTS_MOCK set there.
+ * refuses to boot with PAYMENTS_MOCK explicitly set there.
  */
 export function getPaymentProvider(): PaymentProvider | null {
   if (isPaystackConfigured()) return 'paystack';
@@ -18,8 +19,14 @@ export function getPaymentProvider(): PaymentProvider | null {
   return null;
 }
 
+/**
+ * The mock is enabled in any non-production environment unless explicitly
+ * turned off with PAYMENTS_MOCK=false. This means a plain `npm run dev` shows
+ * the full pay-now journey with no setup. Production is always off.
+ */
 export function isMockPaymentsEnabled(): boolean {
-  return process.env.PAYMENTS_MOCK === 'true' && process.env.NODE_ENV !== 'production';
+  if (process.env.NODE_ENV === 'production') return false;
+  return process.env.PAYMENTS_MOCK !== 'false';
 }
 
 export function isOnlinePaymentAvailable(): boolean {
