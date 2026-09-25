@@ -14,6 +14,8 @@ const prisma = new PrismaClient({
 const services = [
   {
     slug: 'wig-wash-style',
+    category: 'Wigs',
+    sortOrder: 1,
     name: 'Wig Wash & Style',
     description: 'Deep cleanse, condition and restyle for your wig.',
     priceCents: 35000,
@@ -22,6 +24,8 @@ const services = [
   },
   {
     slug: 'silk-press',
+    category: 'Hair',
+    sortOrder: 2,
     name: 'Silk Press',
     description: 'Smooth, sleek press with a lightweight finish.',
     priceCents: 45000,
@@ -30,6 +34,8 @@ const services = [
   },
   {
     slug: 'protective-braids',
+    category: 'Hair',
+    sortOrder: 3,
     name: 'Protective Braids',
     description: 'Long-lasting braided style that protects your natural hair.',
     priceCents: 60000,
@@ -38,6 +44,8 @@ const services = [
   },
   {
     slug: 'cut-and-shape',
+    category: 'Hair',
+    sortOrder: 1,
     name: 'Cut & Shape',
     description: 'Precision cut tailored to your face and texture.',
     priceCents: 28000,

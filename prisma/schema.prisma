@@ -173,6 +173,10 @@ model Service {
   slug            String    @unique
   name            String
   description     String?
+  // Menu grouping for the public price list (e.g. "Hair", "Wigs", "Nails").
+  category        String?
+  // Manual ordering within a category; ties fall back to price.
+  sortOrder       Int       @default(0)
   priceCents      Int
   durationMinutes Int
   pointsAwarded   Int       @default(0)
@@ -183,6 +187,7 @@ model Service {
   bookings        Booking[]
 
   @@index([active])
+  @@index([category, sortOrder])
   @@map("service")
 }
 
