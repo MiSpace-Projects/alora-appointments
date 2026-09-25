@@ -3,10 +3,13 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { routes } from '@/app/config/routes';
-import { featuredCategory, serviceCategories } from './servicesData';
+import { serviceFamilies } from './servicesData';
 import styles from './ServiceSection.module.css';
 
 const STYLES_ANCHOR = routes.styles.path;
+const featuredCategory = serviceFamilies.find((f) => f.featured) ?? serviceFamilies[0];
+const serviceCategories = serviceFamilies.filter((f) => f !== featuredCategory);
+const familyPath = (slug: string) => `${routes.servicesIndex.path}/${slug}`;
 
 /**
  * Service families with a line of copy each; every tile links to the price
@@ -46,8 +49,8 @@ export default function Services() {
             <span className={styles.badge}>Featured</span>
             <h3 className={styles.cardTitle}>{featuredCategory.title}</h3>
             <p>{featuredCategory.description}</p>
-            <Link href={STYLES_ANCHOR} className={styles.cardLink}>
-              View styles →
+            <Link href={familyPath(featuredCategory.slug)} className={styles.cardLink}>
+              Explore →
             </Link>
           </div>
         </motion.div>
@@ -70,8 +73,8 @@ export default function Services() {
               <div className={styles.cardBody}>
                 <h3 className={styles.cardTitle}>{item.title}</h3>
                 <p className={styles.cardDesc}>{item.description}</p>
-                <Link href={STYLES_ANCHOR} className={styles.cardLink}>
-                  View styles →
+                <Link href={familyPath(item.slug)} className={styles.cardLink}>
+                  Explore →
                 </Link>
               </div>
             </motion.div>

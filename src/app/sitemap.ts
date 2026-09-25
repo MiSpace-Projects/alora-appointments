@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { serviceFamilies } from '@/app/features/servicesSection/servicesData';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
@@ -7,6 +8,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '',
     '/login',
     '/register',
+    '/services',
+    ...serviceFamilies.map((family) => `/services/${family.slug}`),
     '/privacy-policy',
     '/cookie-policy',
     '/terms',

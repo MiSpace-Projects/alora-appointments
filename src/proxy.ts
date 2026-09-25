@@ -15,6 +15,7 @@ const PUBLIC_ROUTES = [
   '/cookie-policy',
   '/terms',
   '/paia-manual',
+  '/services',
 ];
 const PROTECTED_PREFIXES = ['/profile'];
 
