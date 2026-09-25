@@ -66,6 +66,15 @@ describe('settlePaymentByReference', () => {
     );
   });
 
+  it('greets a just-completed payment as PAID on the return page', async () => {
+    const { settlePaymentByReference } = await import('@/lib/data/payments');
+    findUnique.mockResolvedValue({ ...pendingPayment, status: 'SUCCESS', paidAt: new Date() });
+
+    await expect(settlePaymentByReference(pendingPayment.reference)).resolves.toBe('PAID');
+    expect(verifyTransaction).not.toHaveBeenCalled();
+    expect(bookingUpdateMany).not.toHaveBeenCalled();
+  });
+
   it('is idempotent: a second delivery after success changes nothing', async () => {
     const { settlePaymentByReference } = await import('@/lib/data/payments');
     findUnique.mockResolvedValue({ ...pendingPayment, status: 'SUCCESS' });
