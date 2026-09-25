@@ -9,6 +9,19 @@ import {
   type VerifiedTransaction,
 } from '@/lib/payments/paystack';
 import { quoteRefund, type RefundQuote } from '@/lib/refund-policy';
+import {
+  getPaymentProvider,
+  isMockReference,
+  MOCK_REFERENCE_PREFIX,
+} from '@/lib/payments/provider';
+import { businessContact } from '@/app/config/business';
+
+/** How long after a successful payment the return page still greets it as fresh. */
+const FRESH_PAYMENT_WINDOW_MS = 15 * 60_000;
+
+function appOrigin(): string {
+  return (process.env.NEXT_PUBLIC_APP_URL ?? businessContact.website).replace(/\/$/, '');
+}
 
 /**
  * Payment DAL. Every mutation is idempotent on the provider reference so the
@@ -55,14 +68,27 @@ export async function startBookingPayment(
     return { authorizationUrl: reusable.authorizationUrl, reference: reusable.reference };
   }
 
-  const reference = buildPaymentReference(booking.id);
-  const init = await initializeTransaction({
-    email: userEmail,
-    amountCents: booking.priceCents,
-    reference,
-    callbackUrl,
-    metadata: { bookingId: booking.id, userId },
-  });
+  const provider = getPaymentProvider();
+  if (!provider) throw new Error('PAYMENTS_UNAVAILABLE');
+
+  let init: { authorizationUrl: string; reference: string };
+  if (provider === 'mock') {
+    // Fake hosted checkout inside this app; never reachable in production.
+    const reference = `${MOCK_REFERENCE_PREFIX}${booking.id}_${Date.now().toString(36)}`;
+    init = {
+      reference,
+      authorizationUrl: `${appOrigin()}/book/payment/mock?reference=${encodeURIComponent(reference)}`,
+    };
+  } else {
+    const reference = buildPaymentReference(booking.id);
+    init = await initializeTransaction({
+      email: userEmail,
+      amountCents: booking.priceCents,
+      reference,
+      callbackUrl,
+      metadata: { bookingId: booking.id, userId },
+    });
+  }
 
   await prisma.$transaction([
     prisma.payment.create({
@@ -95,10 +121,43 @@ export type SettleOutcome = 'PAID' | 'ALREADY_PAID' | 'FAILED' | 'PENDING' | 'UN
 export async function settlePaymentByReference(reference: string): Promise<SettleOutcome> {
   const payment = await prisma.payment.findUnique({ where: { reference } });
   if (!payment) return 'UNKNOWN_REFERENCE';
-  if (payment.status === 'SUCCESS') return 'ALREADY_PAID';
+  if (payment.status === 'SUCCESS') {
+    // The webhook often settles before the customer lands on the return
+    // page; greet a just-completed payment as PAID rather than "already".
+    const fresh =
+      payment.paidAt != null && Date.now() - payment.paidAt.getTime() < FRESH_PAYMENT_WINDOW_MS;
+    return fresh ? 'PAID' : 'ALREADY_PAID';
+  }
+  if (isMockReference(reference)) {
+    // Mock payments are settled explicitly by the fake checkout page.
+    return payment.status === 'FAILED' ? 'FAILED' : 'PENDING';
+  }
 
   const verified = await verifyTransaction(reference);
   return applyVerifiedTransaction(payment, verified);
+}
+
+/**
+ * Mock provider only: the fake checkout page reports the outcome the tester
+ * chose. Runs through the same state machine as a verified Paystack result.
+ */
+export async function settleMockPayment(
+  reference: string,
+  outcome: 'success' | 'failed',
+): Promise<SettleOutcome> {
+  if (!isMockReference(reference)) return 'UNKNOWN_REFERENCE';
+  const payment = await prisma.payment.findUnique({ where: { reference } });
+  if (!payment) return 'UNKNOWN_REFERENCE';
+  if (payment.status === 'SUCCESS') return 'ALREADY_PAID';
+  return applyVerifiedTransaction(payment, {
+    status: outcome,
+    reference,
+    amount: payment.amountCents,
+    currency: 'ZAR',
+    channel: 'mock',
+    paid_at: new Date().toISOString(),
+    gateway_response: outcome === 'success' ? 'Approved (mock)' : 'Declined (mock)',
+  });
 }
 
 async function applyVerifiedTransaction(
@@ -201,7 +260,13 @@ export async function cancelBookingWithRefund(
   }
 
   try {
-    const refund = await refundTransaction(paid.reference, quote.refundCents);
+    const refund = isMockReference(paid.reference)
+      ? {
+          status: 'processed',
+          amountCents: quote.refundCents,
+          refundId: `mock_refund_${Date.now()}`,
+        }
+      : await refundTransaction(paid.reference, quote.refundCents);
     const refundedCents = paid.refundedCents + quote.refundCents;
     const status: PaymentStatus =
       refundedCents >= paid.amountCents ? 'REFUNDED' : 'PARTIALLY_REFUNDED';
