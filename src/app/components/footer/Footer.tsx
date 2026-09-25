@@ -1,10 +1,24 @@
-import styles from './Footer.module.css';
+import Link from 'next/link';
+import { routes } from '@/app/config/routes';
+import { businessContact } from '@/app/config/business';
 import ProtectedLink from '../protected/ProtectedLink';
+import styles from './Footer.module.css';
 
-const bookUrl = '/book';
-const dashUrl = '/profile';
+export interface FooterServiceLink {
+  slug: string;
+  name: string;
+}
 
-export default function Footer() {
+interface FooterProps {
+  /** Live catalog from the DB; each entry deep-links into the booking form. */
+  services: FooterServiceLink[];
+}
+
+const legalLinks = [routes.privacy, routes.cookies, routes.terms, routes.paia] as const;
+
+export default function Footer({ services }: FooterProps) {
+  const year = new Date().getFullYear();
+
   return (
     <footer className={styles.footer}>
       <div className={styles.top}>
@@ -16,28 +30,32 @@ export default function Footer() {
           </p>
         </div>
 
-        <div className={styles.col}>
-          <span className={styles.colTitle}>Services</span>
-          <ul className={styles.links}>
-            {['Wig Care', 'Nail Art', 'Matric Farewell', 'Hair Styling', 'Makeup'].map((s) => (
-              <li key={s}>
-                <ProtectedLink href={bookUrl}>{s}</ProtectedLink>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {services.length > 0 && (
+          <div className={styles.col}>
+            <span className={styles.colTitle}>Services</span>
+            <ul className={styles.links}>
+              {services.map((service) => (
+                <li key={service.slug}>
+                  <ProtectedLink href={`${routes.bookNow.path}?service=${service.slug}`}>
+                    {service.name}
+                  </ProtectedLink>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className={styles.col}>
           <span className={styles.colTitle}>Quick Links</span>
           <ul className={styles.links}>
             <li>
-              <ProtectedLink href={bookUrl}>Book Appointment</ProtectedLink>
+              <ProtectedLink href={routes.bookNow.path}>Book Appointment</ProtectedLink>
             </li>
             <li>
-              <ProtectedLink href={dashUrl}>My Bookings</ProtectedLink>
+              <ProtectedLink href={routes.myProfile.path}>My Bookings</ProtectedLink>
             </li>
             <li>
-              <ProtectedLink href={dashUrl}>Loyalty Points</ProtectedLink>
+              <ProtectedLink href={routes.myProfile.path}>Loyalty Points</ProtectedLink>
             </li>
           </ul>
         </div>
@@ -46,19 +64,32 @@ export default function Footer() {
           <span className={styles.colTitle}>Contact</span>
           <ul className={styles.links}>
             <li>
-              <span>alorabookings@gmail.com</span>
+              <a href={`mailto:${businessContact.email}`}>{businessContact.email}</a>
             </li>
             <li>
-              <span>+27(60) 639-7955</span>
+              <a href={`tel:${businessContact.phoneE164}`}>{businessContact.phoneDisplay}</a>
             </li>
             <li>
-              <span>Bethlehem, Free State</span>
+              <span>{businessContact.location}</span>
             </li>
+          </ul>
+        </div>
+
+        <div className={styles.col}>
+          <span className={styles.colTitle}>Legal</span>
+          <ul className={styles.links}>
+            {legalLinks.map((route) => (
+              <li key={route.path}>
+                <Link href={route.path}>{route.label}</Link>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
 
-      <div className={styles.bottom}>© 2026 Alora Appointments. All rights reserved.</div>
+      <div className={styles.bottom}>
+        © {year} {businessContact.tradingName}. All rights reserved.
+      </div>
     </footer>
   );
 }

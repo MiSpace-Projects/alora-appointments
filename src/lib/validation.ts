@@ -22,6 +22,12 @@ export const authSignUpSchema = z.object({
   name: accountNameSchema,
   email: z.string().trim().toLowerCase().email('Please enter a valid email'),
   password: newPasswordSchema,
+  // POPIA s18 notice / ECTA terms: acceptance is mandatory and enforced server-side.
+  termsAccepted: z
+    .boolean()
+    .refine((accepted) => accepted === true, 'Please accept the terms and privacy policy'),
+  // POPIA s69: marketing is strictly opt-in and unticked by default.
+  marketingOptIn: z.boolean(),
 });
 
 export const registerSchema = authSignUpSchema

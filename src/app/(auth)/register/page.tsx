@@ -15,7 +15,9 @@ import { AuthCard, AuthHeader } from '@/app/components/authCard/AuthCard';
 import { FormField } from '@/app/components/form/Form';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
 import { TabControl } from '@/app/components/AuthTabs/TabControl';
+import { routes } from '@/app/config/routes';
 import styles from './page.module.css';
+import shared from '../shared.module.css';
 
 function PasswordStrength({ password }: { password: string }) {
   const checks = [{ label: '15+ characters', met: password.length >= 15 }];
@@ -58,6 +60,7 @@ export default function RegisterPage() {
     formState: { errors },
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
+    defaultValues: { termsAccepted: false, marketingOptIn: false },
   });
 
   const password = useWatch({
@@ -74,6 +77,8 @@ export default function RegisterPage() {
         name: data.name,
         email: data.email,
         password: data.password,
+        termsAccepted: data.termsAccepted,
+        marketingOptIn: data.marketingOptIn,
       });
 
       if (result.error) {
@@ -127,6 +132,39 @@ export default function RegisterPage() {
         autoComplete="new-password"
         {...register('confirmPassword')}
       />
+
+      <div className={shared.consentBlock}>
+        <label className={shared.checkboxLabel}>
+          <input
+            type="checkbox"
+            className={shared.checkboxInput}
+            aria-invalid={errors.termsAccepted ? true : undefined}
+            {...register('termsAccepted')}
+          />
+          <span className={shared.checkboxText}>
+            I have read and accept the{' '}
+            <Link href={routes.terms.path} className={shared.inlineLink} target="_blank">
+              Terms &amp; Booking Policy
+            </Link>{' '}
+            and the{' '}
+            <Link href={routes.privacy.path} className={shared.inlineLink} target="_blank">
+              Privacy Policy
+            </Link>
+            .
+          </span>
+        </label>
+        {errors.termsAccepted && (
+          <span className={shared.fieldError} role="alert">
+            {errors.termsAccepted.message}
+          </span>
+        )}
+        <label className={shared.checkboxLabel}>
+          <input type="checkbox" className={shared.checkboxInput} {...register('marketingOptIn')} />
+          <span className={shared.checkboxText}>
+            Email me about offers and new services (optional; unsubscribe any time).
+          </span>
+        </label>
+      </div>
 
       <div className={styles.submitArea}>
         <SubmitButton loading={loading}>

@@ -82,7 +82,8 @@ export async function completeBooking(bookingId: string) {
 
     await tx.booking.update({ where: { id: bookingId }, data: { status: 'COMPLETED' } });
 
-    if (booking.pointsAwarded > 0) {
+    // A booking whose account has since been deleted has no wallet to credit.
+    if (booking.pointsAwarded > 0 && booking.userId) {
       await tx.pointsTransaction.create({
         data: {
           userId: booking.userId,

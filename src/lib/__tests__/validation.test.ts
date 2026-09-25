@@ -27,7 +27,19 @@ describe('registration validation', () => {
     email: 'ada@example.com',
     password: 'a long passphrase',
     confirmPassword: 'a long passphrase',
+    termsAccepted: true,
+    marketingOptIn: false,
   };
+
+  it('requires the terms to be accepted (POPIA s18 notice / ECTA terms)', () => {
+    expect(authSignUpSchema.safeParse({ ...base, termsAccepted: false }).success).toBe(false);
+    expect(registerSchema.safeParse({ ...base, termsAccepted: false }).success).toBe(false);
+  });
+
+  it('keeps marketing strictly opt-in (POPIA s69)', () => {
+    expect(authSignUpSchema.parse(base).marketingOptIn).toBe(false);
+    expect(authSignUpSchema.parse({ ...base, marketingOptIn: true }).marketingOptIn).toBe(true);
+  });
 
   it('accepts a 15-character passphrase without composition rules', () => {
     expect(registerSchema.safeParse(base).success).toBe(true);

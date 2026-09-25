@@ -2,6 +2,8 @@
 
 import styles from './ServiceSection.module.css';
 import { motion } from 'framer-motion';
+import ProtectedLink from '@/app/components/protected/ProtectedLink';
+import { routes } from '@/app/config/routes';
 
 // const reveal = {
 //   hidden: { opacity: 0, y: 30 },
@@ -32,7 +34,9 @@ export default function Services() {
         </div>
 
         <div className={styles.headerRight}>
-          <span className={styles.viewAll}>View All →</span>
+          <ProtectedLink href={routes.bookNow.path} className={styles.viewAll}>
+            Book a service →
+          </ProtectedLink>
         </div>
       </motion.div>
 
