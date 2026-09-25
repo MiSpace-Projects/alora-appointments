@@ -131,11 +131,6 @@
   color: #ffffff;
 }
 
-.featured p {
-  color: #ffffff;
-  opacity: 0.9;
-}
-
 .badge {
   font-size: var(--text-xs);
   letter-spacing: 0.15em;
@@ -182,11 +177,15 @@
   text-align: left;
 }
 
-.cardDesc {
+/* Copy sits on a photo with a dark overlay, so it stays white in both themes;
+   the `.services` prefix outranks the homepage's `.home p` colour rule. */
+.services .cardDesc,
+.services .featured p {
   margin: 0;
   font-size: var(--text-sm);
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.85);
+  color: #ffffff;
+  opacity: 0.88;
 }
 
 .cardLink {
