@@ -4,6 +4,7 @@ const config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+    '^server-only$': '<rootDir>/test/server-only.mock.ts',
     '\\.(css|scss|sass)$': 'identity-obj-proxy',
   },
   transform: {

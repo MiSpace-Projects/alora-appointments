@@ -12,7 +12,13 @@ export function listUserBookings(userId: string) {
   return prisma.booking.findMany({
     where: { userId },
     orderBy: { startsAt: 'desc' },
-    include: { service: { select: { name: true, slug: true } } },
+    include: {
+      service: { select: { name: true, slug: true } },
+      payments: {
+        orderBy: { createdAt: 'desc' },
+        select: { status: true, amountCents: true, refundedCents: true, channel: true },
+      },
+    },
   });
 }
 
@@ -51,6 +57,7 @@ export async function createBooking(userId: string, input: CreateBookingInput) {
       priceCents: service.priceCents,
       pointsAwarded: service.pointsAwarded,
       notes: input.notes,
+      paymentMethod: input.paymentMethod,
       status: 'PENDING',
     },
   });

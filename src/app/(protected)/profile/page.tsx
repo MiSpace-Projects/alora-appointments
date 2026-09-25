@@ -4,6 +4,7 @@ import { auth } from '@/lib/auth';
 import { listUserBookings } from '@/lib/data/bookings';
 import { getUserLoyalty } from '@/lib/data/loyalty';
 import { ProfileView } from './ProfileView';
+import { isPaystackConfigured } from '@/lib/payments/paystack';
 
 /**
  * Server component: resolves the session and loads the user's real bookings and
@@ -22,5 +23,12 @@ export default async function ProfilePage() {
     getUserLoyalty(session.user.id),
   ]);
 
-  return <ProfileView user={session.user} bookings={bookings} loyalty={loyalty} />;
+  return (
+    <ProfileView
+      user={session.user}
+      bookings={bookings}
+      loyalty={loyalty}
+      onlinePaymentAvailable={isPaystackConfigured()}
+    />
+  );
 }

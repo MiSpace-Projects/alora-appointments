@@ -93,9 +93,26 @@ describe('createBookingSchema', () => {
     const result = createBookingSchema.parse({
       serviceId: 'service-1',
       startsAt: new Date(Date.now() + 60_000).toISOString(),
+      paymentMethod: 'PAY_IN_SALON',
     });
 
     expect(result.startsAt).toBeInstanceOf(Date);
+  });
+
+  it('requires an explicit payment method (ECTA s43 choice before confirming)', () => {
+    expect(
+      createBookingSchema.safeParse({
+        serviceId: 'service-1',
+        startsAt: new Date(Date.now() + 60_000).toISOString(),
+      }).success,
+    ).toBe(false);
+    expect(
+      createBookingSchema.safeParse({
+        serviceId: 'service-1',
+        startsAt: new Date(Date.now() + 60_000).toISOString(),
+        paymentMethod: 'PAY_NOW',
+      }).success,
+    ).toBe(true);
   });
 
   it('rejects a booking in the past', () => {
@@ -103,6 +120,7 @@ describe('createBookingSchema', () => {
       createBookingSchema.safeParse({
         serviceId: 'service-1',
         startsAt: new Date(Date.now() - 60_000).toISOString(),
+        paymentMethod: 'PAY_IN_SALON',
       }).success,
     ).toBe(false);
   });

@@ -7,6 +7,7 @@ import { formatZar, formatBookingDate, formatBookingTime } from '@/lib/format';
 import ProtectedLink from '../../components/protected/ProtectedLink';
 import { SecuritySettings } from './SecuritySettings';
 import { PrivacySettings } from './PrivacySettings';
+import { BookingActions } from './BookingActions';
 import styles from './page.module.css';
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
@@ -23,12 +24,17 @@ const item = {
 
 type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
 
+type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'PARTIALLY_REFUNDED' | 'REFUNDED';
+
 export interface BookingView {
   id: string;
   startsAt: Date | string;
   status: BookingStatus;
   priceCents: number;
   pointsAwarded: number;
+  paymentMethod: 'PAY_NOW' | 'PAY_IN_SALON';
+  paidAt: Date | string | null;
+  payments: { status: PaymentStatus; amountCents: number; refundedCents: number }[];
   service: { name: string };
 }
 
@@ -68,14 +74,34 @@ function isUpcoming(b: BookingView): boolean {
   return future && (b.status === 'PENDING' || b.status === 'CONFIRMED');
 }
 
+/** Human label for the money side of a booking. */
+function paymentLabel(b: BookingView): { text: string; tone: 'paid' | 'refunded' | 'due' } {
+  const settled = b.payments.find(
+    (p) => p.status === 'SUCCESS' || p.status === 'PARTIALLY_REFUNDED' || p.status === 'REFUNDED',
+  );
+  if (settled && settled.refundedCents > 0) {
+    return {
+      text:
+        settled.refundedCents >= settled.amountCents
+          ? 'Refunded'
+          : `Refunded ${formatZar(settled.refundedCents)}`,
+      tone: 'refunded',
+    };
+  }
+  if (settled || b.paidAt) return { text: 'Paid online', tone: 'paid' };
+  return { text: b.paymentMethod === 'PAY_NOW' ? 'Payment due' : 'Pay at salon', tone: 'due' };
+}
+
 export function ProfileView({
   user,
   bookings,
   loyalty,
+  onlinePaymentAvailable,
 }: {
   user: ProfileUser;
   bookings: BookingView[];
   loyalty: LoyaltyStanding;
+  onlinePaymentAvailable: boolean;
 }) {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
 
@@ -186,8 +212,24 @@ export function ProfileView({
                     {booking.status.toLowerCase()}
                   </span>
                   <p className={styles.bookingPrice}>{formatZar(booking.priceCents)}</p>
+                  <p
+                    className={`${styles.paymentLabel} ${styles[`payment_${paymentLabel(booking).tone}`]}`}
+                  >
+                    {paymentLabel(booking).text}
+                  </p>
                   <p className={styles.bookingPoints}>+{booking.pointsAwarded} loyalty points</p>
                 </div>
+                {isUpcoming(booking) && (
+                  <BookingActions
+                    bookingId={booking.id}
+                    canPay={
+                      onlinePaymentAvailable &&
+                      !booking.paidAt &&
+                      !booking.payments.some((p) => p.status === 'SUCCESS')
+                    }
+                    canCancel
+                  />
+                )}
               </motion.div>
             ))
           )}
