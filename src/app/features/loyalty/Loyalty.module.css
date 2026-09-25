@@ -7,11 +7,45 @@
   color: var(--text);
 }
 
+/* Intro row: copy on the left, a theme-matched portrait on the right. */
+.intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+  align-items: center;
+  gap: 3rem;
+}
+
 .header {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   align-items: flex-start;
+}
+
+.portrait {
+  position: relative;
+  width: 100%;
+  height: 22rem;
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+
+.portraitImg {
+  object-fit: cover;
+  object-position: center 15%;
+}
+
+/* Show the light-background shot in light mode, the dark one in dark mode. */
+.portraitDark {
+  display: none;
+}
+
+:global([data-theme='dark']) .portraitLight {
+  display: none;
+}
+
+:global([data-theme='dark']) .portraitDark {
+  display: block;
 }
 
 .kicker {
@@ -144,6 +178,16 @@
 @media (max-width: 900px) {
   .page {
     padding: 3.5rem 2.5rem;
+  }
+
+  /* Portrait is a desktop accent; on tablet/phone the copy stands alone. */
+  .intro {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .portrait {
+    display: none;
   }
 
   .grid {

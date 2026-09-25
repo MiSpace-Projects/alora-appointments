@@ -8,3 +8,49 @@
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
+
+/* Single column in light mode (banner spans full width). In dark mode a
+   portrait joins on the right; its black backdrop blends into the band. */
+.inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.portrait {
+  display: none;
+}
+
+.portraitImg {
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+:global([data-theme='dark']) .inner {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
+  align-items: center;
+  gap: 2rem;
+}
+
+:global([data-theme='dark']) .portrait {
+  display: block;
+  position: relative;
+  align-self: stretch;
+  min-height: 22rem;
+  margin: 1.5rem 1.5rem 1.5rem 0;
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  /* Portrait is a desktop accent; the banner stands alone on smaller screens. */
+  :global([data-theme='dark']) .inner {
+    grid-template-columns: 1fr;
+  }
+
+  :global([data-theme='dark']) .portrait {
+    display: none;
+  }
+}
