@@ -15,6 +15,11 @@ model User {
   createdAt        DateTime            @default(now())
   updatedAt        DateTime            @updatedAt
   twoFactorEnabled Boolean             @default(false)
+  // Consent captured at sign-up (POPIA s18 notice / s69 marketing opt-in).
+  // Written by better-auth from the registration form; the audit trail with
+  // versions and timestamps lives in ConsentRecord.
+  termsAccepted    Boolean             @default(false)
+  marketingOptIn   Boolean             @default(false)
   sessions         Session[]
   accounts         Account[]
   twoFactors       TwoFactor[]
@@ -22,6 +27,7 @@ model User {
   authDevices      AuthDevice[]
   bookings         Booking[]
   pointsLedger     PointsTransaction[]
+  consentRecords   ConsentRecord[]
 
   @@unique([email])
   @@map("user")
@@ -175,7 +181,9 @@ model Service {
 
 model Booking {
   id            String        @id @default(cuid())
-  userId        String
+  // Nullable so a deleted account leaves its bookings behind as anonymous
+  // financial records (5-year tax retention) instead of cascading them away.
+  userId        String?
   serviceId     String
   startsAt      DateTime
   status        BookingStatus @default(PENDING)
@@ -188,7 +196,7 @@ model Booking {
   updatedAt     DateTime      @updatedAt
   cancelledAt   DateTime?
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
   service Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
 
   @@index([userId, startsAt])
@@ -211,4 +219,33 @@ model PointsTransaction {
 
   @@index([userId, createdAt])
   @@map("points_transaction")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Consent audit trail (POPIA s11(1)(a), s18, s69). Append-only: a withdrawal
+// is a new row with granted=false, never an update, so we can always show
+// what a person agreed to and when.
+// ─────────────────────────────────────────────────────────────
+
+enum ConsentKind {
+  TERMS
+  PRIVACY_NOTICE
+  COOKIE_NOTICE
+  MARKETING
+}
+
+model ConsentRecord {
+  id        String      @id @default(cuid())
+  userId    String?
+  kind      ConsentKind
+  version   String
+  granted   Boolean
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime    @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, kind, createdAt])
+  @@map("consent_record")
 }

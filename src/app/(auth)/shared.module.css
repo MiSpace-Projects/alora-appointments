@@ -96,6 +96,39 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
+/* Consent block on sign-up: stacked checkboxes, top-aligned so multi-line
+   labels read cleanly. */
+.consentBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.consentBlock .checkboxLabel {
+  align-items: flex-start;
+}
+
+.consentBlock .checkboxInput {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.consentBlock .checkboxText {
+  line-height: 1.45;
+}
+
+.inlineLink {
+  color: #d4c5b0;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.fieldError {
+  font-size: 0.75rem;
+  color: #ff8f8f;
+}
+
 .link {
   font-size: 0.8rem;
   color: #d4c5b0;

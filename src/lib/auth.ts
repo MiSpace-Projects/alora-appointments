@@ -4,6 +4,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { haveIBeenPwned, twoFactor } from 'better-auth/plugins';
 import { prisma } from './prisma';
 import {
+  deleteAccountEmail,
   newDeviceEmail,
   passwordChangedEmail,
   sendAuthEmail,
@@ -13,7 +14,12 @@ import {
 import { authRuntimeConfig, getTrustedOrigins } from './auth-config';
 import { hashPassword, verifyPassword } from './password';
 import { authSignUpSchema } from './validation';
-import { recordSecurityEvent, registerKnownDevice } from './security-events';
+import {
+  getConfiguredClientAddress,
+  recordSecurityEvent,
+  registerKnownDevice,
+} from './security-events';
+import { recordSignUpConsents } from './data/consent';
 
 const HOUR_SECONDS = 60 * 60;
 const SESSION_TTL_SECONDS = 7 * 24 * HOUR_SECONDS;
@@ -206,7 +212,12 @@ export const auth = betterAuth({
   hooks: {
     before: createAuthMiddleware(async (context) => {
       if (context.path !== '/sign-up/email') return;
-      const parsed = authSignUpSchema.safeParse(context.body);
+      const body = (context.body ?? {}) as Record<string, unknown>;
+      const parsed = authSignUpSchema.safeParse({
+        ...body,
+        termsAccepted: body.termsAccepted === true,
+        marketingOptIn: body.marketingOptIn === true,
+      });
       if (!parsed.success) {
         throw new APIError('BAD_REQUEST', {
           message: parsed.error.issues[0]?.message ?? 'Invalid account details',
@@ -220,20 +231,58 @@ export const auth = betterAuth({
             name: parsed.data.name,
             email: parsed.data.email,
             password: parsed.data.password,
+            termsAccepted: parsed.data.termsAccepted,
+            marketingOptIn: parsed.data.marketingOptIn,
           },
         },
       };
     }),
   },
 
+  user: {
+    additionalFields: {
+      termsAccepted: { type: 'boolean', required: true, input: true },
+      marketingOptIn: { type: 'boolean', required: false, defaultValue: false, input: true },
+    },
+    // POPIA s24 right to deletion: the user confirms by email link; bookings and
+    // payments survive as anonymous records via the SetNull relations.
+    deleteUser: {
+      enabled: true,
+      deleteTokenExpiresIn: 24 * HOUR_SECONDS,
+      sendDeleteAccountVerification: async ({ user, url }) => {
+        const content = deleteAccountEmail(url);
+        await sendAuthEmail({
+          kind: 'DELETE_ACCOUNT',
+          to: user.email,
+          subject: 'Confirm deletion of your Alora account',
+          ...content,
+          tags: ['authentication', 'account-deletion'],
+        });
+      },
+      beforeDelete: async (user) => {
+        await recordSecurityEvent({
+          event: 'ACCOUNT_DELETED',
+          outcome: 'SUCCESS',
+          userId: user.id,
+        });
+      },
+    },
+  },
+
   databaseHooks: {
     user: {
       create: {
-        after: async (user) => {
+        after: async (user, ctx) => {
           await recordSecurityEvent({
             event: 'ACCOUNT_CREATED',
             outcome: 'SUCCESS',
             userId: user.id,
+          });
+          await recordSignUpConsents({
+            userId: user.id,
+            marketingOptIn: Boolean((user as { marketingOptIn?: boolean }).marketingOptIn),
+            ipAddress: ctx?.headers ? getConfiguredClientAddress(ctx.headers) : null,
+            userAgent: ctx?.headers?.get('user-agent') ?? null,
           });
         },
       },

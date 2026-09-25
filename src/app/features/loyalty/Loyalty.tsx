@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import { CiStar, CiTrophy, CiGift } from 'react-icons/ci';
 import { LuCrown } from 'react-icons/lu';
 import type { IconType } from 'react-icons';
+import ProtectedLink from '@/app/components/protected/ProtectedLink';
+import { routes } from '@/app/config/routes';
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 
@@ -122,7 +124,9 @@ export default function LoyaltyPage() {
         viewport={{ once: true }}
         variants={item}
       >
-        <button className={styles.cta}>Start Earning Points →</button>
+        <ProtectedLink href={routes.bookNow.path} className={styles.cta}>
+          Start Earning Points →
+        </ProtectedLink>
       </motion.div>
     </div>
   );

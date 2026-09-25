@@ -124,6 +124,17 @@
   border-color: rgba(238, 136, 136, 0.4);
 }
 
+/* Destructive submit (account deletion): keeps the SubmitButton shape, reads as a warning. */
+.dangerSubmit {
+  color: #ffffff;
+  background: rgba(238, 136, 136, 0.18);
+  border: 1px solid rgba(238, 136, 136, 0.5);
+}
+
+.dangerSubmit:hover:not(:disabled) {
+  background: rgba(238, 136, 136, 0.32);
+}
+
 .iconButton {
   width: 2.25rem;
   padding: 0;
