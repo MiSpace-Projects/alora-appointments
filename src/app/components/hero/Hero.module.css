@@ -218,11 +218,10 @@
     object-position: 50% top;
   }
 
-  /* The light crop's focal points (hand + profile) sit at its left edge, so
-     anchor left: on tall phones the afro bleeds off the right edge instead of
-     the hand being clipped. */
+  /* The light crop (image 19) is a centred close-up: keep the face centred and
+     let the afro bleed off both edges on tall phones. */
   .lightPortrait {
-    object-position: left top;
+    object-position: 50% top;
   }
 
   .description {
