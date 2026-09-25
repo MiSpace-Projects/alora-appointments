@@ -1,0 +1,104 @@
+/* Editorial gallery — portrait tiles whose own background matches the theme,
+   so each photo dissolves into the canvas. Same type system and #d4c5b0
+   accent as the rest of the site. */
+.section {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5rem 7rem 5.5rem;
+  color: var(--text);
+  background: var(--background);
+  text-align: left;
+  scroll-margin-top: var(--navbar-height, 72px);
+}
+
+.head {
+  margin-bottom: 2.5rem;
+}
+
+.kicker {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.heading {
+  margin: 0;
+  font-family: var(--font-playfair-display), serif;
+  font-size: clamp(2rem, 3.4vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.section .sub {
+  margin: 0.75rem 0 0;
+  max-width: 34rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* Auto-fit keeps any count centred and balanced: a single light-mode photo
+   sits as one feature tile, four dark-mode photos form a row. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.25rem;
+}
+
+/* A lone image should not stretch full width; cap it to one column's feel. */
+.grid[data-count='1'] {
+  grid-template-columns: minmax(0, 22rem);
+}
+
+.tile {
+  position: relative;
+  margin: 0;
+  aspect-ratio: 4 / 5;
+  border-radius: 1.1rem;
+  overflow: hidden;
+  background: var(--content-bg, rgba(128, 128, 128, 0.1));
+}
+
+.image {
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tile:hover .image {
+  transform: scale(1.04);
+}
+
+@media (max-width: 1024px) {
+  .section {
+    padding: 4rem 2.5rem;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 3.5rem 1.25rem 4rem;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .grid[data-count='1'] {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .image {
+    transition: none;
+  }
+}
