@@ -4,8 +4,6 @@ import Services from '../features/servicesSection/ServiceSection';
 import LoyaltyPage from '../features/loyalty/Loyalty';
 import QuickBookingsSection from '../features/quickBookings/QuickBookings';
 import Testimonials from '../features/testimonials/Testimonials';
-import FloatingThemeToggle from '../components/FloatingThemeToggle';
-import Footer from '../components/footer/Footer';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
@@ -37,8 +35,6 @@ export default function Home() {
         <QuickBookingsSection />
         <Testimonials />
       </div>
-      <FloatingThemeToggle />
-      <Footer />
     </>
   );
 }

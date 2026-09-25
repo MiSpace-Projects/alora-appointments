@@ -87,6 +87,9 @@
 }
 
 .viewAll {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
   font-size: var(--text-sm);
   border: 1px solid var(--button-border);
   padding: var(--space-3) var(--space-5);

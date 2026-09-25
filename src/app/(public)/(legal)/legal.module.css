@@ -1,0 +1,226 @@
+/* Legal documents — same canvas and type system as the rest of Alora (black
+   surface, #d4c5b0 accent, Playfair headings, Geist body). Long-form reading
+   layout: a narrow measure, generous leading, quiet section index. */
+
+.page {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: calc(var(--navbar-height) + var(--breadcrumb-height) + 2rem) 1.5rem 5rem;
+  color: var(--text-color);
+  background: var(--content-bg);
+}
+
+.shell {
+  width: 100%;
+  max-width: 44rem;
+  margin: 0 auto;
+}
+
+.kicker {
+  margin: 0 0 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-playfair-display), serif;
+  font-size: clamp(2rem, 6vw, 3rem);
+  font-weight: 600;
+  line-height: 1.05;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  margin: 1rem 0 0;
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.lede {
+  margin: 1.75rem 0 0;
+  font-size: 1.02rem;
+  line-height: 1.7;
+  opacity: 0.85;
+}
+
+.toc {
+  margin: 2.25rem 0 0;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid rgba(128, 128, 128, 0.22);
+  border-radius: 1rem;
+}
+
+.tocTitle {
+  margin: 0 0 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.tocList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0.35rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.88rem;
+}
+
+.tocList a {
+  opacity: 0.8;
+  transition: opacity 0.15s ease;
+}
+
+.tocList a:hover,
+.tocList a:focus-visible {
+  opacity: 1;
+  color: #d4c5b0;
+}
+
+.body {
+  margin-top: 2.5rem;
+  font-size: 0.97rem;
+  line-height: 1.75;
+}
+
+.body section + section {
+  margin-top: 2.5rem;
+}
+
+.body h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-playfair-display), serif;
+  font-size: 1.45rem;
+  font-weight: 600;
+  line-height: 1.2;
+  scroll-margin-top: calc(var(--navbar-height) + 1.5rem);
+}
+
+.body h3 {
+  margin: 1.4rem 0 0.4rem;
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.body p {
+  margin: 0 0 0.9rem;
+  opacity: 0.86;
+}
+
+.body ul,
+.body ol {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+  opacity: 0.86;
+}
+
+.body li {
+  margin: 0.3rem 0;
+}
+
+.body a {
+  color: #d4c5b0;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.body strong {
+  font-weight: 650;
+  opacity: 1;
+}
+
+/* Definition-style rows (name / address / officer) */
+.facts {
+  display: grid;
+  grid-template-columns: minmax(9rem, 12rem) 1fr;
+  gap: 0.55rem 1.25rem;
+  margin: 0 0 1rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid rgba(128, 128, 128, 0.22);
+  border-radius: 0.9rem;
+  font-size: 0.9rem;
+}
+
+.facts dt {
+  opacity: 0.55;
+}
+
+.facts dd {
+  margin: 0;
+}
+
+/* Value the owner still has to supply — deliberately loud so it cannot ship unnoticed. */
+.tbc {
+  display: inline-block;
+  padding: 0.05rem 0.5rem;
+  border: 1px dashed rgba(212, 197, 176, 0.7);
+  border-radius: 999px;
+  color: #d4c5b0;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.table {
+  width: 100%;
+  margin: 0 0 1rem;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.table th,
+.table td {
+  padding: 0.6rem 0.6rem;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.18);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.callout {
+  margin: 0 0 1rem;
+  padding: 0.9rem 1.1rem;
+  border-left: 2px solid #d4c5b0;
+  background: rgba(212, 197, 176, 0.07);
+  border-radius: 0 0.75rem 0.75rem 0;
+}
+
+.callout p:last-child {
+  margin-bottom: 0;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .facts {
+    grid-template-columns: 1fr;
+    gap: 0.15rem;
+  }
+
+  .facts dt {
+    margin-top: 0.6rem;
+  }
+}

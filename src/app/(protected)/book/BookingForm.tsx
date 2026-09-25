@@ -20,7 +20,13 @@ export interface ServiceOption {
   pointsAwarded: number;
 }
 
-export function BookingForm({ services }: { services: ServiceOption[] }) {
+interface BookingFormProps {
+  services: ServiceOption[];
+  /** Service to preselect (from `/book?service=<slug>`); must be one of `services`. */
+  preselectedServiceId?: string;
+}
+
+export function BookingForm({ services, preselectedServiceId }: BookingFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -34,6 +40,7 @@ export function BookingForm({ services }: { services: ServiceOption[] }) {
     formState: { errors },
   } = useForm<z.input<typeof createBookingSchema>, unknown, CreateBookingInput>({
     resolver: zodResolver(createBookingSchema),
+    defaultValues: { serviceId: preselectedServiceId ?? '' },
   });
 
   const selectedId = useWatch({ control, name: 'serviceId' });
@@ -70,12 +77,7 @@ export function BookingForm({ services }: { services: ServiceOption[] }) {
               <label className={styles.label} htmlFor="serviceId">
                 Service
               </label>
-              <select
-                id="serviceId"
-                className={styles.select}
-                defaultValue=""
-                {...register('serviceId')}
-              >
+              <select id="serviceId" className={styles.select} {...register('serviceId')}>
                 <option value="" disabled>
                   Select a service
                 </option>

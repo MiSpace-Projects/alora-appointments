@@ -17,7 +17,8 @@ export type AuthEmailKind =
   | 'EMAIL_VERIFICATION'
   | 'PASSWORD_RESET'
   | 'PASSWORD_CHANGED'
-  | 'NEW_DEVICE';
+  | 'NEW_DEVICE'
+  | 'DELETE_ACCOUNT';
 
 interface SendAuthEmailInput {
   kind: AuthEmailKind;
@@ -146,5 +147,18 @@ export function newDeviceEmail(): { html: string; text: string } {
       '<p>Your Alora account was signed in from a device we have not seen before.</p><p>If this was not you, reset your password and revoke active sessions from your profile.</p>',
     ),
     text: 'Your Alora account was signed in from a new device. If this was not you, reset your password and revoke active sessions from your profile.',
+  };
+}
+
+export function deleteAccountEmail(url: string): { html: string; text: string } {
+  return {
+    html: shell(
+      'Confirm Account Deletion',
+      `<p>You asked us to delete your Alora account. Click below to confirm. Your sign-in details, loyalty points and personal information will be removed; booking and payment records are kept without your name for five years as tax law requires.</p>
+       ${ctaButton(url, 'Delete My Account')}
+       <p>Or copy this link: ${escapeHtml(url)}</p>
+       <p>This link expires in 24 hours. If you did not request this, ignore this email and consider changing your password.</p>`,
+    ),
+    text: `Confirm deletion of your Alora account: ${url}\n\nThis link expires in 24 hours. If you did not request this, ignore this email.`,
   };
 }
