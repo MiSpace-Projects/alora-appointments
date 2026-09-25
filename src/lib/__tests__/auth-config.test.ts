@@ -26,9 +26,6 @@ describe('production auth configuration', () => {
       NEXT_PUBLIC_BETTER_AUTH_URL: 'https://alora.example.com',
       AUTH_IP_ADDRESS_HEADERS: 'cf-connecting-ip',
       AUTH_FINGERPRINT_SECRET: Buffer.alloc(32, 2).toString('base64'),
-      NEXT_PUBLIC_TURNSTILE_SITE_KEY: 'site-key',
-      TURNSTILE_SECRET_KEY: 'secret-key',
-      TURNSTILE_ALLOWED_HOSTNAMES: 'alora.example.com',
       RESEND_API_KEY: 're_test_key',
       EMAIL_FROM: 'Alora <no-reply@alora.example.com>',
     });
@@ -43,9 +40,6 @@ describe('production auth configuration', () => {
       NEXT_PUBLIC_APP_URL: 'https://alora.example.com',
       AUTH_IP_ADDRESS_HEADERS: 'cf-connecting-ip',
       AUTH_FINGERPRINT_SECRET: Buffer.alloc(32, 2).toString('base64'),
-      NEXT_PUBLIC_TURNSTILE_SITE_KEY: 'site-key',
-      TURNSTILE_SECRET_KEY: 'secret-key',
-      TURNSTILE_ALLOWED_HOSTNAMES: 'alora.example.com',
     });
     delete process.env.RESEND_API_KEY;
     delete process.env.EMAIL_FROM;

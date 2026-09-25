@@ -28,6 +28,7 @@ model User {
   bookings         Booking[]
   pointsLedger     PointsTransaction[]
   consentRecords   ConsentRecord[]
+  payments         Payment[]
 
   @@unique([email])
   @@map("user")
@@ -150,6 +151,12 @@ enum BookingStatus {
   COMPLETED
 }
 
+// How the customer chose to settle: online at booking time, or at the salon.
+enum PaymentMethod {
+  PAY_NOW
+  PAY_IN_SALON
+}
+
 // Ledger entry reasons — why points moved. Kept explicit so the append-only
 // history is self-describing during reconciliation.
 enum PointsReason {
@@ -192,16 +199,65 @@ model Booking {
   priceCents    Int
   pointsAwarded Int
   notes         String?
+  paymentMethod PaymentMethod @default(PAY_IN_SALON)
+  // Set when an online payment succeeds; the Payment row holds the detail.
+  paidAt        DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   cancelledAt   DateTime?
 
-  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-  service Service @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  service  Service   @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  payments Payment[]
 
   @@index([userId, startsAt])
   @@index([startsAt, status])
   @@map("booking")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Payments (Paystack hosted checkout). One row per attempt; the booking is
+// paid when a row reaches SUCCESS. Card data never touches this system: only
+// the provider reference, amount, status and channel are stored (POPIA
+// minimality). Rows are never deleted — they are financial records.
+// ─────────────────────────────────────────────────────────────
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  PARTIALLY_REFUNDED
+  REFUNDED
+}
+
+model Payment {
+  id               String        @id @default(cuid())
+  bookingId        String
+  userId           String?
+  provider         String        @default("paystack")
+  // Our reference sent to the provider; unique so webhooks and callbacks are idempotent.
+  reference        String        @unique
+  amountCents      Int
+  currency         String        @default("ZAR")
+  status           PaymentStatus @default(PENDING)
+  channel          String?
+  providerId       String?
+  authorizationUrl String?
+  paidAt           DateTime?
+  refundedCents    Int           @default(0)
+  refundReference  String?
+  failureReason    String?
+  lastEventAt      DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([bookingId])
+  @@index([userId, createdAt])
+  @@index([status])
+  @@map("payment")
 }
 
 // Append-only loyalty ledger. Balance is derived as SUM(delta); rows are never

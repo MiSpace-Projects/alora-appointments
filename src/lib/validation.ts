@@ -60,6 +60,8 @@ export const createBookingSchema = z.object({
     message: 'Choose a time in the future',
   }),
   notes: z.string().max(500, 'Notes are too long').optional(),
+  // ECTA s43: the customer chooses how to settle before confirming.
+  paymentMethod: z.enum(['PAY_NOW', 'PAY_IN_SALON']),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;
