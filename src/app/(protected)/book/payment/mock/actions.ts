@@ -1,0 +1,31 @@
+'use server';
+
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { auth } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
+import { settleMockPayment } from '@/lib/data/payments';
+import { isMockPaymentsEnabled } from '@/lib/payments/provider';
+
+/**
+ * Fake checkout outcome. Mirrors what Paystack's page does at the end: apply
+ * the result server-side, then send the customer to our return page with
+ * the reference. Only exists when the mock provider is enabled.
+ */
+export async function completeMockPaymentAction(formData: FormData): Promise<void> {
+  if (!isMockPaymentsEnabled()) redirect('/');
+
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect('/login');
+
+  const reference = String(formData.get('reference') ?? '');
+  const outcome = formData.get('outcome') === 'success' ? 'success' : 'failed';
+
+  const owned = await prisma.payment.findFirst({
+    where: { reference, userId: session.user.id },
+    select: { id: true },
+  });
+  if (owned) await settleMockPayment(reference, outcome);
+
+  redirect(`/book/payment?reference=${encodeURIComponent(reference)}`);
+}

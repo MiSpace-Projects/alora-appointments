@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth';
 import { listUserBookings } from '@/lib/data/bookings';
 import { getUserLoyalty } from '@/lib/data/loyalty';
 import { ProfileView } from './ProfileView';
-import { isPaystackConfigured } from '@/lib/payments/paystack';
+import { isOnlinePaymentAvailable } from '@/lib/payments/provider';
 
 /**
  * Server component: resolves the session and loads the user's real bookings and
@@ -28,7 +28,7 @@ export default async function ProfilePage() {
       user={session.user}
       bookings={bookings}
       loyalty={loyalty}
-      onlinePaymentAvailable={isPaystackConfigured()}
+      onlinePaymentAvailable={isOnlinePaymentAvailable()}
     />
   );
 }

@@ -5,7 +5,8 @@ import { revalidatePath } from 'next/cache';
 import { auth } from '@/lib/auth';
 import { createBooking } from '@/lib/data/bookings';
 import { startBookingPayment } from '@/lib/data/payments';
-import { isPaystackConfigured, PaystackError } from '@/lib/payments/paystack';
+import { PaystackError } from '@/lib/payments/paystack';
+import { isOnlinePaymentAvailable } from '@/lib/payments/provider';
 import { createBookingSchema } from '@/lib/validation';
 import { businessContact } from '@/app/config/business';
 
@@ -44,7 +45,7 @@ export async function createBookingAction(input: unknown): Promise<BookingAction
     return { ok: false, error: parsed.error.issues[0]?.message ?? 'Please check the form.' };
   }
 
-  if (parsed.data.paymentMethod === 'PAY_NOW' && !isPaystackConfigured()) {
+  if (parsed.data.paymentMethod === 'PAY_NOW' && !isOnlinePaymentAvailable()) {
     return { ok: false, error: ERROR_COPY.PAYMENTS_UNAVAILABLE };
   }
 
@@ -92,7 +93,7 @@ export async function startPaymentAction(bookingId: unknown): Promise<BookingAct
   if (typeof bookingId !== 'string' || bookingId.length === 0) {
     return { ok: false, error: ERROR_COPY.BOOKING_NOT_FOUND };
   }
-  if (!isPaystackConfigured()) {
+  if (!isOnlinePaymentAvailable()) {
     return { ok: false, error: ERROR_COPY.PAYMENTS_UNAVAILABLE };
   }
 

@@ -103,6 +103,9 @@ export function getProductionAuthConfigurationErrors(): string[] {
   if (!decodeCanonicalBase64(process.env.AUTH_FINGERPRINT_SECRET)) {
     errors.push('AUTH_FINGERPRINT_SECRET must be exactly 32 random bytes in canonical base64');
   }
+  if (process.env.PAYMENTS_MOCK === 'true') {
+    errors.push('PAYMENTS_MOCK must not be enabled in production');
+  }
   if (!process.env.RESEND_API_KEY) {
     errors.push('RESEND_API_KEY is required');
   }
