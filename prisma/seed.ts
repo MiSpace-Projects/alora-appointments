@@ -29,7 +29,7 @@ const services = [
     priceCents: 95000,
     durationMinutes: 300,
     pointsAwarded: 95,
-    imageUrl: '/styles/knotless-braids-cutout.png',
+    imageUrl: '/styles/knotless-braids-cutout.webp',
   },
   {
     slug: 'box-braids',
@@ -40,7 +40,7 @@ const services = [
     priceCents: 85000,
     durationMinutes: 300,
     pointsAwarded: 85,
-    imageUrl: null,
+    imageUrl: '/styles/box-braids-cutout.webp',
   },
   {
     slug: 'cornrows',
@@ -51,7 +51,7 @@ const services = [
     priceCents: 35000,
     durationMinutes: 120,
     pointsAwarded: 35,
-    imageUrl: null,
+    imageUrl: '/styles/cornrows-cutout.webp',
   },
   {
     slug: 'fulani-braids',
@@ -62,7 +62,7 @@ const services = [
     priceCents: 75000,
     durationMinutes: 240,
     pointsAwarded: 75,
-    imageUrl: null,
+    imageUrl: '/styles/fulani-braids-cutout.webp',
   },
   // ── Locs & twists ──
   {
@@ -74,7 +74,7 @@ const services = [
     priceCents: 110000,
     durationMinutes: 360,
     pointsAwarded: 110,
-    imageUrl: null,
+    imageUrl: '/styles/faux-locs-cutout.webp',
   },
   {
     slug: 'passion-twists',
@@ -85,7 +85,7 @@ const services = [
     priceCents: 80000,
     durationMinutes: 240,
     pointsAwarded: 80,
-    imageUrl: null,
+    imageUrl: '/styles/passion-twists-cutout.webp',
   },
   {
     slug: 'loc-retwist',
@@ -96,7 +96,7 @@ const services = [
     priceCents: 45000,
     durationMinutes: 120,
     pointsAwarded: 45,
-    imageUrl: null,
+    imageUrl: '/styles/loc-retwist-cutout.webp',
   },
   // ── Natural ──
   {
@@ -108,7 +108,7 @@ const services = [
     priceCents: 40000,
     durationMinutes: 120,
     pointsAwarded: 40,
-    imageUrl: '/styles/twist-out-cutout.png',
+    imageUrl: '/styles/twist-out-cutout.webp',
   },
   {
     slug: 'wash-and-go',
@@ -119,7 +119,7 @@ const services = [
     priceCents: 30000,
     durationMinutes: 75,
     pointsAwarded: 30,
-    imageUrl: '/styles/wash-and-go-cutout.png',
+    imageUrl: '/styles/wash-and-go-cutout.webp',
   },
   {
     slug: 'cut-and-shape',
@@ -130,7 +130,7 @@ const services = [
     priceCents: 28000,
     durationMinutes: 45,
     pointsAwarded: 28,
-    imageUrl: '/styles/afro-shaping-cutout.png',
+    imageUrl: '/styles/cut-and-shape-cutout.webp',
   },
   {
     slug: 'bantu-knots',
@@ -141,7 +141,7 @@ const services = [
     priceCents: 35000,
     durationMinutes: 90,
     pointsAwarded: 35,
-    imageUrl: null,
+    imageUrl: '/styles/bantu-knots-cutout.webp',
   },
   // ── Press & wigs ──
   {
@@ -153,7 +153,7 @@ const services = [
     priceCents: 45000,
     durationMinutes: 90,
     pointsAwarded: 45,
-    imageUrl: null,
+    imageUrl: '/styles/silk-press-cutout.webp',
   },
   {
     slug: 'wig-wash-style',
@@ -164,7 +164,7 @@ const services = [
     priceCents: 35000,
     durationMinutes: 60,
     pointsAwarded: 35,
-    imageUrl: null,
+    imageUrl: '/styles/wig-wash-style-cutout.webp',
   },
 ];
 
