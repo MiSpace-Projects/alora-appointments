@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { requireSession } from '@/lib/session';
-import { prisma } from '@/lib/prisma';
-import { settlePaymentByReference, type SettleOutcome } from '@/lib/data/payments';
+import {
+  isPaymentOwnedByUser,
+  settlePaymentByReference,
+  type SettleOutcome,
+} from '@/lib/data/payments';
 import { routes } from '@/app/config/routes';
 import styles from '../book.module.css';
 
@@ -52,10 +55,7 @@ export default async function PaymentReturnPage({ searchParams }: PageProps) {
   let outcome: SettleOutcome = 'UNKNOWN_REFERENCE';
   if (reference) {
     // Ownership: only settle references that belong to this user's bookings.
-    const owned = await prisma.payment.findFirst({
-      where: { reference, userId: session.user.id },
-      select: { id: true },
-    });
+    const owned = await isPaymentOwnedByUser(session.user.id, reference);
     if (owned) {
       try {
         outcome = await settlePaymentByReference(reference);

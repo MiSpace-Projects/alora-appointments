@@ -2,8 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { requireSession } from '@/lib/session';
-import { prisma } from '@/lib/prisma';
-import { settleMockPayment } from '@/lib/data/payments';
+import { isPaymentOwnedByUser, settleMockPayment } from '@/lib/data/payments';
 import { isMockPaymentsEnabled } from '@/lib/payments/provider';
 
 /**
@@ -19,11 +18,9 @@ export async function completeMockPaymentAction(formData: FormData): Promise<voi
   const reference = String(formData.get('reference') ?? '');
   const outcome = formData.get('outcome') === 'success' ? 'success' : 'failed';
 
-  const owned = await prisma.payment.findFirst({
-    where: { reference, userId: session.user.id },
-    select: { id: true },
-  });
-  if (owned) await settleMockPayment(reference, outcome);
+  if (await isPaymentOwnedByUser(session.user.id, reference)) {
+    await settleMockPayment(reference, outcome);
+  }
 
   redirect(`/book/payment?reference=${encodeURIComponent(reference)}`);
 }

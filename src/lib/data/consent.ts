@@ -75,3 +75,34 @@ export async function recordSignUpConsents(input: SignUpConsentInput): Promise<v
     console.error('[consent] failed to record sign-up consents', error);
   }
 }
+
+export interface SetMarketingConsentInput {
+  userId: string;
+  optIn: boolean;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+}
+
+/**
+ * Set the marketing flag and append a consent row in one transaction, so the
+ * flag and the audit trail can never drift (POPIA s69). Withdrawal is a new
+ * row with granted=false, never a delete.
+ */
+export async function setMarketingConsent(input: SetMarketingConsentInput): Promise<void> {
+  await prisma.$transaction([
+    prisma.user.update({
+      where: { id: input.userId },
+      data: { marketingOptIn: input.optIn },
+    }),
+    prisma.consentRecord.create({
+      data: {
+        userId: input.userId,
+        kind: 'MARKETING',
+        version: legalVersions.privacy,
+        granted: input.optIn,
+        ipHash: input.ipAddress ? fingerprint(input.ipAddress) : null,
+        userAgent: input.userAgent?.slice(0, 512) ?? null,
+      },
+    }),
+  ]);
+}
