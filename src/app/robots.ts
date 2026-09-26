@@ -8,7 +8,16 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
       // Authenticated areas have no SEO value and should not be crawled.
-      disallow: ['/profile', '/reset-password'],
+      disallow: [
+        '/profile',
+        '/book',
+        '/login',
+        '/register',
+        '/forgot-password',
+        '/reset-password',
+        '/two-factor',
+        '/verify-email',
+      ],
     },
     sitemap: `${siteUrl}/sitemap.xml`,
   };

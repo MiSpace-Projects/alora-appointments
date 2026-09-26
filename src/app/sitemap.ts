@@ -6,8 +6,6 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     '',
-    '/login',
-    '/register',
     '/services',
     ...serviceFamilies.map((family) => `/services/${family.slug}`),
     '/privacy-policy',

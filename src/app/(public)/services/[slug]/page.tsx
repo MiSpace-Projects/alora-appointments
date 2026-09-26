@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import { formatZar, formatDuration } from '@/lib/format';
 import { listActiveServices } from '@/lib/data/services';
 import { routes } from '@/app/config/routes';
-import { cancellationPolicy } from '@/app/config/business';
+import { businessContact, cancellationPolicy } from '@/app/config/business';
 import ProtectedLink from '@/app/components/protected/ProtectedLink';
 import { getServiceFamily, serviceFamilies } from '@/app/features/servicesSection/servicesData';
 import styles from '../services.module.css';
@@ -46,8 +46,35 @@ export default async function ServiceFamilyPage({ params }: PageProps) {
   const catalog = await listActiveServices().catch(() => []);
   const menu = catalog.filter((item) => item.category && family.categories.includes(item.category));
 
+  const serviceSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: family.title,
+    description: family.description,
+    serviceType: family.title,
+    provider: {
+      '@type': 'HairSalon',
+      name: businessContact.tradingName,
+      url: businessContact.website,
+    },
+    areaServed: 'Bethlehem, Free State, South Africa',
+    ...(menu.length > 0 && {
+      offers: menu.map((item) => ({
+        '@type': 'Offer',
+        name: item.name,
+        price: (item.priceCents / 100).toFixed(2),
+        priceCurrency: 'ZAR',
+        availability: 'https://schema.org/InStock',
+      })),
+    }),
+  };
+
   return (
     <main className={styles.page}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+      />
       <section className={styles.hero}>
         <div className={styles.heroCopy}>
           <p className={styles.kicker}>Service</p>
@@ -63,7 +90,13 @@ export default async function ServiceFamilyPage({ params }: PageProps) {
           </div>
         </div>
         <div className={styles.heroImage}>
-          <Image src={family.img} alt="" fill priority sizes="(max-width: 760px) 100vw, 50vw" />
+          <Image
+            src={family.img}
+            alt={`${family.title} at Alora`}
+            fill
+            priority
+            sizes="(max-width: 760px) 100vw, 50vw"
+          />
         </div>
       </section>
 
@@ -104,7 +137,7 @@ export default async function ServiceFamilyPage({ params }: PageProps) {
             {menu.map((item) => (
               <li key={item.slug} className={styles.stripRow}>
                 <div className={styles.thumb}>
-                  {item.imageUrl && <Image src={item.imageUrl} alt="" fill sizes="56px" />}
+                  {item.imageUrl && <Image src={item.imageUrl} alt={item.name} fill sizes="56px" />}
                 </div>
                 <div>
                   <p className={styles.stripName}>{item.name}</p>
