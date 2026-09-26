@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { listActiveServices } from '@/lib/data/services';
 import { isOnlinePaymentAvailable } from '@/lib/payments/provider';
 import { BookingForm, type ServiceOption } from './BookingForm';
@@ -5,6 +6,8 @@ import { BookingForm, type ServiceOption } from './BookingForm';
 // Auth-gated and reads the live catalog from the DB per request — never
 // prerendered at build time.
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = { title: 'Book an appointment', robots: { index: false } };
 
 /**
  * Server component: loads the live service catalog and renders the booking form.

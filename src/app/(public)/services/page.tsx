@@ -30,7 +30,12 @@ export default function ServicesIndexPage(): React.JSX.Element {
             href={`${routes.servicesIndex.path}/${family.slug}`}
             className={styles.indexItem}
           >
-            <Image src={family.img} alt="" fill sizes="(max-width: 760px) 100vw, 33vw" />
+            <Image
+              src={family.img}
+              alt={family.title}
+              fill
+              sizes="(max-width: 760px) 100vw, 33vw"
+            />
             <div className={styles.indexCopy}>
               <h2 className={styles.indexTitle}>{family.title}</h2>
               <p className={styles.indexDesc}>{family.description}</p>

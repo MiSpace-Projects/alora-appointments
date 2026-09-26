@@ -6,6 +6,9 @@ import { listActiveServices } from '@/lib/data/services';
 import LoyaltyPage from '../features/loyalty/Loyalty';
 import QuickBookingsSection from '../features/quickBookings/QuickBookings';
 import Testimonials from '../features/testimonials/Testimonials';
+import { businessContact } from '@/app/config/business';
+import type { Metadata } from 'next';
+import { routes } from '@/app/config/routes';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
@@ -16,11 +19,24 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 const localBusinessSchema = {
   '@context': 'https://schema.org',
   '@type': 'HairSalon',
-  name: 'Alora',
+  name: businessContact.tradingName,
   description: 'Premium hair and beauty appointments with loyalty rewards on every visit.',
   url: siteUrl,
+  telephone: businessContact.phoneE164,
+  email: businessContact.email,
   priceRange: '$$',
   currenciesAccepted: 'ZAR',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Bethlehem',
+    addressRegion: 'Free State',
+    addressCountry: 'ZA',
+  },
+  areaServed: 'Bethlehem, Free State, South Africa',
+};
+
+export const metadata: Metadata = {
+  alternates: { canonical: routes.home.path },
 };
 
 export default async function Home() {
