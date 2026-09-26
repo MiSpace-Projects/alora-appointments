@@ -2,10 +2,9 @@
 
 import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
+import { setMarketingConsent } from '@/lib/data/consent';
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { fingerprint, getConfiguredClientAddress } from '@/lib/security-events';
-import { legalVersions } from '@/app/config/business';
+import { getConfiguredClientAddress } from '@/lib/security-events';
 
 export type PrivacyActionResult = { ok: true } | { ok: false; error: string };
 
@@ -24,22 +23,12 @@ export async function setMarketingOptInAction(optIn: boolean): Promise<PrivacyAc
   const ipAddress = getConfiguredClientAddress(requestHeaders);
 
   try {
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: session.user.id },
-        data: { marketingOptIn: optIn },
-      }),
-      prisma.consentRecord.create({
-        data: {
-          userId: session.user.id,
-          kind: 'MARKETING',
-          version: legalVersions.privacy,
-          granted: optIn,
-          ipHash: ipAddress ? fingerprint(ipAddress) : null,
-          userAgent: requestHeaders.get('user-agent')?.slice(0, 512) ?? null,
-        },
-      }),
-    ]);
+    await setMarketingConsent({
+      userId: session.user.id,
+      optIn,
+      ipAddress,
+      userAgent: requestHeaders.get('user-agent'),
+    });
     revalidatePath('/profile');
     return { ok: true };
   } catch {
