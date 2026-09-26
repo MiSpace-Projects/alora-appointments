@@ -3,7 +3,7 @@
 import styles from './DynamicBanner.module.css';
 import { motion } from 'framer-motion';
 import { staggerContainer, fadeUpItem } from '@/lib/motion';
-import { FiArrowUpRight } from 'react-icons/fi';
+import { ArrowUpRight } from 'lucide-react';
 import ProtectedLink from '../protected/ProtectedLink';
 
 interface DynamicBannerProps {
@@ -51,7 +51,7 @@ export default function DynamicBanner({
         <motion.div variants={fadeUpItem}>
           <ProtectedLink href={ctaHref} className={styles.cta}>
             {ctaLabel}
-            <FiArrowUpRight />
+            <ArrowUpRight size={18} strokeWidth={1.8} aria-hidden="true" />
           </ProtectedLink>
         </motion.div>
       )}

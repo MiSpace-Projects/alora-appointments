@@ -4,9 +4,7 @@ import Image from 'next/image';
 import styles from './Loyalty.module.css';
 import { motion } from 'framer-motion';
 import { staggerContainer, fadeUpItem } from '@/lib/motion';
-import { CiStar, CiTrophy, CiGift } from 'react-icons/ci';
-import { LuCrown } from 'react-icons/lu';
-import type { IconType } from 'react-icons';
+import { Star, Trophy, Gift, Crown, type LucideIcon } from 'lucide-react';
 import ProtectedLink from '@/app/components/protected/ProtectedLink';
 import { routes } from '@/app/config/routes';
 
@@ -15,35 +13,35 @@ const tiers: {
   name: string;
   range: string;
   detail: string;
-  icon: IconType;
+  icon: LucideIcon;
 }[] = [
   {
     level: '01',
     name: 'Bronze',
     range: '0 – 499 pts',
     detail: 'Earn 10 pts per booking',
-    icon: CiStar,
+    icon: Star,
   },
   {
     level: '02',
     name: 'Silver',
     range: '500 – 999 pts',
     detail: '5% off every 5th visit',
-    icon: CiGift,
+    icon: Gift,
   },
   {
     level: '03',
     name: 'Gold',
     range: '1 000 – 1 999 pts',
     detail: '10% off + add-on',
-    icon: CiTrophy,
+    icon: Trophy,
   },
   {
     level: '04',
     name: 'Platinum',
     range: '2 000+ pts',
     detail: '15% off + priority booking',
-    icon: LuCrown,
+    icon: Crown,
   },
 ];
 
