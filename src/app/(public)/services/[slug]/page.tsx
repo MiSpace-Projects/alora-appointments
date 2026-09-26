@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { formatZar } from '@/lib/format';
+import { formatZar, formatDuration } from '@/lib/format';
 import { listActiveServices } from '@/lib/data/services';
 import { routes } from '@/app/config/routes';
 import { cancellationPolicy } from '@/app/config/business';
@@ -30,13 +30,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description: family.description,
     alternates: { canonical: `${routes.servicesIndex.path}/${family.slug}` },
   };
-}
-
-function formatDuration(minutes: number): string {
-  if (minutes < 60) return `${minutes} min`;
-  const hours = Math.floor(minutes / 60);
-  const rest = minutes % 60;
-  return rest === 0 ? `${hours} hr${hours > 1 ? 's' : ''}` : `${hours} hr ${rest} min`;
 }
 
 /**
