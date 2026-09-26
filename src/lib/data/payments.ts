@@ -16,6 +16,8 @@ import {
 } from '@/lib/payments/provider';
 /** How long after a successful payment the return page still greets it as fresh. */
 const FRESH_PAYMENT_WINDOW_MS = 15 * 60_000;
+/** How long a pending checkout URL may be reused before a fresh one is created. */
+const REUSABLE_PAYMENT_WINDOW_MS = 30 * 60_000;
 
 /**
  * Payment DAL. Every mutation is idempotent on the provider reference so the
@@ -56,7 +58,7 @@ export async function startBookingPayment(
     (p) =>
       p.status === 'PENDING' &&
       p.authorizationUrl &&
-      Date.now() - p.createdAt.getTime() < 30 * 60_000,
+      Date.now() - p.createdAt.getTime() < REUSABLE_PAYMENT_WINDOW_MS,
   );
   if (reusable?.authorizationUrl) {
     return { authorizationUrl: reusable.authorizationUrl, reference: reusable.reference };
@@ -385,5 +387,41 @@ export async function getReceiptByReference(
     startsAt: payment.booking.startsAt,
     customerName: customer.name,
     customerEmail: customer.email,
+  };
+}
+
+/** True when the reference belongs to one of this user's payments (ownership guard). */
+export async function isPaymentOwnedByUser(userId: string, reference: string): Promise<boolean> {
+  const owned = await prisma.payment.findFirst({
+    where: { reference, userId },
+    select: { id: true },
+  });
+  return owned !== null;
+}
+
+export interface CheckoutPaymentView {
+  reference: string;
+  amountCents: number;
+  serviceName: string;
+}
+
+/** Minimal payment + service data for the checkout page; ownership enforced. */
+export async function getOwnedCheckoutPayment(
+  userId: string,
+  reference: string,
+): Promise<CheckoutPaymentView | null> {
+  const payment = await prisma.payment.findFirst({
+    where: { reference, userId },
+    select: {
+      reference: true,
+      amountCents: true,
+      booking: { select: { service: { select: { name: true } } } },
+    },
+  });
+  if (!payment) return null;
+  return {
+    reference: payment.reference,
+    amountCents: payment.amountCents,
+    serviceName: payment.booking.service.name,
   };
 }

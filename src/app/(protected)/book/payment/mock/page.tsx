@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireSession } from '@/lib/session';
-import { prisma } from '@/lib/prisma';
 import { formatZar } from '@/lib/format';
 import { isMockPaymentsEnabled } from '@/lib/payments/provider';
+import { getOwnedCheckoutPayment } from '@/lib/data/payments';
 import { routes } from '@/app/config/routes';
 import { completeMockPaymentAction } from './actions';
 import styles from './mock.module.css';
@@ -32,11 +32,8 @@ export default async function MockCheckoutPage({ searchParams }: PageProps) {
   const reference = Array.isArray(raw) ? raw[0] : raw;
   if (!reference) notFound();
 
-  const payment = await prisma.payment.findFirst({
-    where: { reference, userId: session.user.id },
-    include: { booking: { include: { service: { select: { name: true } } } } },
-  });
-  if (!payment) notFound();
+  const checkout = await getOwnedCheckoutPayment(session.user.id, reference);
+  if (!checkout) notFound();
 
   return (
     <main className={styles.page}>
@@ -47,9 +44,9 @@ export default async function MockCheckoutPage({ searchParams }: PageProps) {
         </div>
 
         <p className={styles.label}>Amount due</p>
-        <p className={styles.amount}>{formatZar(payment.amountCents)}</p>
+        <p className={styles.amount}>{formatZar(checkout.amountCents)}</p>
         <p className={styles.meta}>
-          {payment.booking.service.name} · ref <code>{reference}</code>
+          {checkout.serviceName} · ref <code>{reference}</code>
         </p>
         <p className={styles.email}>{session.user.email}</p>
 
@@ -61,7 +58,7 @@ export default async function MockCheckoutPage({ searchParams }: PageProps) {
         <form action={completeMockPaymentAction} className={styles.actions}>
           <input type="hidden" name="reference" value={reference} />
           <button type="submit" name="outcome" value="success" className={styles.pay}>
-            Pay {formatZar(payment.amountCents)}
+            Pay {formatZar(checkout.amountCents)}
           </button>
           <button type="submit" name="outcome" value="failed" className={styles.decline}>
             Simulate a declined card
