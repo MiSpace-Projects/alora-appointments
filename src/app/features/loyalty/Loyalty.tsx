@@ -61,11 +61,11 @@ export default function LoyaltyPage() {
             Rewards
           </motion.span>
 
-          <motion.h1 className={styles.title} variants={fadeUpItem}>
+          <motion.h2 className={styles.title} variants={fadeUpItem}>
             Loyalty
             <br />
             Programme
-          </motion.h1>
+          </motion.h2>
 
           <motion.p className={styles.subtitle} variants={fadeUpItem}>
             Every visit earns points. Climb the tiers and unlock exclusive perks.
