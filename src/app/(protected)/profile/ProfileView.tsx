@@ -3,15 +3,20 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { EASE_OUT } from '@/lib/motion';
 import type { LoyaltyStanding } from '@/lib/loyalty-core';
-import { formatZar, formatBookingDate, formatBookingTime } from '@/lib/format';
+import {
+  formatZar,
+  formatBookingDate,
+  formatBookingTime,
+  getInitials,
+  getFirstName,
+} from '@/lib/format';
 import ProtectedLink from '../../components/protected/ProtectedLink';
 import { SecuritySettings } from './SecuritySettings';
 import { PrivacySettings } from './PrivacySettings';
 import { BookingActions } from './BookingActions';
 import styles from './page.module.css';
-
-const easeOut = [0.22, 1, 0.36, 1] as const;
 
 const container = {
   hidden: { opacity: 0 },
@@ -20,7 +25,7 @@ const container = {
 
 const item = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easeOut } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_OUT } },
 };
 
 type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
@@ -57,21 +62,6 @@ const statusClass: Record<BookingStatus, string> = {
   CANCELLED: styles.statusCancelled,
   COMPLETED: styles.statusConfirmed,
 };
-
-function getInitials(name?: string | null): string {
-  if (!name) return 'U';
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-}
-
-function getFirstName(name?: string | null): string {
-  if (!name) return 'there';
-  return name.split(' ')[0];
-}
 
 // A booking is "upcoming" while it's still live and in the future; everything
 // else (completed, cancelled, past) is history.
@@ -205,7 +195,7 @@ export function ProfileView({
                 className={styles.bookingCard}
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, ease: easeOut }}
+                transition={{ duration: 0.4, ease: EASE_OUT }}
               >
                 <div className={styles.bookingLeft}>
                   <p className={styles.bookingService}>{booking.service.name}</p>

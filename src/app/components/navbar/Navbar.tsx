@@ -9,17 +9,8 @@ import { navItems } from './navbarData';
 import ProtectedLink from '../protected/ProtectedLink';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
+import { getInitials } from '@/lib/format';
 import styles from './Navbar.module.css';
-
-function getInitials(name?: string | null): string {
-  if (!name) return 'U';
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);

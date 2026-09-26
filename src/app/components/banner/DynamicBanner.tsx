@@ -2,20 +2,9 @@
 
 import styles from './DynamicBanner.module.css';
 import { motion } from 'framer-motion';
+import { staggerContainer, fadeUpItem } from '@/lib/motion';
 import { FiArrowUpRight } from 'react-icons/fi';
 import ProtectedLink from '../protected/ProtectedLink';
-
-const easeOut = [0.22, 1, 0.36, 1] as const;
-
-const container = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.12 } },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: easeOut } },
-};
 
 interface DynamicBannerProps {
   kicker?: string;
@@ -43,23 +32,23 @@ export default function DynamicBanner({
       initial="hidden"
       whileInView="show"
       viewport={{ once: true }}
-      variants={container}
+      variants={staggerContainer}
     >
       {kicker && (
-        <motion.span className={styles.kicker} variants={item}>
+        <motion.span className={styles.kicker} variants={fadeUpItem}>
           {kicker}
         </motion.span>
       )}
-      <motion.h2 className={styles.title} variants={item}>
+      <motion.h2 className={styles.title} variants={fadeUpItem}>
         {title}
       </motion.h2>
       {subtitle && (
-        <motion.p className={styles.subtitle} variants={item}>
+        <motion.p className={styles.subtitle} variants={fadeUpItem}>
           {subtitle}
         </motion.p>
       )}
       {ctaLabel && ctaHref && (
-        <motion.div variants={item}>
+        <motion.div variants={fadeUpItem}>
           <ProtectedLink href={ctaHref} className={styles.cta}>
             {ctaLabel}
             <FiArrowUpRight />
