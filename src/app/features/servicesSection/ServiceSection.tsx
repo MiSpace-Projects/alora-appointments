@@ -6,6 +6,10 @@ import { routes } from '@/app/config/routes';
 import { serviceFamilies } from './servicesData';
 import styles from './ServiceSection.module.css';
 
+// Pexels serves resized images via query params; CSS backgrounds bypass the
+// Next image optimizer, so size them here instead of shipping full-res JPEGs.
+const sized = (url: string, w: number) => `${url}?auto=compress&cs=tinysrgb&w=${w}`;
+
 const STYLES_ANCHOR = routes.styles.path;
 const featuredCategory = serviceFamilies.find((f) => f.featured) ?? serviceFamilies[0];
 const serviceCategories = serviceFamilies.filter((f) => f !== featuredCategory);
@@ -39,7 +43,7 @@ export default function Services() {
       <div className={styles.content}>
         <motion.div
           className={styles.featured}
-          style={{ backgroundImage: `url('${featuredCategory.img}')` }}
+          style={{ backgroundImage: `url('${sized(featuredCategory.img, 1200)}')` }}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.35 }}
@@ -60,7 +64,7 @@ export default function Services() {
             <motion.div
               key={item.title}
               className={styles.card}
-              style={{ backgroundImage: `url('${item.img}')` }}
+              style={{ backgroundImage: `url('${sized(item.img, 800)}')` }}
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, amount: 0.35 }}
