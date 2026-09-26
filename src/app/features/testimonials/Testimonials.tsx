@@ -3,18 +3,7 @@
 import CircularTestimonials from '@/app/components/circularTestimonials/CircularTestimonials';
 import styles from './Testimonials.module.css';
 import { motion } from 'framer-motion';
-
-const easeOut = [0.22, 1, 0.36, 1] as const;
-
-const container = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.12 } },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: easeOut } },
-};
+import { staggerContainer, fadeUpItem } from '@/lib/motion';
 
 const testimonials = [
   {
@@ -48,12 +37,12 @@ export default function Testimonials() {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
-        variants={container}
+        variants={staggerContainer}
       >
-        <motion.span className={styles.kicker} variants={item}>
+        <motion.span className={styles.kicker} variants={fadeUpItem}>
           FROM OUR CLIENTS
         </motion.span>
-        <motion.h2 className={styles.title} variants={item}>
+        <motion.h2 className={styles.title} variants={fadeUpItem}>
           Client Stories
         </motion.h2>
       </motion.div>

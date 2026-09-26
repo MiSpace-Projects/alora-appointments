@@ -3,30 +3,12 @@
 import Image from 'next/image';
 import styles from './Loyalty.module.css';
 import { motion } from 'framer-motion';
+import { staggerContainer, fadeUpItem } from '@/lib/motion';
 import { CiStar, CiTrophy, CiGift } from 'react-icons/ci';
 import { LuCrown } from 'react-icons/lu';
 import type { IconType } from 'react-icons';
 import ProtectedLink from '@/app/components/protected/ProtectedLink';
 import { routes } from '@/app/config/routes';
-
-const easeOut = [0.22, 1, 0.36, 1] as const;
-
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.12 },
-  },
-};
-
-const item = {
-  hidden: { opacity: 0, y: 24 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: easeOut },
-  },
-};
 
 const tiers: {
   level: string;
@@ -68,26 +50,31 @@ const tiers: {
 export default function LoyaltyPage() {
   return (
     <div className={styles.page}>
-      <motion.section className={styles.intro} initial="hidden" animate="show" variants={container}>
+      <motion.section
+        className={styles.intro}
+        initial="hidden"
+        animate="show"
+        variants={staggerContainer}
+      >
         <div className={styles.header}>
-          <motion.span className={styles.kicker} variants={item}>
+          <motion.span className={styles.kicker} variants={fadeUpItem}>
             Rewards
           </motion.span>
 
-          <motion.h1 className={styles.title} variants={item}>
+          <motion.h1 className={styles.title} variants={fadeUpItem}>
             Loyalty
             <br />
             Programme
           </motion.h1>
 
-          <motion.p className={styles.subtitle} variants={item}>
+          <motion.p className={styles.subtitle} variants={fadeUpItem}>
             Every visit earns points. Climb the tiers and unlock exclusive perks.
           </motion.p>
         </div>
 
         {/* Theme-matched portrait: light-background shot in light mode, dark in dark,
             so the photo's own backdrop dissolves into the section. */}
-        <motion.div className={styles.portrait} variants={item} aria-hidden="true">
+        <motion.div className={styles.portrait} variants={fadeUpItem} aria-hidden="true">
           <Image
             src="/features/face-art.webp"
             alt=""
@@ -110,12 +97,12 @@ export default function LoyaltyPage() {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
-        variants={container}
+        variants={staggerContainer}
       >
         {tiers.map((tier) => {
           const Icon = tier.icon;
           return (
-            <motion.div key={tier.level} className={styles.card} variants={item}>
+            <motion.div key={tier.level} className={styles.card} variants={fadeUpItem}>
               <div className={styles.cardLeft}>
                 <div className={styles.icon}>
                   <Icon size={22} />
@@ -139,7 +126,7 @@ export default function LoyaltyPage() {
         initial="hidden"
         whileInView="show"
         viewport={{ once: true }}
-        variants={item}
+        variants={fadeUpItem}
       >
         <ProtectedLink href={routes.bookNow.path} className={styles.cta}>
           Start Earning Points →

@@ -5,6 +5,7 @@ import QRCode from 'react-qr-code';
 import { Download, Link as LinkIcon, ShieldCheck, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { authClient } from '@/lib/auth-client';
+import { formatDateTime } from '@/lib/format';
 import { FormField } from '@/app/components/form/Form';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
 import styles from './SecuritySettings.module.css';
@@ -48,13 +49,6 @@ function deviceLabel(userAgent: string | null | undefined): string {
           ? 'Windows'
           : 'Unknown platform';
   return `${browser} on ${platform}`;
-}
-
-function formatDate(value: Date | string): string {
-  return new Intl.DateTimeFormat('en-ZA', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(value));
 }
 
 export function SecuritySettings({
@@ -348,7 +342,9 @@ export function SecuritySettings({
                   <div>
                     <strong>{deviceLabel(session.userAgent)}</strong>
                     <p>
-                      {current ? 'Current session' : `Last active ${formatDate(session.updatedAt)}`}
+                      {current
+                        ? 'Current session'
+                        : `Last active ${formatDateTime(session.updatedAt)}`}
                     </p>
                   </div>
                   {!current && (
