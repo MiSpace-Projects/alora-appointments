@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import styles from './CircularTestimonials.module.css';
@@ -236,7 +236,7 @@ export const CircularTestimonials = ({
               onMouseEnter={() => setHoverPrev(true)}
               onMouseLeave={() => setHoverPrev(false)}
             >
-              <FaArrowLeft size={20} color={colorArrowFg} />
+              <ArrowLeft size={20} color={colorArrowFg} />
             </button>
             <button
               className={styles.arrow}
@@ -246,7 +246,7 @@ export const CircularTestimonials = ({
               onMouseEnter={() => setHoverNext(true)}
               onMouseLeave={() => setHoverNext(false)}
             >
-              <FaArrowRight size={20} color={colorArrowFg} />
+              <ArrowRight size={20} color={colorArrowFg} />
             </button>
           </div>
         </div>
