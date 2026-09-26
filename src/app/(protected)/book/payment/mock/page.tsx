@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { headers } from 'next/headers';
-import { notFound, redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { notFound } from 'next/navigation';
+import { requireSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import { formatZar } from '@/lib/format';
 import { isMockPaymentsEnabled } from '@/lib/payments/provider';
@@ -26,8 +25,7 @@ interface PageProps {
 export default async function MockCheckoutPage({ searchParams }: PageProps) {
   if (!isMockPaymentsEnabled()) notFound();
 
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect('/login');
+  const session = await requireSession();
 
   const params = await searchParams;
   const raw = params.reference;

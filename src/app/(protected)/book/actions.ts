@@ -1,8 +1,7 @@
 'use server';
 
-import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import { auth } from '@/lib/auth';
+import { getCurrentSession } from '@/lib/session';
 import { createBooking } from '@/lib/data/bookings';
 import { startBookingPayment } from '@/lib/data/payments';
 import { PaystackError } from '@/lib/payments/paystack';
@@ -35,7 +34,7 @@ function paymentReturnUrl(): string {
  * and the Paystack checkout URL is returned for the browser to navigate to.
  */
 export async function createBookingAction(input: unknown): Promise<BookingActionResult> {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getCurrentSession();
   if (!session) {
     return { ok: false, error: 'You must be signed in to book.' };
   }
@@ -86,7 +85,7 @@ export async function createBookingAction(input: unknown): Promise<BookingAction
 
 /** Start (or resume) online payment for one of the user's own unpaid bookings. */
 export async function startPaymentAction(bookingId: unknown): Promise<BookingActionResult> {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getCurrentSession();
   if (!session) {
     return { ok: false, error: 'You must be signed in.' };
   }
