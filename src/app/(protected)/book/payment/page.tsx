@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { requireSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import { settlePaymentByReference, type SettleOutcome } from '@/lib/data/payments';
 import { routes } from '@/app/config/routes';
@@ -45,8 +43,7 @@ const copy: Record<SettleOutcome, { title: string; body: string }> = {
  * anything in the URL; the webhook performs the same idempotent settlement.
  */
 export default async function PaymentReturnPage({ searchParams }: PageProps) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect('/login');
+  const session = await requireSession();
 
   const params = await searchParams;
   const raw = params.reference ?? params.trxref;
