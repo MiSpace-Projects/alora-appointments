@@ -12,6 +12,8 @@ interface HeroPortraitProps {
   alt: string;
   /** Extra class that scopes the portrait to a theme (`lightPortrait` / `darkPortrait`). */
   themeClassName: string;
+  /** Preload as the LCP image. Only the default-theme portrait should set this. */
+  priority?: boolean;
 }
 
 /**
@@ -24,8 +26,9 @@ export function HeroPortrait({
   mobileSrc,
   alt,
   themeClassName,
+  priority = false,
 }: HeroPortraitProps): React.JSX.Element {
-  const common = { alt, fill: true, priority: true } as const;
+  const common = { alt, fill: true, priority } as const;
 
   const {
     props: { srcSet: mobileSrcSet },

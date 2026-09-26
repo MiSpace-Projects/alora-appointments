@@ -47,10 +47,11 @@ export default function Hero() {
 
       <motion.div className={styles.portrait} variants={visualVariants}>
         <HeroPortrait
-          desktopSrc="/hero/alora-afro-cutout-v2.png"
-          mobileSrc="/hero/alora-afro-mobile-light-cutout.png"
+          desktopSrc="/hero/alora-afro-cutout-v2.webp"
+          mobileSrc="/hero/alora-afro-mobile-light-cutout.webp"
           alt="Monochrome side-profile portrait of a woman with natural hair"
           themeClassName={styles.lightPortrait}
+          priority
         />
         <HeroPortrait
           desktopSrc="/hero/alora-dark-desktop-cutout.webp"
