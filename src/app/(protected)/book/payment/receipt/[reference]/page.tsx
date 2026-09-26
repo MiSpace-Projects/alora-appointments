@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { headers } from 'next/headers';
-import { notFound, redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { notFound } from 'next/navigation';
+import { requireSession } from '@/lib/session';
 import { getReceiptByReference } from '@/lib/data/payments';
 import { formatZar, formatBookingDate, formatBookingTime } from '@/lib/format';
 import { businessContact, businessLegal } from '@/app/config/business';
@@ -28,8 +27,7 @@ function formatDateTime(value: Date | null): string {
  * unless the business is VAT-registered — noted on the document.
  */
 export default async function ReceiptPage({ params }: PageProps) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect('/login');
+  const session = await requireSession();
 
   const { reference } = await params;
   const receipt = await getReceiptByReference(session.user.id, reference, {

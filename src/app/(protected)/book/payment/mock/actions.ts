@@ -1,8 +1,7 @@
 'use server';
 
-import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { requireSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 import { settleMockPayment } from '@/lib/data/payments';
 import { isMockPaymentsEnabled } from '@/lib/payments/provider';
@@ -15,8 +14,7 @@ import { isMockPaymentsEnabled } from '@/lib/payments/provider';
 export async function completeMockPaymentAction(formData: FormData): Promise<void> {
   if (!isMockPaymentsEnabled()) redirect('/');
 
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect('/login');
+  const session = await requireSession();
 
   const reference = String(formData.get('reference') ?? '');
   const outcome = formData.get('outcome') === 'success' ? 'success' : 'failed';

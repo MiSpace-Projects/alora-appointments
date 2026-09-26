@@ -1,8 +1,7 @@
 'use server';
 
-import { headers } from 'next/headers';
 import { revalidatePath } from 'next/cache';
-import { auth } from '@/lib/auth';
+import { getCurrentSession } from '@/lib/session';
 import { cancelBookingWithRefund, getRefundQuoteForBooking } from '@/lib/data/payments';
 import type { RefundQuote } from '@/lib/refund-policy';
 
@@ -14,7 +13,7 @@ export type CancelResult =
 
 /** Refund preview shown before the customer confirms a cancellation (ECTA s43(2) spirit: no surprises). */
 export async function getRefundQuoteAction(bookingId: unknown): Promise<RefundQuoteResult> {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getCurrentSession();
   if (!session) return { ok: false, error: 'You must be signed in.' };
   if (typeof bookingId !== 'string') return { ok: false, error: 'Booking not found.' };
 
@@ -25,7 +24,7 @@ export async function getRefundQuoteAction(bookingId: unknown): Promise<RefundQu
 
 /** Cancel one of the user's own bookings and refund per policy if it was paid online. */
 export async function cancelBookingAction(bookingId: unknown): Promise<CancelResult> {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const session = await getCurrentSession();
   if (!session) return { ok: false, error: 'You must be signed in.' };
   if (typeof bookingId !== 'string') return { ok: false, error: 'Booking not found.' };
 

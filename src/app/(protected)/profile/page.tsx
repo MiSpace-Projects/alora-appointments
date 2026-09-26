@@ -1,6 +1,4 @@
-import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
-import { auth } from '@/lib/auth';
+import { requireSession } from '@/lib/session';
 import { listUserBookings } from '@/lib/data/bookings';
 import { getUserLoyalty } from '@/lib/data/loyalty';
 import { ProfileView } from './ProfileView';
@@ -13,10 +11,7 @@ import { isOnlinePaymentAvailable } from '@/lib/payments/provider';
  * is defence in depth.
  */
 export default async function ProfilePage() {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) {
-    redirect('/login');
-  }
+  const session = await requireSession();
 
   const [bookings, loyalty] = await Promise.all([
     listUserBookings(session.user.id),
