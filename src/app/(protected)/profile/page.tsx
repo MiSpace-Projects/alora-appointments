@@ -18,9 +18,15 @@ export default async function ProfilePage() {
     getUserLoyalty(session.user.id),
   ]);
 
+  // Explicit DTO: only what the view needs crosses the RSC boundary, never the
+  // whole session.user. (twoFactorEnabled is a better-auth plugin field that
+  // isn't in the inferred user type, so it's read through a narrow cast.)
+  const { name, email, marketingOptIn } = session.user;
+  const twoFactorEnabled = (session.user as { twoFactorEnabled?: boolean }).twoFactorEnabled;
+
   return (
     <ProfileView
-      user={session.user}
+      user={{ name, email, twoFactorEnabled, marketingOptIn }}
       bookings={bookings}
       loyalty={loyalty}
       onlinePaymentAvailable={isOnlinePaymentAvailable()}
