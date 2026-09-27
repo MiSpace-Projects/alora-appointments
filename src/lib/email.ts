@@ -33,7 +33,12 @@ export async function sendAuthEmail(input: SendAuthEmailInput): Promise<boolean>
   const { apiKey, from } = authRuntimeConfig.email;
 
   if (!apiKey || !from) {
-    console.warn(`[email] Resend not configured — ${input.kind} not sent. ${input.text}`);
+    // The text contains one-time links/tokens, so only surface it in dev.
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(`[email] Resend not configured — ${input.kind} not sent.\n${input.text}`);
+    } else {
+      console.warn(`[email] Resend not configured — ${input.kind} not sent.`);
+    }
     return false;
   }
 
@@ -48,7 +53,7 @@ export async function sendAuthEmail(input: SendAuthEmailInput): Promise<boolean>
     });
 
     if (error) {
-      console.error('[email] send failed:', error);
+      console.error('[email] send failed:', error instanceof Error ? error.message : error);
       await recordSecurityEvent({
         event: 'EMAIL_DISPATCHED',
         outcome: 'FAILURE',
@@ -64,7 +69,7 @@ export async function sendAuthEmail(input: SendAuthEmailInput): Promise<boolean>
     });
     return true;
   } catch (error) {
-    console.error('[email] send threw:', error);
+    console.error('[email] send threw:', error instanceof Error ? error.message : error);
     await recordSecurityEvent({
       event: 'EMAIL_DISPATCHED',
       outcome: 'FAILURE',
