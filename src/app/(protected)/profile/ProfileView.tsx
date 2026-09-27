@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { EASE_OUT } from '@/lib/motion';
+import type { BookingStatus, PaymentStatus, PaymentMethod } from '@prisma/client';
 import type { LoyaltyStanding } from '@/lib/loyalty-core';
 import {
   formatZar,
@@ -28,17 +29,13 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE_OUT } },
 };
 
-type BookingStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED';
-
-type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'PARTIALLY_REFUNDED' | 'REFUNDED';
-
 export interface BookingView {
   id: string;
   startsAt: Date | string;
   status: BookingStatus;
   priceCents: number;
   pointsAwarded: number;
-  paymentMethod: 'PAY_NOW' | 'PAY_IN_SALON';
+  paymentMethod: PaymentMethod;
   paidAt: Date | string | null;
   payments: {
     reference: string;
