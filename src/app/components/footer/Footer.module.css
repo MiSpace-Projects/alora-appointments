@@ -78,11 +78,19 @@
 }
 
 .bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding-top: 1.5rem;
   font-size: 0.8rem;
   opacity: 0.45;
   text-align: center;
+}
+
+.credit {
+  letter-spacing: 0.02em;
 }
 
 @media (max-width: 768px) {
