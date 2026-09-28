@@ -42,6 +42,21 @@
   vertical-align: middle;
 }
 
+.ownerLink {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #c9a96e;
+  text-decoration: none;
+}
+
+.ownerLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
 .grid {
   display: flex;
   flex-direction: row;
