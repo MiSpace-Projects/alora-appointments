@@ -16,11 +16,6 @@ interface PrivacySettingsProps {
   initialMarketingOptIn: boolean;
 }
 
-/**
- * POPIA self-service: marketing consent (s69) and account deletion (s24).
- * Deletion is confirmed by password here and by an emailed link before it
- * happens; bookings/payments survive as anonymous records (see Privacy Policy).
- */
 export function PrivacySettings({ initialMarketingOptIn }: PrivacySettingsProps) {
   const [marketingOptIn, setMarketingOptIn] = useState(initialMarketingOptIn);
   const [savingMarketing, startMarketing] = useTransition();

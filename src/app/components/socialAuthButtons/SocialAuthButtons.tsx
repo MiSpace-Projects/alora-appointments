@@ -57,10 +57,6 @@ const PROVIDERS: {
   { id: 'discord', label: 'Discord', Icon: DiscordIcon },
 ];
 
-// Next.js only inlines NEXT_PUBLIC_* vars accessed by their literal name — a
-// dynamic `process.env[key]` lookup resolves to undefined in the browser, which
-// is why these must be read statically. (This was the bug that kept every
-// social button hidden.)
 const PROVIDER_ENABLED: Record<SocialProvider, boolean> = {
   google: process.env.NEXT_PUBLIC_GOOGLE_ENABLED === 'true',
   github: process.env.NEXT_PUBLIC_GITHUB_ENABLED === 'true',

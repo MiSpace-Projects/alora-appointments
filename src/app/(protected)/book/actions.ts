@@ -27,12 +27,6 @@ function paymentReturnUrl(): string {
   return `${base.replace(/\/$/, '')}/book/payment`;
 }
 
-/**
- * Server action for creating a booking. Re-authorizes and re-validates on the
- * server — the client form's checks are UX only and are never trusted here.
- * For "pay now" the booking is created first (so a closed tab never loses it)
- * and the Paystack checkout URL is returned for the browser to navigate to.
- */
 export async function createBookingAction(input: unknown): Promise<BookingActionResult> {
   const session = await getCurrentSession();
   if (!session) {
@@ -74,7 +68,6 @@ export async function createBookingAction(input: unknown): Promise<BookingAction
     );
     return { ok: true, bookingId, redirectUrl: authorizationUrl };
   } catch (err) {
-    // The booking exists and is unpaid; the profile offers a retry.
     const code = err instanceof PaystackError ? 'PAYMENTS_UNAVAILABLE' : errorCode(err);
     return {
       ok: false,
@@ -83,7 +76,6 @@ export async function createBookingAction(input: unknown): Promise<BookingAction
   }
 }
 
-/** Start (or resume) online payment for one of the user's own unpaid bookings. */
 export async function startPaymentAction(bookingId: unknown): Promise<BookingActionResult> {
   const session = await getCurrentSession();
   if (!session) {

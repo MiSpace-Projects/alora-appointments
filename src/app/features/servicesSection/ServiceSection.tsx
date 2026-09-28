@@ -6,8 +6,6 @@ import { routes } from '@/app/config/routes';
 import { serviceFamilies } from './servicesData';
 import styles from './ServiceSection.module.css';
 
-// Pexels serves resized images via query params; CSS backgrounds bypass the
-// Next image optimizer, so size them here instead of shipping full-res JPEGs.
 const sized = (url: string, w: number) => `${url}?auto=compress&cs=tinysrgb&w=${w}`;
 
 const STYLES_ANCHOR = routes.styles.path;
@@ -15,10 +13,6 @@ const featuredCategory = serviceFamilies.find((f) => f.featured) ?? serviceFamil
 const serviceCategories = serviceFamilies.filter((f) => f !== featuredCategory);
 const familyPath = (slug: string) => `${routes.servicesIndex.path}/${slug}`;
 
-/**
- * Service families with a line of copy each; every tile links to the price
- * list, which holds the concrete menu and prices from the database.
- */
 export default function Services() {
   return (
     <div id="services" className={styles.services}>

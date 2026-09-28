@@ -1,8 +1,3 @@
-/* Service family pages — a descriptive editorial piece: full-bleed image
-   hero, numbered "what's included" rows, the family's styles as a compact
-   menu strip (thumbnail · name · duration · price · book), prep notes, CTA.
-   Same canvas, Playfair headings, #d4c5b0 hairlines and accent. */
-
 .page {
   width: 100%;
   box-sizing: border-box;
@@ -13,7 +8,6 @@
   text-align: left;
 }
 
-/* ── Hero ── */
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
@@ -80,7 +74,6 @@
   pointer-events: none;
 }
 
-/* ── Shared section frame ── */
 .section {
   padding: 4.5rem 7rem 0;
 }
@@ -101,7 +94,6 @@
   line-height: 1.1;
 }
 
-/* ── Numbered includes ── */
 .includes {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -141,7 +133,6 @@
   opacity: 0.78;
 }
 
-/* ── Menu strip ── */
 .strip {
   margin: 0;
   padding: 0;
@@ -254,7 +245,6 @@
   opacity: 0.7;
 }
 
-/* ── Prep notes ── */
 .prep {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
@@ -274,7 +264,6 @@
   opacity: 0.88;
 }
 
-/* ── CTA band ── */
 .cta {
   display: flex;
   align-items: center;
@@ -299,7 +288,6 @@
   opacity: 0.7;
 }
 
-/* ── Index page ── */
 .indexGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));

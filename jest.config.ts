@@ -1,4 +1,3 @@
-/** @type {import('jest').Config} */
 const config = {
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],

@@ -15,9 +15,6 @@ model User {
   createdAt        DateTime            @default(now())
   updatedAt        DateTime            @updatedAt
   twoFactorEnabled Boolean             @default(false)
-  // Consent captured at sign-up (POPIA s18 notice / s69 marketing opt-in).
-  // Written by better-auth from the registration form; the audit trail with
-  // versions and timestamps lives in ConsentRecord.
   termsAccepted    Boolean             @default(false)
   marketingOptIn   Boolean             @default(false)
   sessions         Session[]
@@ -140,10 +137,6 @@ model AuthDevice {
   @@map("auth_device")
 }
 
-// ─────────────────────────────────────────────────────────────
-// Domain: single-salon appointments + loyalty
-// ─────────────────────────────────────────────────────────────
-
 enum BookingStatus {
   PENDING
   CONFIRMED
@@ -151,14 +144,11 @@ enum BookingStatus {
   COMPLETED
 }
 
-// How the customer chose to settle: online at booking time, or at the salon.
 enum PaymentMethod {
   PAY_NOW
   PAY_IN_SALON
 }
 
-// Ledger entry reasons — why points moved. Kept explicit so the append-only
-// history is self-describing during reconciliation.
 enum PointsReason {
   EARNED_BOOKING
   REDEEMED
@@ -166,16 +156,12 @@ enum PointsReason {
   ADJUSTMENT
 }
 
-// DB-driven service catalog. Editable without a deploy; prices are integer
-// cents (ZAR) to avoid floating-point money bugs.
 model Service {
   id              String    @id @default(cuid())
   slug            String    @unique
   name            String
   description     String?
-  // Menu grouping for the public price list (e.g. "Hair", "Wigs", "Nails").
   category        String?
-  // Manual ordering within a category; ties fall back to price.
   sortOrder       Int       @default(0)
   priceCents      Int
   durationMinutes Int
@@ -193,19 +179,14 @@ model Service {
 
 model Booking {
   id            String        @id @default(cuid())
-  // Nullable so a deleted account leaves its bookings behind as anonymous
-  // financial records (5-year tax retention) instead of cascading them away.
   userId        String?
   serviceId     String
   startsAt      DateTime
   status        BookingStatus @default(PENDING)
-  // Snapshot price/points at booking time so later catalog edits never rewrite
-  // a customer's historical booking or their earned points.
   priceCents    Int
   pointsAwarded Int
   notes         String?
   paymentMethod PaymentMethod @default(PAY_IN_SALON)
-  // Set when an online payment succeeds; the Payment row holds the detail.
   paidAt        DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
@@ -220,13 +201,6 @@ model Booking {
   @@map("booking")
 }
 
-// ─────────────────────────────────────────────────────────────
-// Payments (Paystack hosted checkout). One row per attempt; the booking is
-// paid when a row reaches SUCCESS. Card data never touches this system: only
-// the provider reference, amount, status and channel are stored (POPIA
-// minimality). Rows are never deleted — they are financial records.
-// ─────────────────────────────────────────────────────────────
-
 enum PaymentStatus {
   PENDING
   SUCCESS
@@ -240,7 +214,6 @@ model Payment {
   bookingId        String
   userId           String?
   provider         String        @default("paystack")
-  // Our reference sent to the provider; unique so webhooks and callbacks are idempotent.
   reference        String        @unique
   amountCents      Int
   currency         String        @default("ZAR")
@@ -265,8 +238,6 @@ model Payment {
   @@map("payment")
 }
 
-// Append-only loyalty ledger. Balance is derived as SUM(delta); rows are never
-// updated or deleted, which keeps the wallet auditable and reconcilable.
 model PointsTransaction {
   id        String       @id @default(cuid())
   userId    String
@@ -281,12 +252,6 @@ model PointsTransaction {
   @@index([userId, createdAt])
   @@map("points_transaction")
 }
-
-// ─────────────────────────────────────────────────────────────
-// Consent audit trail (POPIA s11(1)(a), s18, s69). Append-only: a withdrawal
-// is a new row with granted=false, never an update, so we can always show
-// what a person agreed to and when.
-// ─────────────────────────────────────────────────────────────
 
 enum ConsentKind {
   TERMS

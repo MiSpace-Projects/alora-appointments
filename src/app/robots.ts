@@ -7,7 +7,6 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      // Authenticated areas have no SEO value and should not be crawled.
       disallow: [
         '/profile',
         '/book',

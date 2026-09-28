@@ -1,7 +1,3 @@
-/* Legal documents — same canvas and type system as the rest of Alora (black
-   surface, #d4c5b0 accent, Playfair headings, Geist body). Long-form reading
-   layout: a narrow measure, generous leading, quiet section index. */
-
 .page {
   width: 100%;
   box-sizing: border-box;
@@ -139,7 +135,6 @@
   opacity: 1;
 }
 
-/* Definition-style rows (name / address / officer) */
 .facts {
   display: grid;
   grid-template-columns: minmax(9rem, 12rem) 1fr;
@@ -159,7 +154,6 @@
   margin: 0;
 }
 
-/* Value the owner still has to supply — deliberately loud so it cannot ship unnoticed. */
 .tbc {
   display: inline-block;
   padding: 0.05rem 0.5rem;

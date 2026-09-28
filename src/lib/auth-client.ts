@@ -6,7 +6,6 @@ const baseURL = process.env.NEXT_PUBLIC_BETTER_AUTH_URL;
 
 export const authClient = createAuthClient({
   ...(baseURL ? { baseURL } : {}),
-  // Infers the consent fields (termsAccepted, marketingOptIn) so sign-up is typed end to end.
   plugins: [
     inferAdditionalFields<typeof auth>(),
     twoFactorClient({ twoFactorPage: '/two-factor' }),

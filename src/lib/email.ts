@@ -3,16 +3,6 @@ import { Resend } from 'resend';
 import { authRuntimeConfig } from './auth-config';
 import { recordSecurityEvent } from './security-events';
 
-/**
- * Transactional email via Resend (direct send).
- *
- * Sender is env-driven (EMAIL_FROM) — never hardcode a domain. For real delivery
- * to customers, EMAIL_FROM must be an address on a domain verified in Resend
- * (SPF/DKIM). When no key is configured the send is skipped rather than failing
- * the auth flow, and the action link (in the text body) is logged so local dev
- * isn't blocked.
- */
-
 export type AuthEmailKind =
   | 'EMAIL_VERIFICATION'
   | 'PASSWORD_RESET'
@@ -33,7 +23,6 @@ export async function sendAuthEmail(input: SendAuthEmailInput): Promise<boolean>
   const { apiKey, from } = authRuntimeConfig.email;
 
   if (!apiKey || !from) {
-    // The text contains one-time links/tokens, so only surface it in dev.
     if (process.env.NODE_ENV !== 'production') {
       console.warn(`[email] Resend not configured — ${input.kind} not sent.\n${input.text}`);
     } else {
@@ -78,9 +67,6 @@ export async function sendAuthEmail(input: SendAuthEmailInput): Promise<boolean>
     return false;
   }
 }
-
-// ── Templates ──────────────────────────────────────────────
-// Shared shell keeps every Alora email visually consistent (#d4c5b0 accent).
 
 function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (character) => {

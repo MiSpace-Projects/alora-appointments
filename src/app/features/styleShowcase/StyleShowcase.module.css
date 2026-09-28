@@ -1,8 +1,3 @@
-/* Style showcase — the inspo's composition (script eyebrow inside a drawn
-   ring, oversized name, cutout standing in front, price panel) rebuilt in
-   Alora's language: black/white canvas, Playfair, #d4c5b0 hairlines, no
-   colour blocks. Three compositions per screen on desktop. */
-
 .section {
   --showcase-gap: 2rem;
   --per-view: 3;
@@ -66,9 +61,6 @@
   cursor: default;
 }
 
-/* ── Track ── */
-/* The viewport carries the page gutters and clips, so exactly N slides are
-   visible and nothing peeks in the gutter. */
 .viewport {
   padding: 0 7rem;
 }
@@ -94,7 +86,6 @@
   flex-direction: column;
 }
 
-/* ── Composition ── */
 .stage {
   position: relative;
   aspect-ratio: 4 / 5;
@@ -145,9 +136,6 @@
   text-wrap: balance;
 }
 
-/* Until artwork is supplied a style keeps the ring + name and a shorter
-   stage, so the composition never reads as a missing image. The slide still
-   stretches so the price panels of a page line up. */
 .stageNoArt {
   aspect-ratio: auto;
   flex: 1 1 auto;
@@ -155,7 +143,6 @@
   justify-content: flex-start;
 }
 
-/* Cutout stands in front of the name, feet at the panel edge. */
 .portrait {
   position: absolute;
   z-index: 2;
@@ -172,7 +159,6 @@
   object-position: center bottom;
 }
 
-/* ── Price panel (the inspo's colour block, as a hairline strip) ── */
 .panel {
   display: flex;
   align-items: center;
@@ -245,7 +231,6 @@
   filter: brightness(1.05);
 }
 
-/* ── Dots ── */
 .dots {
   display: flex;
   justify-content: center;

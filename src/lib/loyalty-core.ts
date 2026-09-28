@@ -1,11 +1,3 @@
-/**
- * loyalty-core.ts — pure loyalty math, no I/O.
- *
- * Kept free of `server-only`/Prisma so the balance and tier rules can be unit
- * tested directly and reused on either side of the wire. The database layer
- * (src/lib/data/loyalty.ts) reads the ledger and delegates the arithmetic here.
- */
-
 export type LoyaltyTier = 'Bronze' | 'Silver' | 'Gold' | 'Platinum';
 
 interface TierBand {
@@ -13,7 +5,6 @@ interface TierBand {
   min: number;
 }
 
-// Ascending thresholds. A member sits in the highest band whose `min` they meet.
 export const TIER_BANDS: readonly TierBand[] = [
   { tier: 'Bronze', min: 0 },
   { tier: 'Silver', min: 500 },
@@ -21,7 +12,6 @@ export const TIER_BANDS: readonly TierBand[] = [
   { tier: 'Platinum', min: 4000 },
 ];
 
-/** Balance is the sum of every ledger delta — never a stored, mutable field. */
 export function computeBalance(entries: ReadonlyArray<{ delta: number }>): number {
   return entries.reduce((sum, e) => sum + e.delta, 0);
 }
@@ -31,7 +21,7 @@ export interface LoyaltyStanding {
   tier: LoyaltyTier;
   nextTier: LoyaltyTier | null;
   pointsToNext: number | null;
-  progressPercent: number; // progress through the CURRENT tier, 0–100
+  progressPercent: number;
 }
 
 export function standingForPoints(points: number): LoyaltyStanding {

@@ -14,11 +14,6 @@ export const metadata: Metadata = {
   alternates: { canonical: routes.cookies.path },
 };
 
-/**
- * Every cookie and storage key this site sets. Keep this table in sync with
- * the auth configuration (better-auth cookie names) and the consent module —
- * the table is the disclosure POPIA s18 requires for online identifiers.
- */
 const cookies = [
   {
     name: '__Secure-better-auth.session_token',

@@ -44,9 +44,6 @@ function ResetPasswordInner() {
     setLoading(true);
 
     try {
-      // better-auth returns errors in the result object rather than throwing;
-      // check `error` explicitly so an expired/invalid token can't be reported
-      // to the user as a successful reset.
       const { error } = await authClient.resetPassword({
         newPassword: data.password,
         token: token,
@@ -60,7 +57,6 @@ function ResetPasswordInner() {
       setResetSuccess(true);
       toast.success('Password reset successfully!');
 
-      // Redirect to login after 3 seconds
       setTimeout(() => {
         router.push('/login');
       }, 3000);

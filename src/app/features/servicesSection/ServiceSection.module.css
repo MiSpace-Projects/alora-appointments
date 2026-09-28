@@ -177,8 +177,6 @@
   text-align: left;
 }
 
-/* Copy sits on a photo with a dark overlay, so it stays white in both themes;
-   the `.services` prefix outranks the homepage's `.home p` colour rule. */
 .services .cardDesc,
 .services .featured p {
   margin: 0;

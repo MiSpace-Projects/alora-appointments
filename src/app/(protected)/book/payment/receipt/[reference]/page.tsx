@@ -21,11 +21,6 @@ function formatDateTime(value: Date | null): string {
   return `${formatBookingDate(value)}, ${formatBookingTime(value)}`;
 }
 
-/**
- * Payment receipt for the acting user's own transaction. A record of the sale
- * (ECTA s43(1)(m) / CPA), printable to PDF via the browser. Not a tax invoice
- * unless the business is VAT-registered — noted on the document.
- */
 export default async function ReceiptPage({ params }: PageProps) {
   const session = await requireSession();
 

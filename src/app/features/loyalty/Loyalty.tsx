@@ -70,8 +70,6 @@ export default function LoyaltyPage() {
           </motion.p>
         </div>
 
-        {/* Theme-matched portrait: light-background shot in light mode, dark in dark,
-            so the photo's own backdrop dissolves into the section. */}
         <motion.div className={styles.portrait} variants={fadeUpItem} aria-hidden="true">
           <Image
             src="/features/face-art.webp"

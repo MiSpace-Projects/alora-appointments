@@ -1,5 +1,3 @@
-/* Receipt — a clean document on the dark canvas, and a plain black-on-white
-   sheet when printed. */
 .page {
   min-height: 100vh;
   display: flex;
@@ -215,7 +213,6 @@
   text-underline-offset: 0.15em;
 }
 
-/* Print: a plain white sheet, no app chrome. */
 @media print {
   .page {
     padding: 0;

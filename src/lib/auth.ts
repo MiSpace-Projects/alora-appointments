@@ -244,8 +244,6 @@ export const auth = betterAuth({
       termsAccepted: { type: 'boolean', required: true, input: true },
       marketingOptIn: { type: 'boolean', required: false, defaultValue: false, input: true },
     },
-    // POPIA s24 right to deletion: the user confirms by email link; bookings and
-    // payments survive as anonymous records via the SetNull relations.
     deleteUser: {
       enabled: true,
       deleteTokenExpiresIn: 24 * HOUR_SECONDS,

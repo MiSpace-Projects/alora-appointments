@@ -34,11 +34,6 @@ body {
   overflow-x: hidden;
 }
 
-/* `clip` stops horizontal overflow without turning <body> into its own
-   scroll container. iOS Safari treats `overflow-x: hidden` here as a nested
-   scroller, which lets the page keep scrolling past the footer. Kept in
-   @supports (not as a duplicate declaration) because the CSS minifier
-   collapses duplicate properties and dropped the `clip` value. */
 @supports (overflow-x: clip) {
   html,
   body {
@@ -86,7 +81,7 @@ a {
     color-scheme: dark;
   }
 }
-/* Accessible labels for icon-only controls. */
+
 .sr-only {
   position: absolute;
   width: 1px;

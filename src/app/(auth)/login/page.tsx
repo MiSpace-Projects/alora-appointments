@@ -75,9 +75,6 @@ function LoginInner() {
           result.error.code ?? result.error.status,
         );
 
-        // Never reveal whether the email exists. Collapse "no such user" and
-        // "wrong password" into one generic message to prevent account
-        // enumeration; the distinction is still recorded server-side for ops.
         const isCredentialError =
           classified.category === 'UNKNOWN_USER' || classified.category === 'INVALID_CREDENTIALS';
 
@@ -140,7 +137,6 @@ function LoginInner() {
         </SubmitButton>
       </motion.div>
 
-      {/* Issue #8: Social sign-in */}
       <SocialAuthButtons redirectTo={destination} onSuccess={refresh} />
     </form>
   );
