@@ -57,7 +57,50 @@ export async function createBooking(userId: string, input: CreateBookingInput) {
       paymentMethod: input.paymentMethod,
       status: 'PENDING',
     },
+    include: { service: { select: { name: true } } },
   });
+}
+
+export function listAllBookings() {
+  return prisma.booking.findMany({
+    orderBy: { startsAt: 'desc' },
+    include: {
+      service: { select: { name: true } },
+      user: { select: { name: true, email: true } },
+      payments: {
+        orderBy: { createdAt: 'desc' },
+        take: 1,
+        select: { status: true, amountCents: true, refundedCents: true },
+      },
+    },
+  });
+}
+
+export async function confirmBooking(bookingId: string) {
+  const result = await prisma.booking.updateMany({
+    where: { id: bookingId, status: 'PENDING' },
+    data: { status: 'CONFIRMED' },
+  });
+  if (result.count === 0) {
+    throw new Error('BOOKING_NOT_CONFIRMABLE');
+  }
+  return prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: {
+      service: { select: { name: true } },
+      user: { select: { name: true, email: true } },
+    },
+  });
+}
+
+export async function cancelBookingAsOwner(bookingId: string) {
+  const result = await prisma.booking.updateMany({
+    where: { id: bookingId, status: { in: ['PENDING', 'CONFIRMED'] } },
+    data: { status: 'CANCELLED', cancelledAt: new Date() },
+  });
+  if (result.count === 0) {
+    throw new Error('BOOKING_NOT_FOUND');
+  }
 }
 
 export async function cancelBooking(userId: string, bookingId: string) {

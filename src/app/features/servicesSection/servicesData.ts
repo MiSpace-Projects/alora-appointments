@@ -8,6 +8,7 @@ export interface ServiceFamily {
   categories: string[];
   img: string;
   featured?: boolean;
+  addOns?: { label: string; price: string }[];
 }
 
 export const serviceFamilies: ServiceFamily[] = [
@@ -15,35 +16,64 @@ export const serviceFamilies: ServiceFamily[] = [
     slug: 'wig-care',
     title: 'Wig Care',
     description:
-      'Deep cleanse, condition, restyle and maintenance so your wig always looks freshly installed.',
+      'Washes and treatments that keep human-hair and premium units soft, clean and lasting.',
     intro:
-      'A good unit deserves a good routine. We wash, condition and restyle human-hair and premium synthetic wigs, revive lace and hairlines, and install frontals and closures so they sit flat, natural and secure.',
+      'A good unit deserves a good routine. We deep-cleanse, condition and treat human-hair and premium synthetic wigs so they keep their movement, shine and lifespan. Standard turnaround is 24 to 48 hours; same-day express is available on weekends at an additional charge.',
     includes: [
       {
-        title: 'Cleanse and condition',
-        body: 'Sulphate-free wash, deep conditioning and a cool rinse to bring back shine and movement without stripping the fibre.',
+        title: 'Basic wash',
+        body: 'Sulphate-free cleanse, conditioning and a cool rinse that lifts product and oil without stripping the fibre.',
       },
       {
-        title: 'Lace and hairline work',
-        body: 'Lace tinting, plucking and baby-hair styling so the install reads as your own scalp, not a wig line.',
+        title: 'Moisture treatment',
+        body: 'A deep moisture mask for dry or ageing hair, restoring softness and slip to tired units.',
       },
       {
-        title: 'Install and lay',
-        body: 'Frontal or closure install with a clean, secure hold, laid and styled to the look you want.',
+        title: 'Keratin treatment',
+        body: 'A smoothing keratin service that tames frizz and brings back a sleek, manageable finish.',
+      },
+    ],
+    prep: [
+      'Drop the unit off in a hygienic condition; excessively tangled or matted wigs may attract an additional fee.',
+      'Tell us the hair type and density in your booking notes so the right products are ready.',
+      'Allow 24 to 48 hours for standard turnaround, or ask about weekend express.',
+    ],
+    categories: ['Wig Care'],
+    img: 'https://images.pexels.com/photos/14730865/pexels-photo-14730865.jpeg',
+    featured: true,
+  },
+  {
+    slug: 'customization-styling',
+    title: 'Customization & Styling',
+    description:
+      'Plucking, tinting, baby hairs, colour and frontal work so a unit reads as your own scalp.',
+    intro:
+      'A unit is only as good as its customization. We pluck, tint and lay lace, add baby hairs, colour and style, and replace or customize frontals and closures so the install sits flat, natural and secure. Most customization is priced on consultation because it depends on the unit and the look.',
+    includes: [
+      {
+        title: 'Basic customization',
+        body: 'Plucking and baby hairs to soften a dense, factory hairline into something natural.',
       },
       {
-        title: 'Restyle and set',
-        body: 'Straighten, curl or set the unit so it leaves the chair ready to wear.',
+        title: 'Advanced customization',
+        body: 'Plucking, baby hairs and a lace tint matched to your scalp for a seamless melt.',
+      },
+      {
+        title: 'Full and glueless customization',
+        body: 'Plucking, tint, baby hairs and styling, with an optional elastic, band and adjustments for a secure glueless fit.',
+      },
+      {
+        title: 'Colour, styling and frontal work',
+        body: 'Curls or straightening, colouring, and frontal or closure replacement and customization on request.',
       },
     ],
     prep: [
       'Bring the unit clean of glue residue if you can; if not, allow extra time and let us know when booking.',
-      'Arrive with your natural hair braided down or ready to be braided; cornrow prep is available as an add-on.',
-      'Tell us the density and lace type in your booking notes so the right products are ready.',
+      'Share references in your booking notes so the parting, colour and style are ready.',
+      'Ranges are quoted at consultation and settled at the salon; deposits may be required for premium or custom work.',
     ],
-    categories: ['Press & Wigs'],
-    img: 'https://images.pexels.com/photos/14730865/pexels-photo-14730865.jpeg',
-    featured: true,
+    categories: ['Customization & Styling'],
+    img: 'https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg',
   },
   {
     slug: 'hair-styling',
@@ -80,52 +110,56 @@ export const serviceFamilies: ServiceFamily[] = [
   {
     slug: 'nail-art',
     title: 'Nail Art',
-    description: 'Manicures, gel overlays and hand-painted designs that last.',
+    description: 'Gel-X sets, soak-offs and hand-painted designs that last.',
     intro:
-      'Clean shaping, healthy cuticles and colour that stays put. From a classic gel manicure to hand-painted art and chrome, we build on properly prepped nails so the finish holds for weeks, not days.',
+      'Clean shaping, healthy nails and colour that stays put. From a plain Gel-X set to hand-painted art, we build on properly prepped nails so the finish holds for weeks, not days.',
     includes: [
       {
         title: 'Prep and shaping',
         body: 'Shape, cuticle care and a gentle buff so product bonds cleanly and the nail stays healthy underneath.',
       },
       {
-        title: 'Gel or overlay',
-        body: 'Gel polish, builder gel or acrylic overlay depending on the strength and length you want.',
+        title: 'Gel-X application',
+        body: 'Short, medium or long Gel-X extensions applied plain, ready for colour or art.',
       },
       {
-        title: 'Art',
-        body: 'Hand-painted designs, French tips, chrome, ombré and embellishments; bring a reference or let us design.',
+        title: 'Art and finish',
+        body: 'French, simple or detailed hand-painted designs, sealed with a top coat and cuticle oil.',
       },
       {
-        title: 'Finish',
-        body: 'Sealed top coat and cuticle oil, with removal and rebalance available on your next visit.',
+        title: 'Soak-off and repair',
+        body: 'Gentle removal of an Alora or other-salon set, refills, and single-nail repairs when you need them.',
       },
     ],
     prep: [
-      'If you are wearing product from another salon, book a removal with your service.',
+      'If you are wearing product from another salon, add a soak-off to your booking.',
       'Send reference pictures in your booking notes for art so the colours are ready.',
     ],
     categories: ['Nails'],
     img: 'https://images.pexels.com/photos/14016180/pexels-photo-14016180.jpeg',
+    addOns: [
+      { label: 'French or simple design', price: '+R50' },
+      { label: 'Detailed nail art', price: '+R80 to R150' },
+    ],
   },
   {
     slug: 'makeup',
     title: 'Makeup',
-    description: 'Soft glam to full glam for events, shoots and evenings out.',
+    description: 'Soft glam to full glam for events, shoots, weddings and matric farewells.',
     intro:
-      'Makeup that photographs the way it looks in the mirror. We work with your undertone and skin, from a soft everyday face to full glam for a shoot or a wedding, and set it to last the whole night.',
+      'Makeup that photographs the way it looks in the mirror. We work with your undertone and skin, from a soft everyday face to full bridal glam, and set it to last the whole day. Strip lashes are included with every glam.',
     includes: [
       {
         title: 'Skin prep',
         body: 'Cleanse, hydrate and prime for your skin type so the base sits smooth and lasts.',
       },
       {
-        title: 'Base and sculpt',
-        body: 'Colour-matched foundation, concealing, contour and highlight tuned to your features and the lighting you will be in.',
+        title: 'Soft or full glam',
+        body: 'A natural soft glam or a sculpted full glam, colour-matched and tuned to your lighting.',
       },
       {
-        title: 'Eyes and lips',
-        body: 'Soft or dramatic eyes, lashes on request, and a lip finish to match the occasion.',
+        title: 'Bridal and party',
+        body: 'Bridal and bridesmaid makeup for the whole party, with lashes included on every look.',
       },
       {
         title: 'Set',
@@ -139,29 +173,35 @@ export const serviceFamilies: ServiceFamily[] = [
     ],
     categories: ['Makeup'],
     img: 'https://images.pexels.com/photos/10698022/pexels-photo-10698022.jpeg',
+    addOns: [
+      { label: 'Strip lashes with any glam', price: 'Included' },
+      { label: 'Early-morning surcharge', price: '+R100' },
+      { label: 'Travel or mobile makeup', price: 'From R150' },
+    ],
   },
   {
     slug: 'matric-farewell',
     title: 'Matric Farewell',
-    description: 'Hair, nails and makeup planned together so your farewell look is complete.',
+    description:
+      'Hair and makeup planned together as one package so your farewell look is complete.',
     intro:
-      'One night, one look, no scrambling between three salons. We plan your hair, nails and makeup together, schedule them so nothing clashes, and have you photo-ready with time to spare.',
+      'One night, one look, no scrambling between salons. Our matric package brings hair and makeup together: wig customization, installation and styling, plus full glam and lashes, planned and timed so you are photo-ready with time to spare.',
     includes: [
       {
         title: 'Look planning',
-        body: 'A short consultation with your dress and references to decide the hair, nail and makeup combination.',
+        body: 'A short consultation with your dress and references to decide the hair and makeup combination.',
       },
       {
         title: 'Hair',
-        body: 'Install or style booked a day or two before, so the night itself is just finishing touches.',
-      },
-      {
-        title: 'Nails',
-        body: 'Gel or art to match the dress, done in the days before so they are set and strong.',
+        body: 'Wig customization, installation and styling booked so the night itself is just finishing touches.',
       },
       {
         title: 'Makeup on the day',
-        body: 'Long-wear glam timed to your pick-up, with lashes and a touch-up kit if you want them.',
+        body: 'Full glam timed to your pick-up, with lashes included.',
+      },
+      {
+        title: 'One package',
+        body: 'Hair and makeup quoted together so there are no surprises on the day.',
       },
     ],
     prep: [
@@ -169,7 +209,7 @@ export const serviceFamilies: ServiceFamily[] = [
       'A parent or guardian holds the account and makes the booking for anyone under 18.',
       'Bring a photo of the dress and any references to the planning session.',
     ],
-    categories: ['Braids', 'Locs & Twists', 'Natural', 'Press & Wigs', 'Nails', 'Makeup'],
+    categories: ['Matric'],
     img: 'https://images.pexels.com/photos/30482416/pexels-photo-30482416.jpeg',
   },
 ];
