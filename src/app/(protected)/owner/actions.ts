@@ -1,8 +1,9 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { requireOwner } from '@/lib/owner';
 import { cancelBookingAsOwner, completeBooking, confirmBooking } from '@/lib/data/bookings';
+import { SERVICES_CACHE_TAG } from '@/lib/data/services';
 import { notifyCustomerBookingConfirmed } from '@/lib/notifications';
 import { formatDateTime } from '@/lib/format';
 
@@ -49,4 +50,12 @@ export async function cancelBookingAction(formData: FormData): Promise<void> {
   await cancelBookingAsOwner(bookingId(formData));
   revalidatePath('/owner');
   revalidatePath('/profile');
+}
+
+export async function refreshCatalogAction(): Promise<void> {
+  await requireOwner();
+  updateTag(SERVICES_CACHE_TAG);
+  revalidatePath('/');
+  revalidatePath('/services');
+  revalidatePath('/book');
 }
