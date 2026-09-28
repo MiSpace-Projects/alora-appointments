@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
@@ -8,7 +8,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import type { z } from 'zod';
 import { createBookingSchema, type CreateBookingInput } from '@/lib/validation';
-import { formatBookingDate, formatBookingTime, formatZar } from '@/lib/format';
+import {
+  formatBookingDate,
+  formatBookingTime,
+  formatPrice,
+  formatZar,
+  type PriceShape,
+} from '@/lib/format';
 import { routes } from '@/app/config/routes';
 import { cancellationPolicy } from '@/app/config/business';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
@@ -19,6 +25,8 @@ export interface ServiceOption {
   id: string;
   name: string;
   priceCents: number;
+  priceType: PriceShape;
+  priceMaxCents: number | null;
   durationMinutes: number;
   pointsAwarded: number;
 }
@@ -46,6 +54,7 @@ export function BookingForm({
     register,
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
   } = useForm<FormInput, unknown, CreateBookingInput>({
     resolver: zodResolver(createBookingSchema),
@@ -57,6 +66,14 @@ export function BookingForm({
 
   const selectedId = useWatch({ control, name: 'serviceId' });
   const selected = services.find((s) => s.id === selectedId);
+  // Online pay-now only settles an exact amount, so it is offered for FIXED
+  // prices. "From"/range services are quoted at the salon and paid there.
+  const canPayNow = onlinePaymentAvailable && selected?.priceType === 'FIXED';
+
+  useEffect(() => {
+    if (!canPayNow) setValue('paymentMethod', 'PAY_IN_SALON');
+    else if (onlinePaymentAvailable) setValue('paymentMethod', 'PAY_NOW');
+  }, [canPayNow, onlinePaymentAvailable, setValue]);
 
   const goToReview = (data: CreateBookingInput) => {
     setServerError(null);
@@ -115,7 +132,7 @@ export function BookingForm({
                 </option>
                 {services.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.name} — {formatZar(s.priceCents)}
+                    {s.name} — {formatPrice(s)}
                   </option>
                 ))}
               </select>
@@ -127,8 +144,15 @@ export function BookingForm({
                 <span>
                   {selected.durationMinutes} min · +{selected.pointsAwarded} points
                 </span>
-                <span className={styles.summaryPrice}>{formatZar(selected.priceCents)}</span>
+                <span className={styles.summaryPrice}>{formatPrice(selected)}</span>
               </div>
+            )}
+
+            {selected && selected.priceType !== 'FIXED' && (
+              <p className={styles.priceNote}>
+                This service is priced on consultation. The amount shown is a guide; the final price
+                is confirmed and settled at the salon.
+              </p>
             )}
 
             <div className={styles.field}>
@@ -147,7 +171,7 @@ export function BookingForm({
             <fieldset className={styles.field}>
               <legend className={styles.label}>Payment</legend>
               <div className={styles.choiceGroup}>
-                {onlinePaymentAvailable && (
+                {canPayNow && (
                   <label className={styles.choice}>
                     <input type="radio" value="PAY_NOW" {...register('paymentMethod')} />
                     <span>
@@ -227,7 +251,7 @@ export function BookingForm({
                 )}
                 <div className={`${styles.reviewRow} ${styles.reviewTotal}`}>
                   <dt>Total</dt>
-                  <dd>{formatZar(reviewedService.priceCents)}</dd>
+                  <dd>{formatPrice(reviewedService)}</dd>
                 </div>
               </dl>
 

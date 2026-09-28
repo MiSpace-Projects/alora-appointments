@@ -20,6 +20,8 @@ export default async function BookPage({
     id: s.id,
     name: s.name,
     priceCents: s.priceCents,
+    priceType: s.priceType,
+    priceMaxCents: s.priceMaxCents,
     durationMinutes: s.durationMinutes,
     pointsAwarded: s.pointsAwarded,
   }));
