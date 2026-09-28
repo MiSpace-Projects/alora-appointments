@@ -5,11 +5,6 @@ import { requireSession } from '@/lib/session';
 import { isPaymentOwnedByUser, settleMockPayment } from '@/lib/data/payments';
 import { isMockPaymentsEnabled } from '@/lib/payments/provider';
 
-/**
- * Fake checkout outcome. Mirrors what Paystack's page does at the end: apply
- * the result server-side, then send the customer to our return page with
- * the reference. Only exists when the mock provider is enabled.
- */
 export async function completeMockPaymentAction(formData: FormData): Promise<void> {
   if (!isMockPaymentsEnabled()) redirect('/');
 

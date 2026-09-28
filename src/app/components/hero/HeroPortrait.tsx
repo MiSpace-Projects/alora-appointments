@@ -1,26 +1,16 @@
 import { getImageProps } from 'next/image';
 import styles from './Hero.module.css';
 
-/** Breakpoint at which the hero switches to the mobile art direction. Keep in sync with Hero.module.css. */
 const MOBILE_MEDIA = '(max-width: 760px)';
 
 interface HeroPortraitProps {
-  /** Cutout shown on desktop / tablet. */
   desktopSrc: string;
-  /** Cutout shown on mobile (different crop, full-bleed treatment). */
   mobileSrc: string;
   alt: string;
-  /** Extra class that scopes the portrait to a theme (`lightPortrait` / `darkPortrait`). */
   themeClassName: string;
-  /** Preload as the LCP image. Only the default-theme portrait should set this. */
   priority?: boolean;
 }
 
-/**
- * Art-directed hero portrait: one `<picture>` per theme so the browser only
- * fetches the source that matches the viewport, instead of loading both
- * crops on every device.
- */
 export function HeroPortrait({
   desktopSrc,
   mobileSrc,

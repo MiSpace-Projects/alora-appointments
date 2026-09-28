@@ -6,12 +6,6 @@ import { routes } from '@/app/config/routes';
 import { useConsent } from './ConsentContext';
 import styles from './CookieNotice.module.css';
 
-/**
- * Cookie notice. Only strictly necessary cookies exist, so there is nothing to
- * opt into; this is a POPIA transparency notice with an acknowledgement,
- * re-openable from the cookie policy page. Rendered as a non-modal dialog so
- * the page stays usable behind it.
- */
 export function CookieNotice() {
   const { ready, noticeOpen, consent, acknowledge, closeNotice } = useConsent();
   const primaryRef = useRef<HTMLButtonElement | null>(null);

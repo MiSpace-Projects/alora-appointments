@@ -42,8 +42,6 @@ export const authRuntimeConfig = {
       ? csv(process.env.AUTH_IP_ADDRESS_HEADERS)
       : ['x-real-ip'],
   trustedProxies: csv(process.env.AUTH_TRUSTED_PROXIES),
-  // Transactional email via Resend. `from` must be an address on a
-  // Resend-verified domain (e.g. "Alora <no-reply@alorastudios.co.za>").
   email: {
     apiKey: process.env.RESEND_API_KEY ?? '',
     from: process.env.EMAIL_FROM ?? '',
@@ -58,9 +56,6 @@ export function getTrustedOrigins(): string[] {
   }
   if (process.env.NODE_ENV !== 'production') {
     origins.add(DEVELOPMENT_ORIGIN);
-    // `next dev` falls back to another port when 3000 is busy; accept any
-    // localhost port in development so sign-in is not rejected as a
-    // cross-origin request. Production stays exact-match only.
     origins.add('http://localhost:*');
     origins.add('http://127.0.0.1:*');
   }
@@ -103,9 +98,6 @@ export function getProductionAuthConfigurationErrors(): string[] {
   if (!decodeCanonicalBase64(process.env.AUTH_FINGERPRINT_SECRET)) {
     errors.push('AUTH_FINGERPRINT_SECRET must be exactly 32 random bytes in canonical base64');
   }
-  // PAYMENTS_MOCK is allowed in production for a pre-launch WIP (the mock
-  // checkout is clearly labelled "Test mode" and charges nothing); a real
-  // Paystack key always takes precedence over it, so this is not a hard error.
   if (!process.env.RESEND_API_KEY) {
     errors.push('RESEND_API_KEY is required');
   }

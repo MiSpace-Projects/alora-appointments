@@ -29,7 +29,6 @@
   min-height: 72px;
 }
 
-/* ── Brand (serif, unchanged identity) ── */
 .logo {
   display: inline-flex;
   align-items: center;
@@ -57,7 +56,6 @@
   font-weight: 900;
 }
 
-/* ── Nav ── */
 .nav {
   display: flex;
   align-items: center;
@@ -78,7 +76,6 @@
   transition: opacity 0.2s ease;
 }
 
-/* animated underline */
 .navLink::after {
   content: '';
   position: absolute;
@@ -95,7 +92,6 @@
   width: 100%;
 }
 
-/* Primary CTA pill */
 .navCta {
   display: inline-flex;
   align-items: center;
@@ -124,7 +120,6 @@
   box-shadow: 0 8px 20px rgba(212, 197, 176, 0.28);
 }
 
-/* ── Hamburger ── */
 .menuButton {
   display: none;
   flex-direction: column;
@@ -165,7 +160,6 @@
   transform: translateY(-6.6px) rotate(-45deg);
 }
 
-/* ── Account avatar ── */
 .avatarWrapper {
   position: relative;
   margin-left: 1.75rem;
@@ -204,7 +198,6 @@
   border-color: rgba(212, 197, 176, 0.5);
 }
 
-/* ── Dropdown ── */
 .dropdown {
   position: absolute;
   right: 0;
@@ -292,7 +285,6 @@
   cursor: default;
 }
 
-/* ── Mobile ── */
 @media (max-width: 768px) {
   .container {
     min-height: 64px;

@@ -7,14 +7,7 @@ import styles from './TabControl.module.css';
 interface TabItem {
   id: string;
   label: string;
-  /** Panel contents. Omit when the tab only navigates (see `href`). */
   content?: ReactNode;
-  /**
-   * If set, selecting this tab navigates to that route instead of swapping in
-   * local content. Used so the "other" auth tab (e.g. Sign up on the login
-   * page) sends the user to the real /register page rather than rendering a
-   * second, dummy form.
-   */
   href?: string;
 }
 

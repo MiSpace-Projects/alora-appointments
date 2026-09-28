@@ -13,8 +13,6 @@ export default function QuickBookingsSection() {
           ctaLabel="Book Appointment"
           ctaHref="/book"
         />
-        {/* Dark-mode-only accent: the photo's black backdrop dissolves into the
-            band, so it only appears in dark mode. */}
         <div className={styles.portrait} aria-hidden="true">
           <Image
             src="/features/gold-skirt.webp"

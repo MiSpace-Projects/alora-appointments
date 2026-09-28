@@ -7,7 +7,6 @@ import Footer from '../footer/Footer';
 import FloatingThemeToggle from '../FloatingThemeToggle';
 import { Breadcrumbs } from './Breadcrumbs';
 
-/** Routes that render as a focused, chrome-free auth screen (no footer / toggle). */
 const AUTH_ROUTE_PREFIXES = [
   '/login',
   '/register',

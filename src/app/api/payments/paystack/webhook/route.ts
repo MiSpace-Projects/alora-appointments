@@ -9,13 +9,6 @@ import { recordProviderRefund, settlePaymentByReference } from '@/lib/data/payme
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-/**
- * Paystack webhook. Authenticity: HMAC-SHA512 over the raw body with the
- * secret key. Trust: even a valid `charge.success` is not taken at face value;
- * the reference is re-verified with Paystack's API before anything changes.
- * Always answers 200 for authentic events so Paystack stops retrying; the
- * settlement itself is idempotent.
- */
 export async function POST(request: Request): Promise<NextResponse> {
   if (!isPaystackConfigured()) {
     return NextResponse.json({ error: 'not configured' }, { status: 503 });
@@ -54,8 +47,6 @@ export async function POST(request: Request): Promise<NextResponse> {
       }
     }
   } catch (error) {
-    // Logged for follow-up; a 200 prevents a retry storm for a reference we
-    // could not settle right now (the return page will also try).
     console.error('[paystack webhook] handler error', name, error);
   }
 

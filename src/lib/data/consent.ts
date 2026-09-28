@@ -13,11 +13,6 @@ export interface RecordConsentInput {
   userAgent?: string | null;
 }
 
-/**
- * Append one consent event. Never updates or deletes: withdrawing consent is a
- * new row with `granted: false`, so the trail always shows what a person agreed
- * to, which version, and when (POPIA accountability, s11(1)(a), s69).
- */
 export function recordConsent(input: RecordConsentInput) {
   return prisma.consentRecord.create({
     data: {
@@ -31,7 +26,6 @@ export function recordConsent(input: RecordConsentInput) {
   });
 }
 
-/** Latest decision per consent kind for a user (null when never recorded). */
 export async function getLatestConsent(userId: string, kind: ConsentKind) {
   return prisma.consentRecord.findFirst({
     where: { userId, kind },
@@ -46,12 +40,6 @@ interface SignUpConsentInput {
   userAgent?: string | null;
 }
 
-/**
- * Consent rows written when an account is created: terms and privacy notice
- * (mandatory, versioned) and the marketing decision (opt-in only, recorded
- * either way so an opt-out is provable too). Best-effort: sign-up must not
- * fail because the audit write did.
- */
 export async function recordSignUpConsents(input: SignUpConsentInput): Promise<void> {
   const base = {
     userId: input.userId,
@@ -83,11 +71,6 @@ export interface SetMarketingConsentInput {
   userAgent?: string | null;
 }
 
-/**
- * Set the marketing flag and append a consent row in one transaction, so the
- * flag and the audit trail can never drift (POPIA s69). Withdrawal is a new
- * row with granted=false, never a delete.
- */
 export async function setMarketingConsent(input: SetMarketingConsentInput): Promise<void> {
   await prisma.$transaction([
     prisma.user.update({

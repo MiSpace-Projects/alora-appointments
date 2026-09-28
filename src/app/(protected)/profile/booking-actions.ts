@@ -11,7 +11,6 @@ export type CancelResult =
   | { ok: true; quote: RefundQuote; refundStatus: 'NOT_NEEDED' | 'REQUESTED' | 'FAILED' }
   | { ok: false; error: string };
 
-/** Refund preview shown before the customer confirms a cancellation (ECTA s43(2) spirit: no surprises). */
 export async function getRefundQuoteAction(bookingId: unknown): Promise<RefundQuoteResult> {
   const session = await getCurrentSession();
   if (!session) return { ok: false, error: 'You must be signed in.' };
@@ -22,7 +21,6 @@ export async function getRefundQuoteAction(bookingId: unknown): Promise<RefundQu
   return { ok: true, quote };
 }
 
-/** Cancel one of the user's own bookings and refund per policy if it was paid online. */
 export async function cancelBookingAction(bookingId: unknown): Promise<CancelResult> {
   const session = await getCurrentSession();
   if (!session) return { ok: false, error: 'You must be signed in.' };

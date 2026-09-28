@@ -1,8 +1,6 @@
-/** @type {import('@commitlint/types').UserConfig} */
 module.exports = {
   extends: ['@commitlint/config-conventional'],
   rules: {
-    // type must be one of the following
     'type-enum': [
       2,
       'always',

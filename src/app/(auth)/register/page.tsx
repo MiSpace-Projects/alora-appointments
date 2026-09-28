@@ -86,7 +86,6 @@ export default function RegisterPage() {
         return;
       }
 
-      // Auto-sign-in remains off. Verification is optional and can be completed later.
       toast.success('Account created. You can sign in now and verify your email later.');
       router.push('/login');
     } catch {

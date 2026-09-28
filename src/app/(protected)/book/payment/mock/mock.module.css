@@ -1,5 +1,3 @@
-/* Deliberately reads as a third-party gateway page (light card on a neutral
-   canvas), not as an Alora page, so demos show the hand-off honestly. */
 .page {
   min-height: 100vh;
   display: flex;

@@ -25,19 +25,12 @@ export interface ServiceOption {
 
 interface BookingFormProps {
   services: ServiceOption[];
-  /** Service to preselect (from `/book?service=<slug>`); must be one of `services`. */
   preselectedServiceId?: string;
-  /** Whether the "pay now" option is offered (gateway configured server-side). */
   onlinePaymentAvailable: boolean;
 }
 
 type FormInput = z.input<typeof createBookingSchema>;
 
-/**
- * Two-step booking: details → review → confirm. The review step lets the
- * customer check and correct everything before placing the order, which ECTA
- * s43(2) requires for online transactions.
- */
 export function BookingForm({
   services,
   preselectedServiceId,
@@ -49,8 +42,6 @@ export function BookingForm({
   const [step, setStep] = useState<'details' | 'review'>('details');
   const [reviewed, setReviewed] = useState<CreateBookingInput | null>(null);
 
-  // z.coerce.date makes the form's input type (datetime string) differ from the
-  // parsed output (Date), so RHF needs both: <input, context, output>.
   const {
     register,
     handleSubmit,

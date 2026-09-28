@@ -15,7 +15,6 @@ export interface ShowcaseStyle {
   priceCents: number;
   durationMinutes: number;
   pointsAwarded: number;
-  /** Transparent cutout (public path). Null until artwork is supplied. */
   imageUrl: string | null;
 }
 
@@ -23,18 +22,11 @@ interface StyleShowcaseProps {
   items: ShowcaseStyle[];
 }
 
-/**
- * Style showcase: one composition per style (script eyebrow, oversized name,
- * cutout portrait in front, price and Book). A scroll-snap track shows three
- * per screen on desktop, paged by arrows and dots; native swipe on touch.
- */
 export function StyleShowcase({ items }: StyleShowcaseProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [page, setPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
 
-  // A page is the visible set of slides plus the gap that follows it, so the
-  // next page lands exactly on a slide edge with nothing peeking.
   const pageWidth = (track: HTMLDivElement): number => {
     const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
     return track.clientWidth + gap;

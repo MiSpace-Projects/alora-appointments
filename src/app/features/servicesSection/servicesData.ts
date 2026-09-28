@@ -1,23 +1,10 @@
-/**
- * The salon's service families: what the services section, the /services
- * index and each family's detail page render. The concrete menu with prices
- * comes from the database and is attached to a family through `categories`
- * (Service.category values). Copy here is marketing content owned by the
- * salon; images are editorial placeholders from Pexels until the salon
- * supplies its own photography.
- */
 export interface ServiceFamily {
   slug: string;
   title: string;
-  /** One line under the tile and on the index. */
   description: string;
-  /** Opening paragraph on the detail page. */
   intro: string;
-  /** Numbered "what's included" rows. */
   includes: { title: string; body: string }[];
-  /** "Before you come" notes. */
   prep: string[];
-  /** Service.category values whose styles belong to this family. */
   categories: string[];
   img: string;
   featured?: boolean;
