@@ -148,6 +148,20 @@ export default async function ServiceFamilyPage({ params }: PageProps) {
             ))}
           </ul>
         )}
+
+        {family.addOns && family.addOns.length > 0 && (
+          <div className={styles.addOns}>
+            <h3 className={styles.addOnsTitle}>Add-ons</h3>
+            <ul className={styles.addOnList}>
+              {family.addOns.map((addOn) => (
+                <li key={addOn.label} className={styles.addOnRow}>
+                  <span>{addOn.label}</span>
+                  <span className={styles.addOnPrice}>{addOn.price}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
 
       <section className={styles.section} aria-labelledby="prep-heading">

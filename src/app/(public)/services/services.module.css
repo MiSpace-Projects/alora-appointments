@@ -245,6 +245,41 @@
   opacity: 0.7;
 }
 
+.addOns {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(128, 128, 128, 0.22);
+}
+
+.addOnsTitle {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.addOnList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.addOnRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.95rem;
+}
+
+.addOnPrice {
+  color: #d4c5b0;
+  white-space: nowrap;
+}
+
 .prep {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
