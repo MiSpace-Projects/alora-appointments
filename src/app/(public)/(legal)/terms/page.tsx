@@ -275,11 +275,12 @@ const sections: LegalSection[] = [
     title: 'Photos and media',
     content: (
       <p>
-        We may photograph or film the work we do, for example a finished wig or hairstyle, for our
-        portfolio and marketing. If an image would identify you and you would rather we did not use
-        it, tell us before or at your appointment, or contact us afterwards, and we will not use it
-        or will remove it. How we handle your personal information, including images, is set out in
-        our <Link href={routes.privacy.path}>Privacy Policy</Link>.
+        We love showing off our work. We will only use a photo or video that identifies you, for
+        example a finished wig or hairstyle, for our portfolio or marketing if you have given us
+        your permission first, and you can withdraw that permission at any time by contacting us and
+        we will stop using the image going forward. Taking reference photos for your own service
+        record is part of the service. How we handle your personal information, including images, is
+        set out in our <Link href={routes.privacy.path}>Privacy Policy</Link>.
       </p>
     ),
   },
