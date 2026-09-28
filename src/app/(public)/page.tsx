@@ -12,10 +12,6 @@ import { routes } from '@/app/config/routes';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
-// JSON-LD structured data — lets search engines render Alora as a rich
-// LocalBusiness result (the single highest-ROI SEO artifact for a booking
-// business). Address/geo are intentionally omitted until confirmed rather than
-// guessed; extend this object as those details are finalised.
 const localBusinessSchema = {
   '@context': 'https://schema.org',
   '@type': 'HairSalon',
@@ -40,8 +36,6 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  // Public menu straight from the catalog; a DB hiccup renders the empty state
-  // rather than taking the homepage down.
   const services = await listActiveServices().catch((error: unknown) => {
     console.error('[home] failed to load the service catalog', error);
     return [];

@@ -3,10 +3,6 @@ import { PrismaNeon } from '@prisma/adapter-neon';
 import { neonConfig } from '@neondatabase/serverless';
 import ws from 'ws';
 
-// The Neon serverless pool (used by the Prisma adapter) needs a WebSocket
-// constructor in every Node runtime — including Vercel's serverless functions.
-// The previous dev-only guard left production without it, which breaks all DB
-// connections on Vercel. Set it unconditionally.
 neonConfig.webSocketConstructor = ws;
 
 const globalForPrisma = globalThis as unknown as {

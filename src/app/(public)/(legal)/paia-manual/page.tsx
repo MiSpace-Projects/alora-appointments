@@ -17,7 +17,6 @@ export const metadata: Metadata = {
   alternates: { canonical: routes.paia.path },
 };
 
-/** Prescribed fees for private bodies (PAIA Regulations, 2021, Annexure B). */
 const fees = [
   { item: 'Request fee (payable when the request is made)', amount: 'R140.00' },
   { item: 'Photocopy or printed A4 page', amount: 'R2.00 per page' },

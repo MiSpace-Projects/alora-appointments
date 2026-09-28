@@ -10,7 +10,6 @@ import ProtectedLink from '@/app/components/protected/ProtectedLink';
 import { getServiceFamily, serviceFamilies } from '@/app/features/servicesSection/servicesData';
 import styles from '../services.module.css';
 
-// The menu strip reads the live catalog per request.
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
@@ -32,12 +31,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-/**
- * Service family detail: a descriptive piece (intro, numbered inclusions,
- * prep notes) plus the family's styles from the catalog as a compact menu
- * strip. Families without catalog entries yet show an honest empty state
- * that still leads to booking.
- */
 export default async function ServiceFamilyPage({ params }: PageProps) {
   const { slug } = await params;
   const family = getServiceFamily(slug);

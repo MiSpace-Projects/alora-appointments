@@ -9,8 +9,6 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Single column in light mode (banner spans full width). In dark mode a
-   portrait joins on the right; its black backdrop blends into the band. */
 .inner {
   display: grid;
   grid-template-columns: 1fr;
@@ -45,7 +43,6 @@
 }
 
 @media (max-width: 900px) {
-  /* Portrait is a desktop accent; the banner stands alone on smaller screens. */
   :global([data-theme='dark']) .inner {
     grid-template-columns: 1fr;
   }

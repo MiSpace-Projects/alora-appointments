@@ -16,12 +16,6 @@ interface PageProps {
   searchParams: Promise<{ reference?: string | string[] }>;
 }
 
-/**
- * Stand-in for Paystack's hosted checkout, for demos and local development.
- * 404s unless PAYMENTS_MOCK=true outside production. Shows exactly what the
- * customer would see on the gateway (merchant, amount, reference) and lets
- * the tester choose the outcome.
- */
 export default async function MockCheckoutPage({ searchParams }: PageProps) {
   if (!isMockPaymentsEnabled()) notFound();
 

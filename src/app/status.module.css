@@ -1,8 +1,3 @@
-/* Shared styling for full-page status surfaces (error, not-found, loading).
-   Echoes the auth/marketing design language: black canvas, Playfair heading,
-   warm #d4c5b0 accent. Kept in one module so every status page stays visually
-   consistent and future states reuse it rather than reinventing the look. */
-
 .page {
   min-height: 100vh;
   display: flex;
@@ -75,7 +70,6 @@
   opacity: 0.85;
 }
 
-/* Loading spinner */
 .spinner {
   width: 34px;
   height: 34px;
@@ -91,7 +85,6 @@
   }
 }
 
-/* Respect users who ask for less motion (WCAG 2.3.3). */
 @media (prefers-reduced-motion: reduce) {
   .spinner {
     animation-duration: 2s;

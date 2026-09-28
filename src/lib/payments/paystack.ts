@@ -2,16 +2,6 @@ import 'server-only';
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { z } from 'zod';
 
-/**
- * Thin, typed Paystack client. Hosted checkout only: we initialise a
- * transaction, send the customer to Paystack's page, and verify the result
- * server-side (callback and webhook both re-verify with the API, so the
- * provider is the source of truth, never the browser).
- *
- * Amounts are in the currency's minor unit (cents for ZAR), which matches how
- * prices are stored (priceCents). The secret key never leaves the server.
- */
-
 const PAYSTACK_API = 'https://api.paystack.co';
 
 export function getPaystackSecretKey(): string | null {
@@ -19,12 +9,10 @@ export function getPaystackSecretKey(): string | null {
   return key && key.length > 0 ? key : null;
 }
 
-/** Online payment is offered only when the gateway is configured. */
 export function isPaystackConfigured(): boolean {
   return getPaystackSecretKey() !== null;
 }
 
-/** Returns configuration problems for the production validator (empty when fine). */
 export function getPaystackConfigurationWarnings(): string[] {
   const key = getPaystackSecretKey();
   if (!key) return [];
@@ -104,7 +92,6 @@ async function paystackFetch(path: string, init: RequestInit): Promise<unknown> 
         'Content-Type': 'application/json',
         ...(init.headers ?? {}),
       },
-      // Provider calls must never be cached by the framework.
       cache: 'no-store',
     });
   } catch (error) {
@@ -185,7 +172,6 @@ export interface RefundResult {
   refundId: string | null;
 }
 
-/** Full or partial refund against a successful transaction reference. */
 export async function refundTransaction(
   reference: string,
   amountCents: number,
@@ -208,10 +194,6 @@ export async function refundTransaction(
   };
 }
 
-/**
- * Webhook authenticity: HMAC-SHA512 of the raw body with the secret key,
- * hex-encoded, in `x-paystack-signature`. Constant-time comparison.
- */
 export function isValidWebhookSignature(rawBody: string, signature: string | null): boolean {
   const key = getPaystackSecretKey();
   if (!key || !signature) return false;
@@ -228,7 +210,6 @@ export const webhookEventSchema = z.object({
 
 export type WebhookEvent = z.infer<typeof webhookEventSchema>;
 
-/** Our own reference format: readable in the Paystack dashboard and traceable to a booking. */
 export function buildPaymentReference(bookingId: string): string {
   const stamp = Date.now().toString(36);
   return `alora_${bookingId}_${stamp}`;

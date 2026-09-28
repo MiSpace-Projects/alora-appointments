@@ -1,8 +1,3 @@
-/**
- * Provider selection: Paystack wins when configured; the mock is the default in
- * development (so the pay-now journey is always visible) but can be forced off
- * and can never activate in production.
- */
 const ORIGINAL_ENV = process.env;
 
 describe('getPaymentProvider', () => {

@@ -7,7 +7,6 @@
   color: var(--text);
 }
 
-/* Intro row: copy on the left, a theme-matched portrait on the right. */
 .intro {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 22rem);
@@ -35,7 +34,6 @@
   object-position: center 15%;
 }
 
-/* Show the light-background shot in light mode, the dark one in dark mode. */
 .portraitDark {
   display: none;
 }
@@ -180,7 +178,6 @@
     padding: 3.5rem 2.5rem;
   }
 
-  /* Portrait is a desktop accent; on tablet/phone the copy stands alone. */
   .intro {
     grid-template-columns: 1fr;
     gap: 1.5rem;

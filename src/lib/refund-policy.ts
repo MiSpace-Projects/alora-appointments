@@ -1,20 +1,11 @@
 import { cancellationPolicy } from '@/app/config/business';
 
-/**
- * Pure refund maths shared by the terms page, the cancel confirmation UI and
- * the server-side cancel action, so the customer is always shown exactly what
- * the server will do. No I/O; unit-tested.
- */
-
 export type RefundTier = 'FULL' | 'PARTIAL' | 'NONE';
 
 export interface RefundQuote {
   tier: RefundTier;
-  /** Cents to refund (0 when nothing was paid or the tier is NONE). */
   refundCents: number;
-  /** Cents retained by the salon. */
   retainedCents: number;
-  /** Hours between the cancellation moment and the appointment start. */
   hoursBefore: number;
 }
 
@@ -30,7 +21,6 @@ export function quoteRefund(input: {
   if (paid === 0) {
     return { tier: 'NONE', refundCents: 0, retainedCents: 0, hoursBefore };
   }
-  // Appointment already started or passed: treated as a no-show.
   if (hoursBefore <= 0) {
     return { tier: 'NONE', refundCents: 0, retainedCents: paid, hoursBefore };
   }

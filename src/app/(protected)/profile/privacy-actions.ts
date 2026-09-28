@@ -8,11 +8,6 @@ import { getConfiguredClientAddress } from '@/lib/security-events';
 
 export type PrivacyActionResult = { ok: true } | { ok: false; error: string };
 
-/**
- * Turn marketing email on or off (POPIA s69). Writes the flag on the user and
- * appends a consent row in the same transaction, so both the grant and the
- * withdrawal are provable and never out of step with the flag.
- */
 export async function setMarketingOptInAction(optIn: boolean): Promise<PrivacyActionResult> {
   const requestHeaders = await headers();
   const session = await auth.api.getSession({ headers: requestHeaders });

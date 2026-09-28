@@ -2,24 +2,11 @@ import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import { PrismaNeon } from '@prisma/adapter-neon';
 
-/**
- * Seed the service catalog. Idempotent (upsert by slug) so it's safe to re-run.
- * Prices are integer cents (ZAR); points mirror the pricing tiers.
- *   Run: npm run db:seed
- */
 const prisma = new PrismaClient({
   adapter: new PrismaNeon({ connectionString: process.env.DATABASE_URL }),
 });
 
-/**
- * Curated style menu for Black South African clients. PRICES, DURATIONS AND
- * POINTS ARE PLACEHOLDERS until the salon supplies its real list; the owner
- * edits them in the database and the site reflects it without a deploy.
- * `imageUrl` is the transparent cutout shown in the style showcase; styles
- * without artwork yet render without an image until it is supplied.
- */
 const services = [
-  // ── Braids ──
   {
     slug: 'knotless-braids',
     category: 'Braids',
@@ -64,7 +51,6 @@ const services = [
     pointsAwarded: 75,
     imageUrl: '/styles/fulani-braids-cutout.webp',
   },
-  // ── Locs & twists ──
   {
     slug: 'faux-locs',
     category: 'Locs & Twists',
@@ -98,7 +84,6 @@ const services = [
     pointsAwarded: 45,
     imageUrl: '/styles/loc-retwist-cutout.webp',
   },
-  // ── Natural ──
   {
     slug: 'twist-out',
     category: 'Natural',
@@ -143,7 +128,6 @@ const services = [
     pointsAwarded: 35,
     imageUrl: '/styles/bantu-knots-cutout.webp',
   },
-  // ── Press & wigs ──
   {
     slug: 'silk-press',
     category: 'Press & Wigs',
@@ -168,7 +152,6 @@ const services = [
   },
 ];
 
-/** Slugs from earlier seeds that the curated menu supersedes; kept for booking history, hidden from the site. */
 const retiredSlugs = ['protective-braids'];
 
 async function main() {

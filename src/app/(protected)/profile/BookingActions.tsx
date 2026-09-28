@@ -11,17 +11,10 @@ import styles from './page.module.css';
 
 interface BookingActionsProps {
   bookingId: string;
-  /** Show the "Pay now" control (unpaid, upcoming, gateway configured). */
   canPay: boolean;
-  /** Show the "Cancel" control (upcoming and live). */
   canCancel: boolean;
 }
 
-/**
- * Per-booking controls: resume/retry online payment, and cancel with a refund
- * preview. The preview is fetched from the server so what the customer sees
- * is exactly what the cancel action will apply.
- */
 export function BookingActions({ bookingId, canPay, canCancel }: BookingActionsProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();

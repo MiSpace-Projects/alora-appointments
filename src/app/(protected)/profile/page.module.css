@@ -360,7 +360,6 @@
   opacity: 0.55;
 }
 
-/* ── Per-booking actions (pay / cancel) ── */
 .bookingActions {
   flex-basis: 100%;
   width: 100%;

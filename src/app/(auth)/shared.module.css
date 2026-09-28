@@ -13,7 +13,6 @@
   justify-content: center;
 }
 
-/* Header with logo and brand */
 .header {
   margin-bottom: 2rem;
   text-align: left;
@@ -40,7 +39,6 @@
   color: #ffffff;
 }
 
-/* Heading blocks - left aligned */
 .headingBlock {
   text-align: left;
   margin-bottom: 1.5rem;
@@ -96,8 +94,6 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* Consent block on sign-up: stacked checkboxes, top-aligned so multi-line
-   labels read cleanly. */
 .consentBlock {
   display: flex;
   flex-direction: column;
