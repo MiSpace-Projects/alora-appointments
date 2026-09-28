@@ -1,0 +1,164 @@
+.page {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 2.5rem 1rem 4rem;
+}
+
+.head {
+  margin-bottom: 1.75rem;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  margin: 0.4rem 0 0;
+  font-size: 0.95rem;
+  opacity: 0.65;
+}
+
+.empty {
+  padding: 2rem 0;
+  opacity: 0.6;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(128, 128, 128, 0.22);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.main {
+  min-width: 0;
+}
+
+.service {
+  margin: 0;
+  font-weight: 600;
+}
+
+.when {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.customer {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  opacity: 0.6;
+  overflow-wrap: anywhere;
+}
+
+.notes {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  white-space: nowrap;
+}
+
+.badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+
+.status_PENDING {
+  color: #e0b354;
+}
+
+.status_CONFIRMED {
+  color: #6fbf8b;
+}
+
+.status_COMPLETED {
+  color: #8aa0c0;
+}
+
+.status_CANCELLED {
+  color: #c07a7a;
+}
+
+.price {
+  font-weight: 600;
+}
+
+.pay {
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.actions button {
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  width: 100%;
+}
+
+.confirm {
+  background: #d4c5b0;
+  color: #000;
+}
+
+.complete {
+  background: transparent;
+  border-color: #8aa0c0 !important;
+  color: #8aa0c0;
+}
+
+.cancel {
+  background: transparent;
+  border-color: rgba(192, 122, 122, 0.6) !important;
+  color: #c07a7a;
+}
+
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .meta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

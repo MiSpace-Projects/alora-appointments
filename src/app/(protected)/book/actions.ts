@@ -7,6 +7,8 @@ import { startBookingPayment } from '@/lib/data/payments';
 import { PaystackError } from '@/lib/payments/paystack';
 import { isOnlinePaymentAvailable } from '@/lib/payments/provider';
 import { createBookingSchema } from '@/lib/validation';
+import { notifyOwnerOfNewBooking } from '@/lib/notifications';
+import { formatDateTime, formatZar } from '@/lib/format';
 import { businessContact } from '@/app/config/business';
 
 export type BookingActionResult =
@@ -49,6 +51,25 @@ export async function createBookingAction(input: unknown): Promise<BookingAction
     const booking = await createBooking(session.user.id, parsed.data);
     bookingId = booking.id;
     revalidatePath('/profile');
+    revalidatePath('/owner');
+    // A failed owner notification must never fail a booking that was saved.
+    try {
+      await notifyOwnerOfNewBooking({
+        customerName: session.user.name,
+        customerEmail: session.user.email,
+        serviceName: booking.service.name,
+        when: formatDateTime(booking.startsAt),
+        price: formatZar(booking.priceCents),
+        paymentMethod:
+          parsed.data.paymentMethod === 'PAY_NOW' ? 'Pay now (online)' : 'Pay at the salon',
+        notes: parsed.data.notes,
+      });
+    } catch (notifyErr) {
+      console.error(
+        '[book] owner notification failed:',
+        notifyErr instanceof Error ? notifyErr.message : notifyErr,
+      );
+    }
   } catch (err) {
     const code = err instanceof Error ? err.message : 'UNKNOWN';
     return {

@@ -87,11 +87,13 @@ export function ProfileView({
   bookings,
   loyalty,
   onlinePaymentAvailable,
+  isOwner = false,
 }: {
   user: ProfileUser;
   bookings: BookingView[];
   loyalty: LoyaltyStanding;
   onlinePaymentAvailable: boolean;
+  isOwner?: boolean;
 }) {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
 
@@ -107,6 +109,11 @@ export function ProfileView({
           {getFirstName(user.name)}
           <i className={styles.star}>✦</i>
         </h1>
+        {isOwner && (
+          <Link href="/owner" className={styles.ownerLink}>
+            Manage bookings →
+          </Link>
+        )}
       </motion.div>
 
       <motion.div className={styles.grid} variants={item}>

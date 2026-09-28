@@ -1,4 +1,5 @@
 import { requireSession } from '@/lib/session';
+import { isOwnerSession } from '@/lib/owner';
 import { listUserBookings } from '@/lib/data/bookings';
 import { getUserLoyalty } from '@/lib/data/loyalty';
 import { ProfileView } from './ProfileView';
@@ -21,6 +22,7 @@ export default async function ProfilePage() {
       bookings={bookings}
       loyalty={loyalty}
       onlinePaymentAvailable={isOnlinePaymentAvailable()}
+      isOwner={isOwnerSession(session)}
     />
   );
 }
