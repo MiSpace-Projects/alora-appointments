@@ -3,7 +3,12 @@ import type { BookingStatus } from '@prisma/client';
 import { requireOwner } from '@/lib/owner';
 import { listAllBookings } from '@/lib/data/bookings';
 import { formatDateTime, formatZar } from '@/lib/format';
-import { confirmBookingAction, completeBookingAction, cancelBookingAction } from './actions';
+import {
+  confirmBookingAction,
+  completeBookingAction,
+  cancelBookingAction,
+  refreshCatalogAction,
+} from './actions';
 import styles from './owner.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -24,12 +29,19 @@ export default async function OwnerBookingsPage() {
   return (
     <main className={styles.page}>
       <header className={styles.head}>
-        <h1 className={styles.title}>Bookings</h1>
-        <p className={styles.subtitle}>
-          {bookings.length === 0
-            ? 'No bookings yet.'
-            : `${bookings.length} booking${bookings.length === 1 ? '' : 's'} · ${pending} awaiting confirmation`}
-        </p>
+        <div>
+          <h1 className={styles.title}>Bookings</h1>
+          <p className={styles.subtitle}>
+            {bookings.length === 0
+              ? 'No bookings yet.'
+              : `${bookings.length} booking${bookings.length === 1 ? '' : 's'} · ${pending} awaiting confirmation`}
+          </p>
+        </div>
+        <form action={refreshCatalogAction}>
+          <button type="submit" className={styles.refresh}>
+            Refresh catalog
+          </button>
+        </form>
       </header>
 
       {bookings.length === 0 ? (
