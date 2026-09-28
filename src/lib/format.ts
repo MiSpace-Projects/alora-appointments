@@ -14,6 +14,24 @@ export function formatZar(cents: number): string {
   return `R${Math.round(cents / 100).toLocaleString('en-ZA')}`;
 }
 
+export type PriceShape = 'FIXED' | 'FROM' | 'RANGE';
+
+export interface PricedItem {
+  priceCents: number;
+  priceType: PriceShape;
+  priceMaxCents?: number | null;
+}
+
+export function formatPrice(item: PricedItem): string {
+  if (item.priceType === 'RANGE' && item.priceMaxCents != null) {
+    return `${formatZar(item.priceCents)}–${formatZar(item.priceMaxCents)}`;
+  }
+  if (item.priceType === 'FROM') {
+    return `From ${formatZar(item.priceCents)}`;
+  }
+  return formatZar(item.priceCents);
+}
+
 export function formatBookingDate(date: Date | string): string {
   return zarDate.format(new Date(date));
 }
