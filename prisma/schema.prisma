@@ -156,6 +156,12 @@ enum PointsReason {
   ADJUSTMENT
 }
 
+enum PriceType {
+  FIXED
+  FROM
+  RANGE
+}
+
 model Service {
   id              String    @id @default(cuid())
   slug            String    @unique
@@ -164,6 +170,8 @@ model Service {
   category        String?
   sortOrder       Int       @default(0)
   priceCents      Int
+  priceType       PriceType @default(FIXED)
+  priceMaxCents   Int?
   durationMinutes Int
   pointsAwarded   Int       @default(0)
   imageUrl        String?

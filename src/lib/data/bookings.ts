@@ -30,6 +30,10 @@ export async function createBooking(userId: string, input: CreateBookingInput) {
     throw new Error('SERVICE_NOT_AVAILABLE');
   }
 
+  if (input.paymentMethod === 'PAY_NOW' && service.priceType !== 'FIXED') {
+    throw new Error('ONLINE_PAYMENT_NOT_ALLOWED');
+  }
+
   const clash = await prisma.booking.findFirst({
     where: {
       userId,

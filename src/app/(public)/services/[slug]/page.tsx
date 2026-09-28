@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { formatZar, formatDuration } from '@/lib/format';
+import { formatPrice, formatDuration } from '@/lib/format';
 import { listActiveServices } from '@/lib/data/services';
 import { routes } from '@/app/config/routes';
 import { businessContact, cancellationPolicy } from '@/app/config/business';
@@ -137,7 +137,7 @@ export default async function ServiceFamilyPage({ params }: PageProps) {
                   {item.description && <p className={styles.stripDesc}>{item.description}</p>}
                 </div>
                 <span className={styles.stripMeta}>{formatDuration(item.durationMinutes)}</span>
-                <span className={styles.stripPrice}>{formatZar(item.priceCents)}</span>
+                <span className={styles.stripPrice}>{formatPrice(item)}</span>
                 <ProtectedLink
                   href={`${routes.bookNow.path}?service=${item.slug}`}
                   className={styles.stripBook}

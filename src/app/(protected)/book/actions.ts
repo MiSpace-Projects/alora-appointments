@@ -20,6 +20,8 @@ const ERROR_COPY: Record<string, string> = {
   BOOKING_NOT_PAYABLE: 'That booking can no longer be paid online.',
   BOOKING_ALREADY_PAID: 'That booking has already been paid.',
   PAYMENTS_UNAVAILABLE: 'Online payment is not available right now. You can pay at the salon.',
+  ONLINE_PAYMENT_NOT_ALLOWED:
+    'This service is priced on consultation, so it can only be settled at the salon.',
 };
 
 function paymentReturnUrl(): string {
