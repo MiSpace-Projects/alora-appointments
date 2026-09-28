@@ -125,6 +125,11 @@ const sections: LegalSection[] = [
           </li>
         </ol>
         <p>
+          Appointments are confirmed on a first-come, first-served basis, so please book in advance.
+          Weekend same-day express appointments are available subject to availability and may carry
+          an additional charge.
+        </p>
+        <p>
           You will receive an email for each booking, which together with your profile page is the
           record of the transaction (ECTA s43(1)(m)). Please arrive on time; if you are more than 15
           minutes late we may have to shorten or reschedule the service.
@@ -215,6 +220,67 @@ const sections: LegalSection[] = [
           </li>
         </ul>
       </>
+    ),
+  },
+  {
+    id: 'wig-services',
+    title: 'Wig care, customization and drop-off',
+    content: (
+      <>
+        <p>
+          These terms apply in addition to the ones above when you leave a wig or hairpiece with us
+          for washing, treatment, customization, colouring or a frontal or closure replacement.
+        </p>
+        <ul>
+          <li>
+            <strong>Turnaround.</strong> Standard turnaround is 24 to 48 hours from drop-off.
+            Same-day express is available on Saturdays and Sundays at an additional charge, subject
+            to availability. If a repair or an unforeseen problem will delay your unit, we tell you
+            as soon as we can.
+          </li>
+          <li>
+            <strong>Condition on drop-off.</strong> Please drop your unit off clean and in a
+            hygienic condition. Excessively tangled, matted or damaged units take longer and may
+            attract an additional fee, which we will agree with you before we start.
+          </li>
+          <li>
+            <strong>Payment and collection.</strong> Full payment is due before a unit is collected,
+            and no unit is released until payment has been received. A deposit may be required for
+            premium services or custom requests.
+          </li>
+          <li>
+            <strong>Collection and storage.</strong> Please collect within 7 days of us telling you
+            the unit is ready. A unit left uncollected for more than 30 days without contact from
+            you may attract a reasonable storage fee.
+          </li>
+          <li>
+            <strong>Results and limits.</strong> We work on every unit with skill and care, but the
+            result depends on the hair quality, any previous chemical processing, the age of the
+            unit and prior heat damage. We cannot guarantee the restoration of a severely damaged
+            unit, and we will give you an honest assessment before we begin.
+          </li>
+          <li>
+            <strong>If you are unhappy.</strong> Once a service has been completed the price is not
+            refundable, but your satisfaction matters. Raise any concern with us as soon as
+            possible, ideally within 24 hours, so we can discuss a correction. This does not affect
+            the rights the Consumer Protection Act gives you, including the right set out under
+            &ldquo;Our responsibility to you&rdquo; above.
+          </li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    id: 'media',
+    title: 'Photos and media',
+    content: (
+      <p>
+        We may photograph or film the work we do, for example a finished wig or hairstyle, for our
+        portfolio and marketing. If an image would identify you and you would rather we did not use
+        it, tell us before or at your appointment, or contact us afterwards, and we will not use it
+        or will remove it. How we handle your personal information, including images, is set out in
+        our <Link href={routes.privacy.path}>Privacy Policy</Link>.
+      </p>
     ),
   },
   {
