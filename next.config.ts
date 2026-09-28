@@ -28,6 +28,9 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },
+  async redirects() {
+    return [{ source: '/services/hair-styling', destination: '/services', permanent: true }];
+  },
 };
 
 export default nextConfig;

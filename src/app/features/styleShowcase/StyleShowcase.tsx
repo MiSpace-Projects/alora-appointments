@@ -1,18 +1,23 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { KeyboardEvent } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { formatZar, formatDuration } from '@/lib/format';
+import { formatDuration, formatPrice, type PriceShape } from '@/lib/format';
 import { routes } from '@/app/config/routes';
 import ProtectedLink from '@/app/components/protected/ProtectedLink';
+import { groupByFamily } from '@/app/features/servicesSection/servicesData';
 import styles from './StyleShowcase.module.css';
 
 export interface ShowcaseStyle {
   slug: string;
   name: string;
   description: string | null;
+  category: string | null;
   priceCents: number;
+  priceType: PriceShape;
+  priceMaxCents: number | null;
   durationMinutes: number;
   pointsAwarded: number;
   imageUrl: string | null;
@@ -22,8 +27,15 @@ interface StyleShowcaseProps {
   items: ShowcaseStyle[];
 }
 
+const LONG_NAME = 16;
+
 export function StyleShowcase({ items }: StyleShowcaseProps) {
+  const groups = useMemo(() => groupByFamily(items), [items]);
+  const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  const active = groups.find((group) => group.family.slug === activeSlug) ?? groups[0];
+
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [page, setPage] = useState(0);
   const [pageCount, setPageCount] = useState(1);
 
@@ -54,6 +66,13 @@ export function StyleShowcase({ items }: StyleShowcaseProps) {
     };
   }, [measure]);
 
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    track.scrollTo({ left: 0 });
+    measure();
+  }, [active?.family.slug, measure]);
+
   const goTo = (target: number) => {
     const track = trackRef.current;
     if (!track) return;
@@ -61,28 +80,41 @@ export function StyleShowcase({ items }: StyleShowcaseProps) {
     track.scrollTo({ left: clamped * pageWidth(track), behavior: 'smooth' });
   };
 
-  if (items.length === 0) {
+  const onTabKey = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+    if (step === 0) return;
+    event.preventDefault();
+    const next = (index + step + groups.length) % groups.length;
+    setActiveSlug(groups[next].family.slug);
+    tabRefs.current[next]?.focus();
+  };
+
+  if (!active) {
     return (
       <section id="styles" className={styles.section} aria-labelledby="styles-heading">
         <p className={styles.kicker} id="styles-heading">
-          Styles &amp; prices
+          Services &amp; prices
         </p>
-        <p className={styles.empty}>Our style menu is being updated. Please check back shortly.</p>
+        <p className={styles.empty}>
+          Our service menu is being updated. Please check back shortly.
+        </p>
       </section>
     );
   }
+
+  const panelId = `showcase-panel-${active.family.slug}`;
 
   return (
     <section id="styles" className={styles.section} aria-labelledby="styles-heading">
       <div className={styles.topBar}>
         <p className={styles.kicker} id="styles-heading">
-          Styles &amp; prices
+          Services &amp; prices
         </p>
         <div className={styles.controls}>
           <button
             type="button"
             className={styles.arrow}
-            aria-label="Previous styles"
+            aria-label={`Previous ${active.family.title} services`}
             disabled={page === 0}
             onClick={() => goTo(page - 1)}
           >
@@ -91,7 +123,7 @@ export function StyleShowcase({ items }: StyleShowcaseProps) {
           <button
             type="button"
             className={styles.arrow}
-            aria-label="Next styles"
+            aria-label={`Next ${active.family.title} services`}
             disabled={page >= pageCount - 1}
             onClick={() => goTo(page + 1)}
           >
@@ -100,21 +132,56 @@ export function StyleShowcase({ items }: StyleShowcaseProps) {
         </div>
       </div>
 
+      <div className={styles.tabs} role="tablist" aria-label="Service families">
+        {groups.map((group, index) => {
+          const selected = group.family.slug === active.family.slug;
+          return (
+            <button
+              key={group.family.slug}
+              ref={(node) => {
+                tabRefs.current[index] = node;
+              }}
+              type="button"
+              role="tab"
+              id={`showcase-tab-${group.family.slug}`}
+              aria-selected={selected}
+              aria-controls={`showcase-panel-${group.family.slug}`}
+              tabIndex={selected ? 0 : -1}
+              className={`${styles.tab}${selected ? ` ${styles.tabActive}` : ''}`}
+              onClick={() => setActiveSlug(group.family.slug)}
+              onKeyDown={(event) => onTabKey(event, index)}
+            >
+              {group.family.title}
+            </button>
+          );
+        })}
+      </div>
+
       <div className={styles.viewport}>
-        <div ref={trackRef} className={styles.track} role="list" aria-label="Hairstyles and prices">
-          {items.map((item) => (
-            <article key={item.slug} className={styles.slide} role="listitem">
+        <div
+          ref={trackRef}
+          id={panelId}
+          className={styles.track}
+          role="tabpanel"
+          aria-labelledby={`showcase-tab-${active.family.slug}`}
+        >
+          {active.items.map((item) => (
+            <article key={item.slug} className={styles.slide}>
               <div className={`${styles.stage}${item.imageUrl ? '' : ` ${styles.stageNoArt}`}`}>
                 <svg className={styles.ring} viewBox="0 0 400 180" aria-hidden="true">
                   <ellipse cx="200" cy="90" rx="196" ry="86" />
                 </svg>
-                <p className={styles.eyebrow}>signature style</p>
-                <h3 className={styles.name}>{item.name}</h3>
+                <p className={styles.eyebrow}>{active.family.title.toLowerCase()}</p>
+                <h3
+                  className={`${styles.name}${item.name.length > LONG_NAME ? ` ${styles.nameLong}` : ''}`}
+                >
+                  {item.name}
+                </h3>
                 {item.imageUrl && (
                   <div className={styles.portrait}>
                     <Image
                       src={item.imageUrl}
-                      alt={`${item.name} on a client`}
+                      alt={item.name}
                       fill
                       sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
                       className={styles.portraitImage}
@@ -132,7 +199,7 @@ export function StyleShowcase({ items }: StyleShowcaseProps) {
                   </p>
                 </div>
                 <div className={styles.buy}>
-                  <span className={styles.price}>{formatZar(item.priceCents)}</span>
+                  <span className={styles.price}>{formatPrice(item)}</span>
                   <ProtectedLink
                     href={`${routes.bookNow.path}?service=${item.slug}`}
                     className={styles.book}
@@ -147,13 +214,12 @@ export function StyleShowcase({ items }: StyleShowcaseProps) {
       </div>
 
       {pageCount > 1 && (
-        <div className={styles.dots} role="tablist" aria-label="Style pages">
+        <div className={styles.dots} aria-label={`${active.family.title} pages`}>
           {Array.from({ length: pageCount }, (_, index) => (
             <button
               key={index}
               type="button"
-              role="tab"
-              aria-selected={index === page}
+              aria-current={index === page ? 'true' : undefined}
               aria-label={`Page ${index + 1} of ${pageCount}`}
               className={`${styles.dot}${index === page ? ` ${styles.dotActive}` : ''}`}
               onClick={() => goTo(index)}

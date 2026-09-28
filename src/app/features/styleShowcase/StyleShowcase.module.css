@@ -33,6 +33,47 @@
   gap: 0.5rem;
 }
 
+.tabs {
+  display: flex;
+  gap: 2rem;
+  padding: 0 7rem;
+  margin: -1rem 0 2.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.22);
+}
+
+.tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex: 0 0 auto;
+  padding: 0.75rem 0;
+  margin-bottom: -1px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.95rem;
+  opacity: 0.55;
+  cursor: pointer;
+  transition:
+    opacity 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tab:hover,
+.tab:focus-visible {
+  opacity: 0.85;
+}
+
+.tabActive {
+  opacity: 1;
+  border-bottom-color: #d4c5b0;
+}
+
 .arrow {
   display: inline-flex;
   width: 2.75rem;
@@ -134,6 +175,10 @@
   text-transform: uppercase;
   text-align: center;
   text-wrap: balance;
+}
+
+.nameLong {
+  font-size: clamp(1.9rem, 3vw, 3rem);
 }
 
 .stageNoArt {
@@ -267,6 +312,7 @@
   }
 
   .topBar,
+  .tabs,
   .viewport {
     padding-left: 2.5rem;
     padding-right: 2.5rem;
@@ -281,13 +327,22 @@
   }
 
   .topBar,
+  .tabs,
   .viewport {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
   }
 
+  .tabs {
+    gap: 1.5rem;
+  }
+
   .name {
     font-size: clamp(2.6rem, 13vw, 3.6rem);
+  }
+
+  .nameLong {
+    font-size: clamp(1.8rem, 8.5vw, 2.5rem);
   }
 
   .panel {
@@ -313,7 +368,8 @@
 
   .arrow,
   .book,
-  .dot {
+  .dot,
+  .tab {
     transition: none;
   }
 }
