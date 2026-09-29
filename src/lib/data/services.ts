@@ -10,7 +10,7 @@ export const listActiveServices = unstable_cache(
       where: { active: true },
       orderBy: [{ category: 'asc' }, { sortOrder: 'asc' }, { priceCents: 'asc' }],
     }),
-  ['active-services', 'v4'],
+  ['active-services', 'v5'],
   { revalidate: 3600, tags: [SERVICES_CACHE_TAG] },
 );
 
