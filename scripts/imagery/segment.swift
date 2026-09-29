@@ -1,7 +1,3 @@
-// Person matte + face box via Apple Vision (macOS 12+).
-// Usage: swift scripts/imagery/segment.swift <input.jpg> <mask.png>
-// Writes an 8-bit greyscale matte the size of the input and prints the face box as JSON
-// ({"x","y","w","h"} in pixels, origin top-left) so framing can be normalised per face.
 import AppKit
 import CoreImage
 import Foundation
