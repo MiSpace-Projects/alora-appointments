@@ -45,3 +45,6 @@ next-env.d.ts
 
 # local dev artifacts
 dev.log
+
+# service imagery build cache (downloads, mattes, contact sheets)
+.imagery-cache/

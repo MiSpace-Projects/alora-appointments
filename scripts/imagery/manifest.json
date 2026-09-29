@@ -1,0 +1,147 @@
+{
+  "outputDir": "public/services",
+  "canvas": {
+    "width": 950,
+    "height": 1400
+  },
+  "face": 0.4,
+  "faceTop": 0.22,
+  "fade": {
+    "from": 0.76,
+    "to": 0.95,
+    "side": 0.1
+  },
+  "matte": {
+    "floor": 0.12,
+    "span": 0.8
+  },
+  "entries": [
+    {
+      "slug": "wig-basic-wash",
+      "source": "pexels:36288122"
+    },
+    {
+      "slug": "wig-moisture-treatment",
+      "source": "pexels:36288155"
+    },
+    {
+      "slug": "wig-keratin-treatment",
+      "source": "pexels:36288118"
+    },
+    {
+      "slug": "wig-customization-basic",
+      "source": "pexels:36288132"
+    },
+    {
+      "slug": "wig-customization-advanced",
+      "source": "pexels:36288128"
+    },
+    {
+      "slug": "wig-customization-full",
+      "source": "pexels:36288157"
+    },
+    {
+      "slug": "wig-customization-glueless",
+      "source": "pexels:36288140"
+    },
+    {
+      "slug": "wig-styling",
+      "source": "pexels:36288138"
+    },
+    {
+      "slug": "wig-colouring",
+      "source": "pexels:36288139"
+    },
+    {
+      "slug": "wig-frontal-replacement",
+      "source": "pexels:36288137"
+    },
+    {
+      "slug": "nails-gelx-short",
+      "source": "pexels:36288123"
+    },
+    {
+      "slug": "nails-gelx-medium",
+      "source": "pexels:36288124"
+    },
+    {
+      "slug": "nails-gelx-long",
+      "source": "pexels:36288125"
+    },
+    {
+      "slug": "nails-gelx-refill",
+      "source": "pexels:36288135"
+    },
+    {
+      "slug": "nails-soakoff-alora",
+      "source": "pexels:36288143"
+    },
+    {
+      "slug": "nails-soakoff-other",
+      "source": "pexels:36288147"
+    },
+    {
+      "slug": "nails-repair",
+      "source": "pexels:36288134"
+    },
+    {
+      "slug": "makeup-soft-glam",
+      "source": "pexels:36288154"
+    },
+    {
+      "slug": "makeup-full-glam",
+      "source": "pexels:36288137"
+    },
+    {
+      "slug": "makeup-bridal",
+      "source": "pexels:36288149"
+    },
+    {
+      "slug": "makeup-bridesmaid",
+      "source": "pexels:36288152"
+    },
+    {
+      "slug": "makeup-strip-lashes",
+      "source": "pexels:36288143"
+    },
+    {
+      "slug": "makeup-travel",
+      "source": "pexels:36288158"
+    },
+    {
+      "slug": "matric-hair-makeup",
+      "source": "pexels:36288157"
+    }
+  ],
+  "tone": {
+    "maxGain": 0.12
+  },
+  "familyCanvas": {
+    "width": 1600,
+    "height": 1200,
+    "background": "#d4c5b0",
+    "faceWidth": 0.37
+  },
+  "families": [
+    {
+      "slug": "wig-care",
+      "source": "pexels:36288122"
+    },
+    {
+      "slug": "customization-styling",
+      "source": "pexels:36288132"
+    },
+    {
+      "slug": "nail-art",
+      "source": "pexels:36288147"
+    },
+    {
+      "slug": "makeup",
+      "source": "pexels:36288140"
+    },
+    {
+      "slug": "matric-farewell",
+      "source": "pexels:36288118"
+    }
+  ]
+}

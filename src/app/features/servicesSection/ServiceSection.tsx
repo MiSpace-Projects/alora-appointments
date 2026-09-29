@@ -6,8 +6,6 @@ import { routes } from '@/app/config/routes';
 import { serviceFamilies } from './servicesData';
 import styles from './ServiceSection.module.css';
 
-const sized = (url: string, w: number) => `${url}?auto=compress&cs=tinysrgb&w=${w}`;
-
 const STYLES_ANCHOR = routes.styles.path;
 const featuredCategory = serviceFamilies.find((f) => f.featured) ?? serviceFamilies[0];
 const serviceCategories = serviceFamilies.filter((f) => f !== featuredCategory);
@@ -37,7 +35,7 @@ export default function Services() {
       <div className={styles.content}>
         <motion.div
           className={styles.featured}
-          style={{ backgroundImage: `url('${sized(featuredCategory.img, 1200)}')` }}
+          style={{ backgroundImage: `url('${featuredCategory.img}')` }}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.35 }}
@@ -58,7 +56,7 @@ export default function Services() {
             <motion.div
               key={item.title}
               className={styles.card}
-              style={{ backgroundImage: `url('${sized(item.img, 800)}')` }}
+              style={{ backgroundImage: `url('${item.img}')` }}
               initial="hidden"
               whileInView="show"
               viewport={{ once: true, amount: 0.35 }}
