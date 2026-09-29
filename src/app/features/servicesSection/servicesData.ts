@@ -39,7 +39,7 @@ export const serviceFamilies: ServiceFamily[] = [
       'Allow 24 to 48 hours for standard turnaround, or ask about weekend express.',
     ],
     categories: ['Wig Care'],
-    img: '/services/family-wig-care.webp',
+    img: 'https://images.pexels.com/photos/14730865/pexels-photo-14730865.jpeg',
     featured: true,
   },
   {
@@ -73,7 +73,7 @@ export const serviceFamilies: ServiceFamily[] = [
       'Ranges are quoted at consultation and settled at the salon; deposits may be required for premium or custom work.',
     ],
     categories: ['Customization & Styling'],
-    img: '/services/family-customization-styling.webp',
+    img: 'https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg',
   },
   {
     slug: 'nail-art',
@@ -104,7 +104,7 @@ export const serviceFamilies: ServiceFamily[] = [
       'Send reference pictures in your booking notes for art so the colours are ready.',
     ],
     categories: ['Nails'],
-    img: '/services/family-nail-art.webp',
+    img: 'https://images.pexels.com/photos/14016180/pexels-photo-14016180.jpeg',
     addOns: [
       { label: 'French or simple design', price: '+R50' },
       { label: 'Detailed nail art', price: '+R80 to R150' },
@@ -140,7 +140,7 @@ export const serviceFamilies: ServiceFamily[] = [
       'Tell us about allergies or sensitive skin in your booking notes.',
     ],
     categories: ['Makeup'],
-    img: '/services/family-makeup.webp',
+    img: 'https://images.pexels.com/photos/10698022/pexels-photo-10698022.jpeg',
     addOns: [
       { label: 'Strip lashes with any glam', price: 'Included' },
       { label: 'Early-morning surcharge', price: '+R100' },
@@ -178,7 +178,7 @@ export const serviceFamilies: ServiceFamily[] = [
       'Bring a photo of the dress and any references to the planning session.',
     ],
     categories: ['Matric'],
-    img: '/services/family-matric-farewell.webp',
+    img: 'https://images.pexels.com/photos/30482416/pexels-photo-30482416.jpeg',
   },
 ];
 
