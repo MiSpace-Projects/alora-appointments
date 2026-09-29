@@ -115,33 +115,5 @@
   ],
   "tone": {
     "maxGain": 0.12
-  },
-  "familyCanvas": {
-    "width": 1600,
-    "height": 1200,
-    "background": "#d4c5b0",
-    "faceWidth": 0.37
-  },
-  "families": [
-    {
-      "slug": "wig-care",
-      "source": "pexels:36288122"
-    },
-    {
-      "slug": "customization-styling",
-      "source": "pexels:36288132"
-    },
-    {
-      "slug": "nail-art",
-      "source": "pexels:36288147"
-    },
-    {
-      "slug": "makeup",
-      "source": "pexels:36288140"
-    },
-    {
-      "slug": "matric-farewell",
-      "source": "pexels:36288118"
-    }
-  ]
+  }
 }

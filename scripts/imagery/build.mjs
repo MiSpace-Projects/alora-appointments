@@ -273,56 +273,6 @@ for (const image of images) {
   built.push(await write(image));
   console.log(`wrote ${image.slug} gain ${image.gain.map((g) => g.toFixed(3)).join(',')}`);
 }
-// Opaque family images for the home cards and family pages: the full studio frame with the
-// white backdrop replaced by one shared colour (via the matte), cropped to the same face
-// width. Wide-framed shots are used so no photo edge ever lands inside the image.
-async function familyImage(family) {
-  const { width: fw, height: fh, background, faceWidth } = manifest.familyCanvas;
-  const file = await resolveSource(family.source);
-  const { mask, face } = segment(file);
-  const { data: rgb, info } = await sharp(file)
-    .rotate()
-    .removeAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-  const { width: w, height: h } = info;
-  const alpha = keepLargest(
-    await sharp(mask).resize(w, h, { fit: 'fill' }).extractChannel(0).raw().toBuffer(),
-    w,
-    h,
-  );
-  const bg = backdropColour(rgb, alpha, w, h);
-  const target = [1, 3, 5].map((i) => parseInt(background.slice(i, i + 2), 16));
-  const out = Buffer.alloc(w * h * 3);
-  for (let n = 0; n < w * h; n++) {
-    const a = Math.min(
-      1,
-      Math.max(0, (alpha[n] / 255 - manifest.matte.floor) / manifest.matte.span),
-    );
-    for (let c = 0; c < 3; c++) {
-      const value = rgb[n * 3 + c];
-      const fg = a > 0 && a < 1 ? Math.max(0, Math.min(255, (value - (1 - a) * bg[c]) / a)) : value;
-      out[n * 3 + c] = Math.round(a * fg + (1 - a) * target[c]);
-    }
-  }
-  const cropW = Math.min(w, Math.round(face.w / faceWidth));
-  const cropH = Math.min(h, Math.round((cropW * fh) / fw));
-  const left = Math.round(Math.min(w - cropW, Math.max(0, face.x + face.w / 2 - cropW / 2)));
-  const top = Math.round(Math.min(h - cropH, Math.max(0, face.y + face.h * 0.5 - cropH * 0.4)));
-  const path_ = path.join(outDir, `family-${family.slug}.webp`);
-  await sharp(out, { raw: { width: w, height: h, channels: 3 } })
-    .extract({ left, top, width: cropW, height: cropH })
-    .resize(fw, fh, { kernel: 'lanczos3' })
-    .webp({ quality: 84, effort: 6 })
-    .toFile(path_);
-  return path_;
-}
-
-for (const family of manifest.families ?? []) {
-  built.push(await familyImage(family));
-  console.log(`wrote family-${family.slug}`);
-}
-
 if (process.argv.includes('--sheet')) {
   console.log(await contactSheet(built, '#141312', 'contact-dark.jpg'));
   console.log(await contactSheet(built, '#f4f1ec', 'contact-light.jpg'));
