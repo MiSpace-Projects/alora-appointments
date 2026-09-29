@@ -1,10 +1,16 @@
 import 'dotenv/config';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { PrismaClient, PriceType } from '@prisma/client';
 import { PrismaNeon } from '@prisma/adapter-neon';
 
 const prisma = new PrismaClient({
   adapter: new PrismaNeon({ connectionString: process.env.DATABASE_URL }),
 });
+
+const serviceImages: Record<string, string> = JSON.parse(
+  readFileSync(path.resolve(process.cwd(), 'prisma/service-images.json'), 'utf8'),
+);
 
 const services = [
   {
@@ -16,7 +22,6 @@ const services = [
     priceCents: 15000,
     durationMinutes: 45,
     pointsAwarded: 15,
-    imageUrl: '/services/wig-basic-wash.webp',
   },
   {
     slug: 'wig-moisture-treatment',
@@ -27,7 +32,6 @@ const services = [
     priceCents: 20000,
     durationMinutes: 60,
     pointsAwarded: 20,
-    imageUrl: '/services/wig-moisture-treatment.webp',
   },
   {
     slug: 'wig-keratin-treatment',
@@ -38,7 +42,6 @@ const services = [
     priceCents: 25000,
     durationMinutes: 90,
     pointsAwarded: 25,
-    imageUrl: '/services/wig-keratin-treatment.webp',
   },
 
   {
@@ -50,7 +53,6 @@ const services = [
     priceCents: 20000,
     durationMinutes: 60,
     pointsAwarded: 20,
-    imageUrl: '/services/wig-customization-basic.webp',
   },
   {
     slug: 'wig-customization-advanced',
@@ -61,7 +63,6 @@ const services = [
     priceCents: 25000,
     durationMinutes: 90,
     pointsAwarded: 25,
-    imageUrl: '/services/wig-customization-advanced.webp',
   },
   {
     slug: 'wig-customization-full',
@@ -74,7 +75,6 @@ const services = [
     priceMaxCents: 35000,
     durationMinutes: 120,
     pointsAwarded: 30,
-    imageUrl: '/services/wig-customization-full.webp',
   },
   {
     slug: 'wig-customization-glueless',
@@ -87,7 +87,6 @@ const services = [
     priceMaxCents: 45000,
     durationMinutes: 150,
     pointsAwarded: 35,
-    imageUrl: '/services/wig-customization-glueless.webp',
   },
   {
     slug: 'wig-styling',
@@ -99,7 +98,6 @@ const services = [
     priceType: PriceType.FROM,
     durationMinutes: 45,
     pointsAwarded: 10,
-    imageUrl: '/services/wig-styling.webp',
   },
   {
     slug: 'wig-colouring',
@@ -111,7 +109,6 @@ const services = [
     priceType: PriceType.FROM,
     durationMinutes: 120,
     pointsAwarded: 25,
-    imageUrl: '/services/wig-colouring.webp',
   },
   {
     slug: 'wig-frontal-replacement',
@@ -123,7 +120,6 @@ const services = [
     priceType: PriceType.FROM,
     durationMinutes: 120,
     pointsAwarded: 35,
-    imageUrl: '/services/wig-frontal-replacement.webp',
   },
 
   {
@@ -135,7 +131,6 @@ const services = [
     priceCents: 25000,
     durationMinutes: 75,
     pointsAwarded: 25,
-    imageUrl: '/services/nails-gelx-short.webp',
   },
   {
     slug: 'nails-gelx-medium',
@@ -146,7 +141,6 @@ const services = [
     priceCents: 28000,
     durationMinutes: 90,
     pointsAwarded: 28,
-    imageUrl: '/services/nails-gelx-medium.webp',
   },
   {
     slug: 'nails-gelx-long',
@@ -157,7 +151,6 @@ const services = [
     priceCents: 32000,
     durationMinutes: 105,
     pointsAwarded: 32,
-    imageUrl: '/services/nails-gelx-long.webp',
   },
   {
     slug: 'nails-gelx-refill',
@@ -170,7 +163,6 @@ const services = [
     priceMaxCents: 28000,
     durationMinutes: 75,
     pointsAwarded: 22,
-    imageUrl: '/services/nails-gelx-refill.webp',
   },
   {
     slug: 'nails-soakoff-alora',
@@ -181,7 +173,6 @@ const services = [
     priceCents: 5000,
     durationMinutes: 20,
     pointsAwarded: 5,
-    imageUrl: '/services/nails-soakoff-alora.webp',
   },
   {
     slug: 'nails-soakoff-other',
@@ -192,7 +183,6 @@ const services = [
     priceCents: 7000,
     durationMinutes: 30,
     pointsAwarded: 7,
-    imageUrl: '/services/nails-soakoff-other.webp',
   },
   {
     slug: 'nails-repair',
@@ -203,7 +193,6 @@ const services = [
     priceCents: 3000,
     durationMinutes: 15,
     pointsAwarded: 3,
-    imageUrl: '/services/nails-repair.webp',
   },
 
   {
@@ -215,7 +204,6 @@ const services = [
     priceCents: 30000,
     durationMinutes: 60,
     pointsAwarded: 30,
-    imageUrl: '/services/makeup-soft-glam.webp',
   },
   {
     slug: 'makeup-full-glam',
@@ -226,7 +214,6 @@ const services = [
     priceCents: 35000,
     durationMinutes: 75,
     pointsAwarded: 35,
-    imageUrl: '/services/makeup-full-glam.webp',
   },
   {
     slug: 'makeup-bridal',
@@ -239,7 +226,6 @@ const services = [
     priceMaxCents: 80000,
     durationMinutes: 120,
     pointsAwarded: 60,
-    imageUrl: '/services/makeup-bridal.webp',
   },
   {
     slug: 'makeup-bridesmaid',
@@ -252,7 +238,6 @@ const services = [
     priceMaxCents: 55000,
     durationMinutes: 90,
     pointsAwarded: 45,
-    imageUrl: '/services/makeup-bridesmaid.webp',
   },
   {
     slug: 'makeup-strip-lashes',
@@ -263,7 +248,6 @@ const services = [
     priceCents: 5000,
     durationMinutes: 15,
     pointsAwarded: 5,
-    imageUrl: '/services/makeup-strip-lashes.webp',
   },
   {
     slug: 'makeup-travel',
@@ -275,7 +259,6 @@ const services = [
     priceType: PriceType.FROM,
     durationMinutes: 30,
     pointsAwarded: 15,
-    imageUrl: '/services/makeup-travel.webp',
   },
 
   {
@@ -290,7 +273,6 @@ const services = [
     priceMaxCents: 100000,
     durationMinutes: 240,
     pointsAwarded: 85,
-    imageUrl: '/services/matric-hair-makeup.webp',
   },
 ];
 
@@ -313,10 +295,11 @@ const retiredSlugs = [
 
 async function main() {
   for (const service of services) {
+    const data = { ...service, imageUrl: serviceImages[service.slug] ?? null };
     await prisma.service.upsert({
       where: { slug: service.slug },
-      update: service,
-      create: service,
+      update: data,
+      create: data,
     });
   }
   await prisma.service.updateMany({
