@@ -3,6 +3,7 @@ import { routes } from '@/app/config/routes';
 import { businessContact } from '@/app/config/business';
 import { serviceFamilies } from '@/app/features/servicesSection/servicesData';
 import ProtectedLink from '../protected/ProtectedLink';
+import { BrandLogo } from '../brand/BrandLogo';
 import styles from './Footer.module.css';
 
 const legalLinks = [routes.privacy, routes.cookies, routes.terms, routes.paia] as const;
@@ -12,9 +13,12 @@ export default function Footer() {
 
   return (
     <footer className={styles.footer}>
+      <BrandLogo className={styles.watermark} decorative />
       <div className={styles.top}>
         <div className={styles.brand}>
-          <div className={styles.logo}>Alora</div>
+          <Link href={routes.home.path} className={styles.logo}>
+            <BrandLogo className={styles.logoMark} />
+          </Link>
           <p className={styles.tagline}>
             Premium wig care, nail artistry, and matric farewell beauty services. Your glow-up
             starts here.

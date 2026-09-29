@@ -7,6 +7,7 @@
   --foreground: #171717;
   --navbar-height: 72px;
   --breadcrumb-height: 40px;
+  --logo-ink: #050505;
 }
 
 [data-theme='light'] {
@@ -16,6 +17,7 @@
   --text-color: #171717;
   --content-bg: #f8f9fa;
   --logo-filter: none;
+  --logo-ink: #050505;
 }
 
 [data-theme='dark'] {
@@ -25,6 +27,7 @@
   --text-color: #ffffff;
   --content-bg: #000;
   --logo-filter: brightness(0) invert(1);
+  --logo-ink: #ede6dc;
 }
 
 html,
