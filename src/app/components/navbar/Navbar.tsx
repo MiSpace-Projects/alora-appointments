@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState, useEffect, useRef } from 'react';
 import { User, LogOut, ArrowUpRight } from 'lucide-react';
 import { routes } from '@/app/config/routes';
@@ -10,6 +9,7 @@ import ProtectedLink from '../protected/ProtectedLink';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';
 import { getInitials } from '@/lib/format';
+import { BrandLogo } from '../brand/BrandLogo';
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
@@ -69,13 +69,7 @@ export default function Navbar() {
     <header className={`${styles.header}${scrolled ? ` ${styles.scrolled}` : ''}`}>
       <div className={styles.container}>
         <Link href={routes.home.path} className={styles.logo} onClick={() => setMenuOpen(false)}>
-          <Image
-            src="/alora-hair.png"
-            alt="Alora"
-            className={styles.logoMark}
-            width={32}
-            height={32}
-          />
+          <BrandLogo className={styles.logoMark} decorative />
           <span className={styles.logoText}>
             <strong>Alora</strong> Appointments
           </span>

@@ -1,12 +1,3 @@
-// Builds every service image from scripts/imagery/manifest.json with one identical treatment,
-// so the whole menu reads as a single series (same light, face size, eye line and fade).
-//
-//   node scripts/imagery/build.mjs            build all
-//   node scripts/imagery/build.mjs --sheet    also write a contact sheet to .imagery-cache/
-//
-// A manifest source is either "pexels:<id>" (downloaded once into .imagery-cache/) or a path
-// to a local photo, e.g. the salon's own work. Needs macOS: the matte and face box come from
-// Apple Vision via segment.swift, compiled on first run.
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
@@ -51,7 +42,6 @@ function segment(file) {
   return { mask, face: JSON.parse(box) };
 }
 
-// Median colour of the four corner patches where the matte says "background".
 function backdropColour(rgb, alpha, w, h) {
   const samples = [[], [], []];
   const patch = Math.round(Math.min(w, h) * 0.06);
@@ -76,8 +66,6 @@ function backdropColour(rgb, alpha, w, h) {
   });
 }
 
-// Keep only the largest solid shape in the matte, dropping stray props (a chair back, a
-// stand) that the person matte sometimes includes.
 function keepLargest(alpha, w, h) {
   const label = new Int32Array(w * h).fill(-1);
   const sizes = [];
@@ -121,8 +109,6 @@ async function compose(file, entry) {
   );
   const bg = backdropColour(rgb, alpha, w, h);
 
-  // Tighten the matte slightly, then un-mix the backdrop from semi-transparent edge pixels
-  // (c = a*fg + (1-a)*bg) so hair keeps no white halo against the dark site.
   const rgba = Buffer.alloc(w * h * 4);
   for (let n = 0; n < w * h; n++) {
     const a = Math.min(
@@ -148,13 +134,9 @@ async function compose(file, entry) {
     .raw()
     .toBuffer();
 
-  // Place the face centre on the vertical axis and the face top on a fixed line.
   const offsetX = Math.round(W / 2 - (face.x + face.w / 2) * scale);
   const offsetY = Math.round(manifest.faceTop * H - face.y * scale);
 
-  // Fades follow where this photo actually ends, so no frame edge is ever visible: the
-  // bottom fade finishes at the photo's bottom (or the canvas), and the sides dissolve
-  // inward from whichever is nearer, the canvas edge or the photo edge.
   const photoBottom = Math.min(H, offsetY + scaledH);
   const fadeTo = Math.min(manifest.fade.to * H, photoBottom - 2);
   const fadeFrom = Math.min(manifest.fade.from * H, fadeTo - 0.12 * H);
@@ -193,7 +175,6 @@ async function compose(file, entry) {
   return { slug: entry.slug, canvas, faceBox };
 }
 
-// Mean colour of the central cheek/nose area of the face (skin, not eyes or lips' edges).
 function skinMean({ canvas, faceBox }) {
   const sum = [0, 0, 0];
   let count = 0;
@@ -212,8 +193,6 @@ function skinMean({ canvas, faceBox }) {
   return sum.map((v) => v / Math.max(1, count));
 }
 
-// Nudge every image's skin tone toward the group median: same hue and exposure across the
-// set. Gains are capped so a correction can never recolour a photo.
 function normaliseTone(images) {
   const means = images.map(skinMean);
   const target = [0, 1, 2].map((c) => {
