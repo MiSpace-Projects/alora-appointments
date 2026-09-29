@@ -75,7 +75,10 @@ export default function Footer() {
       </div>
 
       <div className={styles.bottom}>
-        © {year} {businessContact.tradingName}. All rights reserved.
+        <span>
+          © {year} {businessContact.tradingName}. All rights reserved.
+        </span>
+        <span className={styles.credit}>Platform © {year} OddityOne</span>
       </div>
     </footer>
   );

@@ -21,8 +21,14 @@ import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
 import { createBookingAction } from './actions';
 import styles from './book.module.css';
 
+export interface FamilyOption {
+  slug: string;
+  title: string;
+}
+
 export interface ServiceOption {
   id: string;
+  familySlug: string;
   name: string;
   priceCents: number;
   priceType: PriceShape;
@@ -32,6 +38,7 @@ export interface ServiceOption {
 }
 
 interface BookingFormProps {
+  families: FamilyOption[];
   services: ServiceOption[];
   preselectedServiceId?: string;
   onlinePaymentAvailable: boolean;
@@ -40,6 +47,7 @@ interface BookingFormProps {
 type FormInput = z.input<typeof createBookingSchema>;
 
 export function BookingForm({
+  families,
   services,
   preselectedServiceId,
   onlinePaymentAvailable,
@@ -49,6 +57,12 @@ export function BookingForm({
   const [serverError, setServerError] = useState<string | null>(null);
   const [step, setStep] = useState<'details' | 'review'>('details');
   const [reviewed, setReviewed] = useState<CreateBookingInput | null>(null);
+  const [familySlug, setFamilySlug] = useState<string>(
+    () =>
+      services.find((s) => s.id === preselectedServiceId)?.familySlug ??
+      (families.length === 1 ? families[0].slug : ''),
+  );
+  const familyServices = services.filter((s) => s.familySlug === familySlug);
 
   const {
     register,
@@ -103,6 +117,13 @@ export function BookingForm({
   };
 
   const reviewedService = reviewed && services.find((s) => s.id === reviewed.serviceId);
+  const reviewedFamily =
+    reviewedService && families.find((family) => family.slug === reviewedService.familySlug);
+
+  const chooseFamily = (slug: string) => {
+    setFamilySlug(slug);
+    if (selected?.familySlug !== slug) setValue('serviceId', '');
+  };
 
   return (
     <main className={styles.page}>
@@ -123,16 +144,37 @@ export function BookingForm({
         ) : step === 'details' ? (
           <form onSubmit={handleSubmit(goToReview)} className={styles.form}>
             <div className={styles.field}>
+              <label className={styles.label} htmlFor="familySlug">
+                Service type
+              </label>
+              <select
+                id="familySlug"
+                className={styles.select}
+                value={familySlug}
+                onChange={(event) => chooseFamily(event.target.value)}
+              >
+                <option value="" disabled>
+                  Select a service type
+                </option>
+                {families.map((family) => (
+                  <option key={family.slug} value={family.slug}>
+                    {family.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className={styles.field}>
               <label className={styles.label} htmlFor="serviceId">
                 Service
               </label>
               <select id="serviceId" className={styles.select} {...register('serviceId')}>
                 <option value="" disabled>
-                  Select a service
+                  {familySlug ? 'Select a service' : 'Choose a service type first'}
                 </option>
-                {services.map((s) => (
+                {familyServices.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.name} — {formatPrice(s)}
+                    {s.name} · {formatPrice(s)}
                   </option>
                 ))}
               </select>
@@ -219,6 +261,12 @@ export function BookingForm({
           reviewedService && (
             <div className={styles.form}>
               <dl className={styles.review}>
+                {reviewedFamily && (
+                  <div className={styles.reviewRow}>
+                    <dt>Type</dt>
+                    <dd>{reviewedFamily.title}</dd>
+                  </div>
+                )}
                 <div className={styles.reviewRow}>
                   <dt>Service</dt>
                   <dd>{reviewedService.name}</dd>

@@ -76,38 +76,6 @@ export const serviceFamilies: ServiceFamily[] = [
     img: 'https://images.pexels.com/photos/3993449/pexels-photo-3993449.jpeg',
   },
   {
-    slug: 'hair-styling',
-    title: 'Hair Styling',
-    description: 'Silk presses, protective braids, cuts and shaping tailored to your texture.',
-    intro:
-      'From knotless braids to a glass-smooth silk press, every style starts with your texture, your scalp and how you actually live. We take the time to section properly, protect your edges and finish so it lasts.',
-    includes: [
-      {
-        title: 'Consultation',
-        body: 'A few minutes on your hair history, scalp and the look you want, so we choose the right size, tension and products.',
-      },
-      {
-        title: 'Prep',
-        body: 'Cleanse, detangle and, where the style needs it, blow-dry or stretch before we start.',
-      },
-      {
-        title: 'The style',
-        body: 'Braids, twists, locs, natural sets, cuts or a press, done with attention to parting, tension and edges.',
-      },
-      {
-        title: 'Finish and aftercare',
-        body: 'Sealed ends, edges laid, and a short aftercare rundown so the style lasts as long as it should.',
-      },
-    ],
-    prep: [
-      'Come with hair washed and detangled unless you have booked a wash; it saves time on the chair.',
-      'For braids and twists, bring your preferred hair if you have a brand you love; otherwise we supply it.',
-      'Long installs run three to six hours. Eat beforehand and bring a charger.',
-    ],
-    categories: ['Braids', 'Locs & Twists', 'Natural', 'Press & Wigs'],
-    img: 'https://images.pexels.com/photos/7446913/pexels-photo-7446913.jpeg',
-  },
-  {
     slug: 'nail-art',
     title: 'Nail Art',
     description: 'Gel-X sets, soak-offs and hand-painted designs that last.',
@@ -216,4 +184,31 @@ export const serviceFamilies: ServiceFamily[] = [
 
 export function getServiceFamily(slug: string): ServiceFamily | undefined {
   return serviceFamilies.find((family) => family.slug === slug);
+}
+
+export function familyForCategory(
+  category: string | null | undefined,
+  families: ServiceFamily[] = serviceFamilies,
+): ServiceFamily | undefined {
+  if (!category) return undefined;
+  return families.find((family) => family.categories.includes(category));
+}
+
+export interface FamilyGroup<T> {
+  family: ServiceFamily;
+  items: T[];
+}
+
+export function groupByFamily<T extends { category: string | null }>(
+  items: T[],
+  families: ServiceFamily[] = serviceFamilies,
+): FamilyGroup<T>[] {
+  return families
+    .map((family) => ({
+      family,
+      items: items.filter(
+        (item) => item.category !== null && family.categories.includes(item.category),
+      ),
+    }))
+    .filter((group) => group.items.length > 0);
 }
