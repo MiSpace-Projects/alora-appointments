@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import { BrandLogo } from '../brand/BrandLogo';
 import styles from './AuthCard.module.css';
 
 export function AuthCard({
@@ -27,13 +27,7 @@ export function AuthHeader() {
   return (
     <div className={styles.header}>
       <div className={styles.brand}>
-        <Image
-          src="/alora-hair.png"
-          alt="Alora"
-          className={styles.logoSmall}
-          width={32}
-          height={32}
-        />
+        <BrandLogo className={styles.logoSmall} decorative />
         <span className={styles.brandName}>Alora Appointments</span>
       </div>
     </div>
