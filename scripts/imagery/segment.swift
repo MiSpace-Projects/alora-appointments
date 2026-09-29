@@ -5,32 +5,43 @@ import Vision
 
 let args = CommandLine.arguments
 guard args.count >= 3 else {
-    FileHandle.standardError.write("usage: segment.swift <input> <mask.png>\n".data(using: .utf8)!)
+    FileHandle.standardError.write("usage: segment.swift <input> <mask.png> [person|foreground]\n".data(using: .utf8)!)
     exit(1)
 }
 
 let inputURL = URL(fileURLWithPath: args[1])
 let maskURL = URL(fileURLWithPath: args[2])
+let mode = args.count >= 4 ? args[3] : "person"
 guard let source = CIImage(contentsOf: inputURL) else {
     FileHandle.standardError.write("cannot read \(args[1])\n".data(using: .utf8)!)
     exit(1)
 }
 let extent = source.extent
-
-let segmentation = VNGeneratePersonSegmentationRequest()
-segmentation.qualityLevel = .accurate
-segmentation.outputPixelFormat = kCVPixelFormatType_OneComponent8
-let faces = VNDetectFaceRectanglesRequest()
-
 let handler = VNImageRequestHandler(ciImage: source, options: [:])
-try handler.perform([segmentation, faces])
+let faces = VNDetectFaceRectanglesRequest()
+var mask: CIImage
 
-guard let matte = segmentation.results?.first?.pixelBuffer else {
-    FileHandle.standardError.write("no person found\n".data(using: .utf8)!)
-    exit(2)
+if mode == "foreground" {
+    let request = VNGenerateForegroundInstanceMaskRequest()
+    try handler.perform([request, faces])
+    guard let observation = request.results?.first else {
+        FileHandle.standardError.write("no subject found\n".data(using: .utf8)!)
+        exit(2)
+    }
+    let buffer = try observation.generateScaledMaskForImage(forInstances: observation.allInstances, from: handler)
+    mask = CIImage(cvPixelBuffer: buffer)
+} else {
+    let segmentation = VNGeneratePersonSegmentationRequest()
+    segmentation.qualityLevel = .accurate
+    segmentation.outputPixelFormat = kCVPixelFormatType_OneComponent8
+    try handler.perform([segmentation, faces])
+    guard let matte = segmentation.results?.first?.pixelBuffer else {
+        FileHandle.standardError.write("no person found\n".data(using: .utf8)!)
+        exit(2)
+    }
+    mask = CIImage(cvPixelBuffer: matte)
 }
 
-var mask = CIImage(cvPixelBuffer: matte)
 mask = mask.transformed(by: CGAffineTransform(
     scaleX: extent.width / mask.extent.width,
     y: extent.height / mask.extent.height))

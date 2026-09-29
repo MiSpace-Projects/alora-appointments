@@ -1,15 +1,36 @@
 {
   "outputDir": "public/services",
+  "mapFile": "prisma/service-images.json",
   "canvas": {
     "width": 950,
     "height": 1400
   },
-  "face": 0.4,
-  "faceTop": 0.22,
+  "framing": {
+    "portrait": {
+      "face": 0.38,
+      "faceTop": 0.24
+    },
+    "hair": {
+      "face": 0.26,
+      "faceTop": 0.17
+    },
+    "subject": {
+      "subject": true,
+      "maxWidth": 0.92,
+      "maxHeight": 0.8,
+      "bottom": 0.97
+    },
+    "group": {
+      "subject": true,
+      "maxWidth": 1.12,
+      "maxHeight": 0.86,
+      "bottom": 0.98
+    }
+  },
   "fade": {
-    "from": 0.76,
-    "to": 0.95,
-    "side": 0.1
+    "from": 0.78,
+    "to": 0.97,
+    "side": 0.08
   },
   "matte": {
     "floor": 0.12,
@@ -18,102 +39,137 @@
   "entries": [
     {
       "slug": "wig-basic-wash",
-      "source": "pexels:36288122"
+      "source": "pexels:17320165",
+      "mode": "foreground",
+      "framing": "subject"
     },
     {
       "slug": "wig-moisture-treatment",
-      "source": "pexels:36288155"
+      "source": "pexels:36720078",
+      "framing": "hair"
     },
     {
       "slug": "wig-keratin-treatment",
-      "source": "pexels:36288118"
+      "source": "pexels:33559315",
+      "framing": "hair"
     },
     {
       "slug": "wig-customization-basic",
-      "source": "pexels:36288132"
+      "source": "pexels:30198184",
+      "framing": "hair"
     },
     {
       "slug": "wig-customization-advanced",
-      "source": "pexels:36288128"
+      "source": "pexels:2331539",
+      "framing": "portrait"
     },
     {
       "slug": "wig-customization-full",
-      "source": "pexels:36288157"
+      "source": "pexels:16298178",
+      "framing": "hair"
     },
     {
       "slug": "wig-customization-glueless",
-      "source": "pexels:36288140"
+      "source": "pexels:10305432",
+      "framing": "hair"
     },
     {
       "slug": "wig-styling",
-      "source": "pexels:36288138"
+      "source": "pexels:11037450",
+      "framing": "hair"
     },
     {
       "slug": "wig-colouring",
-      "source": "pexels:36288139"
+      "source": "pexels:32767443",
+      "framing": "hair"
     },
     {
       "slug": "wig-frontal-replacement",
-      "source": "pexels:36288137"
+      "source": "pexels:8106142",
+      "framing": "hair"
     },
     {
       "slug": "nails-gelx-short",
-      "source": "pexels:36288123"
+      "source": "unsplash:photo-1677739424301-ba2cdf1631e9",
+      "mode": "foreground",
+      "framing": "subject"
     },
     {
       "slug": "nails-gelx-medium",
-      "source": "pexels:36288124"
+      "source": "unsplash:photo-1633955726992-2b7c0d2d2a69",
+      "mode": "foreground",
+      "framing": "subject"
     },
     {
       "slug": "nails-gelx-long",
-      "source": "pexels:36288125"
+      "source": "unsplash:photo-1690749072212-373daf1d58ca",
+      "mode": "foreground",
+      "framing": "subject"
     },
     {
       "slug": "nails-gelx-refill",
-      "source": "pexels:36288135"
+      "source": "unsplash:photo-1663229050022-10896e8ea58a",
+      "mode": "foreground",
+      "framing": "subject",
+      "crop": {
+        "left": 0.0,
+        "top": 0.42,
+        "width": 1.0,
+        "height": 0.58
+      }
     },
     {
       "slug": "nails-soakoff-alora",
-      "source": "pexels:36288143"
+      "source": "unsplash:photo-1706040285481-28cc91e92c36",
+      "mode": "foreground",
+      "framing": "subject"
     },
     {
       "slug": "nails-soakoff-other",
-      "source": "pexels:36288147"
+      "source": "pexels:7755285",
+      "mode": "foreground",
+      "framing": "subject"
     },
     {
       "slug": "nails-repair",
-      "source": "pexels:36288134"
+      "source": "unsplash:photo-1663229049340-fcd5212a1b13",
+      "mode": "foreground",
+      "framing": "subject"
     },
     {
       "slug": "makeup-soft-glam",
-      "source": "pexels:36288154"
+      "source": "pexels:3973709",
+      "framing": "portrait"
     },
     {
       "slug": "makeup-full-glam",
-      "source": "pexels:36288137"
+      "source": "pexels:23158360",
+      "framing": "portrait"
     },
     {
       "slug": "makeup-bridal",
-      "source": "pexels:36288149"
+      "source": "pexels:6512263",
+      "framing": "portrait"
     },
     {
       "slug": "makeup-bridesmaid",
-      "source": "pexels:36288152"
+      "source": "pexels:7255250",
+      "framing": "portrait"
     },
     {
       "slug": "makeup-strip-lashes",
-      "source": "pexels:36288143"
+      "source": "pexels:19742921",
+      "framing": "portrait"
     },
     {
       "slug": "makeup-travel",
-      "source": "pexels:36288158"
+      "source": "pexels:11041338",
+      "framing": "group"
     },
     {
       "slug": "matric-hair-makeup",
-      "source": "pexels:36288157"
+      "source": "pexels:31610244",
+      "framing": "hair"
     }
-  ],
-  "tone": {
-    "maxGain": 0.12
-  }
+  ]
 }
