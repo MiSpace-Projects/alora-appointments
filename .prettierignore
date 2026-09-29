@@ -5,3 +5,5 @@ out
 coverage
 *.min.js
 public
+.claude
+.imagery-cache
