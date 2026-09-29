@@ -10,8 +10,6 @@ export const listActiveServices = unstable_cache(
       where: { active: true },
       orderBy: [{ category: 'asc' }, { sortOrder: 'asc' }, { priceCents: 'asc' }],
     }),
-  // The version suffix is bumped when the catalog is reseeded so a deploy serves
-  // the new menu immediately instead of waiting out the revalidate window.
   ['active-services', 'v3'],
   { revalidate: 3600, tags: [SERVICES_CACHE_TAG] },
 );
