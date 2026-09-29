@@ -1,5 +1,13 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  unlinkSync,
+  writeFileSync,
+} from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
@@ -8,6 +16,9 @@ const cache = path.join(root, '.imagery-cache');
 const manifest = JSON.parse(readFileSync(path.join(root, 'scripts/imagery/manifest.json'), 'utf8'));
 const { width: W, height: H } = manifest.canvas;
 const outDir = path.join(root, manifest.outputDir);
+const mapFile = path.join(root, manifest.mapFile);
+const publicBase = '/' + path.relative(path.join(root, 'public'), outDir).split(path.sep).join('/');
+const only = process.argv.find((arg) => arg.startsWith('--only='))?.slice('--only='.length);
 mkdirSync(cache, { recursive: true });
 mkdirSync(outDir, { recursive: true });
 
@@ -16,30 +27,42 @@ if (!existsSync(segmentBin)) {
   execFileSync(
     'swiftc',
     ['-O', path.join(root, 'scripts/imagery/segment.swift'), '-o', segmentBin],
-    {
-      stdio: 'inherit',
-    },
+    { stdio: 'inherit' },
   );
 }
 
+const remote = {
+  pexels: (id) =>
+    `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&w=4000`,
+  unsplash: (id) => `https://images.unsplash.com/${id}?w=4000&q=90&fm=jpg`,
+};
+
 async function resolveSource(source) {
-  if (!source.startsWith('pexels:')) return path.resolve(root, source);
-  const id = source.slice('pexels:'.length);
-  const file = path.join(cache, `pexels-${id}.jpg`);
-  if (!existsSync(file)) {
-    const url = `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&w=3200`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`download failed for ${source}: ${response.status}`);
-    writeFileSync(file, Buffer.from(await response.arrayBuffer()));
+  const [provider, id] = source.split(':');
+  if (!remote[provider]) return path.resolve(root, source);
+  const file = path.join(cache, `${provider}-${id}.jpg`);
+  for (let attempt = 1; !existsSync(file); attempt++) {
+    try {
+      const response = await fetch(remote[provider](id));
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      writeFileSync(file, Buffer.from(await response.arrayBuffer()));
+    } catch (error) {
+      if (attempt >= 4) throw new Error(`download failed for ${source}: ${error.message}`);
+      await new Promise((resolve) => setTimeout(resolve, attempt * 3000));
+    }
   }
   return file;
 }
 
-function segment(file) {
-  const mask = file.replace(/\.[a-z]+$/i, '.mask.png');
-  const box = execFileSync(segmentBin, [file, mask], { encoding: 'utf8' }).trim();
-  if (box === 'null') throw new Error(`no face found in ${file}`);
-  return { mask, face: JSON.parse(box) };
+function segment(file, mode) {
+  const mask = file.replace(/\.[a-z]+$/i, `.${mode}.png`);
+  const faceFile = file.replace(/\.[a-z]+$/i, `.${mode}.face.json`);
+  if (!existsSync(mask) || !existsSync(faceFile)) {
+    const box = execFileSync(segmentBin, [file, mask, mode], { encoding: 'utf8' }).trim();
+    writeFileSync(faceFile, box);
+  }
+  const box = readFileSync(faceFile, 'utf8').trim();
+  return { mask, face: box === 'null' ? null : JSON.parse(box) };
 }
 
 function backdropColour(rgb, alpha, w, h) {
@@ -60,7 +83,7 @@ function backdropColour(rgb, alpha, w, h) {
     }
   }
   return samples.map((list) => {
-    if (list.length === 0) return 245;
+    if (list.length === 0) return 128;
     list.sort((a, b) => a - b);
     return list[list.length >> 1];
   });
@@ -94,8 +117,69 @@ function keepLargest(alpha, w, h) {
   return alpha;
 }
 
-async function compose(file, entry) {
-  const { mask, face } = segment(file);
+function subjectBox(alpha, w, h) {
+  let x0 = w,
+    y0 = h,
+    x1 = 0,
+    y1 = 0;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      if (alpha[y * w + x] < 128) continue;
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
+    }
+  }
+  return { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+}
+
+function placement(entry, face, alpha, w, h) {
+  const framing = manifest.framing[entry.framing ?? 'portrait'];
+  if (framing.subject || !face) {
+    const box = subjectBox(alpha, w, h);
+    const scale = Math.min(
+      ((framing.maxWidth ?? 0.9) * W) / box.w,
+      ((framing.maxHeight ?? 0.78) * H) / box.h,
+    );
+    return {
+      scale,
+      offsetX: Math.round(W / 2 - (box.x + box.w / 2) * scale),
+      offsetY: Math.round((framing.bottom ?? 0.96) * H - (box.y + box.h) * scale),
+    };
+  }
+  const scale = ((entry.face ?? framing.face) * H) / face.h;
+  return {
+    scale,
+    offsetX: Math.round(W / 2 - (face.x + face.w / 2) * scale),
+    offsetY: Math.round((entry.faceTop ?? framing.faceTop) * H - face.y * scale),
+  };
+}
+
+async function cropped(file, crop) {
+  if (!crop) return file;
+  const key = [crop.left, crop.top, crop.width, crop.height].join('-');
+  const out = file.replace(/\.[a-z]+$/i, `.crop-${key}.jpg`);
+  if (!existsSync(out)) {
+    const { width, height } = await sharp(file).rotate().metadata();
+    await sharp(file)
+      .rotate()
+      .extract({
+        left: Math.round(crop.left * width),
+        top: Math.round(crop.top * height),
+        width: Math.round(crop.width * width),
+        height: Math.round(crop.height * height),
+      })
+      .jpeg({ quality: 95 })
+      .toFile(out);
+  }
+  return out;
+}
+
+async function compose(source, entry) {
+  const file = await cropped(source, entry.crop);
+  const mode = entry.mode ?? 'person';
+  const { mask, face } = segment(file, mode);
   const { data: rgb, info } = await sharp(file)
     .rotate()
     .removeAlpha()
@@ -125,17 +209,14 @@ async function compose(file, entry) {
     rgba[n * 4 + 3] = Math.round(a * 255);
   }
 
-  const faceHeight = (entry.face ?? manifest.face) * H;
-  const scale = faceHeight / face.h;
+  const { scale, offsetX, offsetY } = placement(entry, face, alpha, w, h);
+  if (scale > 1.25) console.warn(`  ${entry.slug}: upscaled x${scale.toFixed(2)}, source is small`);
   const scaledW = Math.round(w * scale);
   const scaledH = Math.round(h * scale);
   const scaled = await sharp(rgba, { raw: { width: w, height: h, channels: 4 } })
     .resize(scaledW, scaledH, { kernel: 'lanczos3' })
     .raw()
     .toBuffer();
-
-  const offsetX = Math.round(W / 2 - (face.x + face.w / 2) * scale);
-  const offsetY = Math.round(manifest.faceTop * H - face.y * scale);
 
   const photoBottom = Math.min(H, offsetY + scaledH);
   const fadeTo = Math.min(manifest.fade.to * H, photoBottom - 2);
@@ -166,58 +247,20 @@ async function compose(file, entry) {
     }
   }
 
-  const faceBox = {
-    x: Math.round(offsetX + face.x * scale),
-    y: Math.round(offsetY + face.y * scale),
-    w: Math.round(face.w * scale),
-    h: Math.round(face.h * scale),
-  };
-  return { slug: entry.slug, canvas, faceBox };
-}
-
-function skinMean({ canvas, faceBox }) {
-  const sum = [0, 0, 0];
-  let count = 0;
-  const x0 = faceBox.x + faceBox.w * 0.3;
-  const x1 = faceBox.x + faceBox.w * 0.7;
-  const y0 = faceBox.y + faceBox.h * 0.45;
-  const y1 = faceBox.y + faceBox.h * 0.62;
-  for (let y = Math.round(y0); y < y1; y++) {
-    for (let x = Math.round(x0); x < x1; x++) {
-      const d = (y * W + x) * 4;
-      if (canvas[d + 3] < 250) continue;
-      for (let c = 0; c < 3; c++) sum[c] += canvas[d + c];
-      count++;
+  const webp = await sharp(canvas, { raw: { width: W, height: H, channels: 4 } })
+    .webp({ quality: 86, alphaQuality: 90, effort: 6 })
+    .toBuffer();
+  const name = `${entry.slug}-${createHash('sha1').update(webp).digest('hex').slice(0, 8)}.webp`;
+  for (const old of readdirSync(outDir)) {
+    if (
+      old === `${entry.slug}.webp` ||
+      new RegExp(`^${entry.slug}-[0-9a-f]{8}\\.webp$`).test(old)
+    ) {
+      unlinkSync(path.join(outDir, old));
     }
   }
-  return sum.map((v) => v / Math.max(1, count));
-}
-
-function normaliseTone(images) {
-  const means = images.map(skinMean);
-  const target = [0, 1, 2].map((c) => {
-    const list = means.map((m) => m[c]).sort((a, b) => a - b);
-    return list[list.length >> 1];
-  });
-  const cap = manifest.tone.maxGain;
-  images.forEach((image, i) => {
-    const gain = target.map((t, c) => Math.min(1 + cap, Math.max(1 - cap, t / means[i][c])));
-    const { canvas } = image;
-    for (let d = 0; d < canvas.length; d += 4) {
-      for (let c = 0; c < 3; c++)
-        canvas[d + c] = Math.min(255, Math.round(canvas[d + c] * gain[c]));
-    }
-    image.gain = gain;
-  });
-  return target;
-}
-
-async function write(image) {
-  const out = path.join(outDir, `${image.slug}.webp`);
-  await sharp(image.canvas, { raw: { width: W, height: H, channels: 4 } })
-    .webp({ quality: 86, alphaQuality: 90, effort: 6 })
-    .toFile(out);
-  return out;
+  writeFileSync(path.join(outDir, name), webp);
+  return { slug: entry.slug, file: path.join(outDir, name), url: `${publicBase}/${name}` };
 }
 
 async function contactSheet(files, background, name) {
@@ -240,19 +283,21 @@ async function contactSheet(files, background, name) {
   return out;
 }
 
-const images = [];
+const images = existsSync(mapFile) ? JSON.parse(readFileSync(mapFile, 'utf8')) : {};
 for (const entry of manifest.entries) {
-  images.push(await compose(await resolveSource(entry.source), entry));
-  console.log(`composed ${entry.slug}`);
+  if (only && !entry.slug.startsWith(only)) continue;
+  const result = await compose(await resolveSource(entry.source), entry);
+  images[entry.slug] = result.url;
+  console.log(`built ${entry.slug} -> ${result.url}`);
 }
-const target = normaliseTone(images);
-console.log(`skin tone target rgb ${target.map((v) => v.toFixed(0)).join(',')}`);
-const built = [];
-for (const image of images) {
-  built.push(await write(image));
-  console.log(`wrote ${image.slug} gain ${image.gain.map((g) => g.toFixed(3)).join(',')}`);
-}
+const ordered = Object.fromEntries(
+  manifest.entries
+    .filter((entry) => images[entry.slug])
+    .map((entry) => [entry.slug, images[entry.slug]]),
+);
+writeFileSync(mapFile, JSON.stringify(ordered, null, 2) + '\n');
 if (process.argv.includes('--sheet')) {
-  console.log(await contactSheet(built, '#141312', 'contact-dark.jpg'));
-  console.log(await contactSheet(built, '#f4f1ec', 'contact-light.jpg'));
+  const files = Object.values(ordered).map((url) => path.join(root, 'public', url));
+  console.log(await contactSheet(files.filter(existsSync), '#141312', 'contact-dark.jpg'));
+  console.log(await contactSheet(files.filter(existsSync), '#f4f1ec', 'contact-light.jpg'));
 }
