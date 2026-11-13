@@ -2,25 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from 'better-auth/cookies';
 import { loginWithCallback } from '@/lib/safe-redirect';
 
-const PUBLIC_ROUTES = [
-  '/',
-  '/login',
-  '/register',
-  '/forgot-password',
-  '/reset-password',
-  '/verify-email',
-  '/two-factor',
-  '/privacy-policy',
-  '/cookie-policy',
-  '/terms',
-  '/paia-manual',
-  '/services',
-];
-const PROTECTED_PREFIXES = ['/profile'];
+const PROTECTED_PREFIXES = ['/book', '/profile', '/owner'];
 
-function isPublic(pathname: string): boolean {
-  if (pathname === '/') return true;
-  return PUBLIC_ROUTES.some((route) => route !== '/' && pathname.startsWith(route));
+function isProtectedPath(pathname: string): boolean {
+  return PROTECTED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
 }
 
 function buildCsp(nonce: string): string {
@@ -60,10 +47,7 @@ export function proxy(request: NextRequest): NextResponse {
   const returnTo = `${pathname}${search}`;
   const hasSession = Boolean(getSessionCookie(request));
 
-  const needsAuth =
-    PROTECTED_PREFIXES.some((route) => pathname.startsWith(route)) || !isPublic(pathname);
-
-  if (!hasSession && needsAuth) {
+  if (!hasSession && isProtectedPath(pathname)) {
     return applySecurityHeaders(
       NextResponse.redirect(new URL(loginWithCallback(returnTo), request.url)),
       csp,
