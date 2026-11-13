@@ -2,11 +2,6 @@ import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
 import { PrismaNeon } from '@prisma/adapter-neon';
 
-/**
- * Seed the service catalog. Idempotent (upsert by slug) so it's safe to re-run.
- * Prices are integer cents (ZAR); points mirror the pricing tiers.
- *   Run: npm run db:seed
- */
 const prisma = new PrismaClient({
   adapter: new PrismaNeon({ connectionString: process.env.DATABASE_URL }),
 });

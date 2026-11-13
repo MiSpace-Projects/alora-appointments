@@ -1,6 +1,6 @@
-/** @type {import('jest').Config} */
-const config = {
-  testEnvironment: 'jsdom',
+const nodeTests = ['**/*.node.test.[jt]s?(x)'];
+
+const shared = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
@@ -10,8 +10,25 @@ const config = {
   transform: {
     '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: { jsx: 'react-jsx' } }],
   },
-  testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
-  testPathIgnorePatterns: ['/node_modules/', '/.next/', '<rootDir>/e2e/'],
+  testPathIgnorePatterns: ['/node_modules/', '/.next/', '<rootDir>/e2e/', '<rootDir>/.claude/'],
+};
+
+const config = {
+  projects: [
+    {
+      ...shared,
+      displayName: 'jsdom',
+      testEnvironment: 'jsdom',
+      testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
+      testPathIgnorePatterns: [...shared.testPathIgnorePatterns, '\\.node\\.test\\.[jt]sx?$'],
+    },
+    {
+      ...shared,
+      displayName: 'node',
+      testEnvironment: 'node',
+      testMatch: nodeTests,
+    },
+  ],
   coverageDirectory: 'coverage',
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts', '!src/**/*.stories.{ts,tsx}'],
   coverageThreshold: {

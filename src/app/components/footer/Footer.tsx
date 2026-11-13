@@ -10,7 +10,6 @@ export interface FooterServiceLink {
 }
 
 interface FooterProps {
-  /** Live catalog from the DB; each entry deep-links into the booking form. */
   services: FooterServiceLink[];
 }
 

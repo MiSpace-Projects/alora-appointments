@@ -5,20 +5,6 @@ import { motion } from 'framer-motion';
 import ProtectedLink from '@/app/components/protected/ProtectedLink';
 import { routes } from '@/app/config/routes';
 
-// const reveal = {
-//   hidden: { opacity: 0, y: 30 },
-//   show: {
-//     opacity: 1,
-//     y: 0,
-//     transition: {
-//       type: 'spring',
-//       stiffness: 90,
-//       damping: 18,
-//       mass: 0.9,
-//     },
-//   },
-// };
-
 export default function Services() {
   return (
     <div id="services" className={styles.services}>

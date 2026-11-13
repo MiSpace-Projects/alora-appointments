@@ -10,16 +10,11 @@ export interface LegalSection {
 interface LegalDocumentProps {
   kicker: string;
   title: string;
-  /** ISO date the document took effect; shown to readers and used in consent records. */
   effectiveDate: string;
   lede: ReactNode;
   sections: LegalSection[];
 }
 
-/**
- * Long-form legal document layout with an anchored section index. Server
- * component: all content is static per version so it renders once and caches.
- */
 export function LegalDocument({
   kicker,
   title,
@@ -66,7 +61,6 @@ export function LegalDocument({
   );
 }
 
-/** Renders a confirmed value, or a visible "to be confirmed" marker when the owner has not supplied it yet. */
 export function Fact({
   value,
   label,

@@ -6,12 +6,6 @@ import { getUserLoyalty } from '@/lib/data/loyalty';
 import { ProfileView } from './ProfileView';
 import { isPaystackConfigured } from '@/lib/payments/paystack';
 
-/**
- * Server component: resolves the session and loads the user's real bookings and
- * loyalty standing through the DAL, then hands them to the animated client view.
- * The (protected) layout already gates auth; the check here narrows the type and
- * is defence in depth.
- */
 export default async function ProfilePage() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {

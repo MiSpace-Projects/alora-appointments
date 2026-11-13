@@ -13,11 +13,8 @@ import {
 import { acknowledgeCookieNoticeAction } from './actions';
 
 interface ConsentContextValue {
-  /** null until read from the cookie on the client, so SSR never flashes the banner. */
   consent: ConsentState | null;
-  /** True once the cookie has been read on the client. */
   ready: boolean;
-  /** Whether the notice sheet is open (first visit, outdated version, or reopened from settings). */
   noticeOpen: boolean;
   acknowledge: () => void;
   openNotice: () => void;
@@ -40,8 +37,6 @@ function writeConsentCookie(state: ConsentState): void {
 }
 
 export function ConsentProvider({ children }: { children: ReactNode }) {
-  // Hydration-safe: the server renders "not ready" (no banner); the cookie is
-  // read once on the client after mount.
   const [state, setState] = useState<{
     ready: boolean;
     consent: ConsentState | null;
@@ -50,7 +45,6 @@ export function ConsentProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const existing = parseConsentCookie(readCookie(CONSENT_COOKIE_NAME));
-    // Deferred to a microtask so the update is not synchronous inside the effect body.
     const id = window.setTimeout(() => {
       setState({ ready: true, consent: existing, noticeOpen: existing === null });
     }, 0);
@@ -63,7 +57,6 @@ export function ConsentProvider({ children }: { children: ReactNode }) {
     const next = createConsentState();
     writeConsentCookie(next);
     setState({ ready: true, consent: next, noticeOpen: false });
-    // Fire-and-forget audit row for signed-in users.
     void acknowledgeCookieNoticeAction();
   }, []);
 

@@ -123,9 +123,6 @@
   object-position: right center;
 }
 
-/* The portraits are real transparent cutouts (public/hero/*-cutout.png), so
-   the subject is OPAQUE and sits in front of the wordmark, occluding the
-   letters where it overlaps them — exactly the GrandPool treatment. No blend. */
 .darkPortrait {
   display: none;
 }
@@ -138,14 +135,6 @@
   display: block;
 }
 
-/* ── Mobile: full-viewport hero, wordmark spanning the width, cutout in front ──
-   The hero becomes a flex column that fills the viewport. `.content` is
-   flattened with `display: contents` so label, title, portrait, description
-   and actions are all direct flex items and can be re-ordered: the portrait
-   slots between title and description, grows to absorb the remaining height,
-   and is pulled up over the lower half of the wordmark with a negative
-   margin. Letter tops stay clear so "Alora" remains readable on both sides
-   of the subject (GrandPool treatment). */
 @media (max-width: 760px) {
   .hero {
     --hero-title-size: clamp(4.5rem, 35vw, 9rem);
@@ -164,8 +153,6 @@
     display: contents;
   }
 
-  /* The eyebrow does not sit over the wordmark on mobile: the wordmark and
-     portrait stand alone at the top, and the eyebrow heads the copy block. */
   .label {
     position: relative;
     z-index: 3;
@@ -176,7 +163,6 @@
     opacity: 0.55;
   }
 
-  /* Sized so the five letters span the full inline width. */
   .title {
     position: relative;
     z-index: 1;
@@ -188,9 +174,6 @@
     white-space: nowrap;
   }
 
-  /* In-flow, grows to fill the leftover viewport height, and overlaps the
-     bottom ~45% of the wordmark. `contain` + top anchoring keeps the subject's
-     head in the letters regardless of how tall the leftover space is. */
   .portrait {
     --hero-bleed: 0;
 
@@ -209,18 +192,11 @@
     mask-image: none;
   }
 
-  /* Mobile crops are near-square, so the portrait bleeds edge to edge and
-     fills the box with `cover`, anchored top: the head always rises into the
-     letters and the crop's bottom edge meets the copy. Any excess width is
-     trimmed at the viewport edges rather than leaving a gap. */
   .portraitImage {
     object-fit: cover;
     object-position: 50% top;
   }
 
-  /* The light crop's focal points (hand + profile) sit at its left edge, so
-     anchor left: on tall phones the afro bleeds off the right edge instead of
-     the hand being clipped. */
   .lightPortrait {
     object-position: left top;
   }

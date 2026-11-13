@@ -4,11 +4,6 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import styles from './status.module.css';
 
-/**
- * Root error boundary. Catches render/runtime errors in the App Router tree and
- * offers a recovery path instead of a blank screen. `reset()` re-renders the
- * segment; the Link is the escape hatch when a retry won't help.
- */
 export default function Error({
   error,
   reset,
@@ -17,7 +12,6 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Surface for the log aggregator; swap console for Sentry/Datadog later.
     console.error('[app-error]', error);
   }, [error]);
 

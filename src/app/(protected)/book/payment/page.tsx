@@ -39,11 +39,6 @@ const copy: Record<SettleOutcome, { title: string; body: string }> = {
   },
 };
 
-/**
- * Paystack sends the customer back here after checkout. The outcome is
- * decided by verifying the reference with Paystack server-side, never by
- * anything in the URL; the webhook performs the same idempotent settlement.
- */
 export default async function PaymentReturnPage({ searchParams }: PageProps) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect('/login');
@@ -54,7 +49,6 @@ export default async function PaymentReturnPage({ searchParams }: PageProps) {
 
   let outcome: SettleOutcome = 'UNKNOWN_REFERENCE';
   if (reference) {
-    // Ownership: only settle references that belong to this user's bookings.
     const owned = await prisma.payment.findFirst({
       where: { reference, userId: session.user.id },
       select: { id: true },

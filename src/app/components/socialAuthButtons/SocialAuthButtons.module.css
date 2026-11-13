@@ -81,7 +81,6 @@
   line-height: 1;
 }
 
-/* Spinner for loading state */
 .spinner {
   display: inline-block;
   width: 14px;
@@ -98,7 +97,6 @@
   }
 }
 
-/* When there's only 1 provider, don't stretch to full width */
 .buttons:has(.socialBtn:only-child) .socialBtn {
   flex: none;
   min-width: 160px;

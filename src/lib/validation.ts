@@ -22,11 +22,9 @@ export const authSignUpSchema = z.object({
   name: accountNameSchema,
   email: z.string().trim().toLowerCase().email('Please enter a valid email'),
   password: newPasswordSchema,
-  // POPIA s18 notice / ECTA terms: acceptance is mandatory and enforced server-side.
   termsAccepted: z
     .boolean()
     .refine((accepted) => accepted === true, 'Please accept the terms and privacy policy'),
-  // POPIA s69: marketing is strictly opt-in and unticked by default.
   marketingOptIn: z.boolean(),
 });
 
@@ -55,12 +53,10 @@ export const resetPasswordSchema = z
 
 export const createBookingSchema = z.object({
   serviceId: z.string().min(1, 'Please choose a service'),
-  // Coerce so form strings and JSON payloads both validate to a real Date.
   startsAt: z.coerce.date().refine((d) => d.getTime() > Date.now(), {
     message: 'Choose a time in the future',
   }),
   notes: z.string().max(500, 'Notes are too long').optional(),
-  // ECTA s43: the customer chooses how to settle before confirming.
   paymentMethod: z.enum(['PAY_NOW', 'PAY_IN_SALON']),
 });
 

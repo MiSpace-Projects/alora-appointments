@@ -1,9 +1,3 @@
-/**
- * Settlement state machine: the callback page and the webhook both call
- * settlePaymentByReference, possibly concurrently and more than once. These
- * tests pin the exactly-once confirmation and the amount/currency guard with
- * Prisma and the provider mocked.
- */
 const updateMany = jest.fn();
 const bookingUpdateMany = jest.fn();
 const findUnique = jest.fn();

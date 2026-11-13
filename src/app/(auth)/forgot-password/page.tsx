@@ -48,9 +48,6 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      // Go straight through better-auth's own endpoint (which is CSRF-protected
-      // and does not disclose whether the address is registered). The previous
-      // hand-rolled /api/auth/forgot-password route bypassed both protections.
       const { error } = await authClient.requestPasswordReset({
         email: data.email,
         redirectTo: `${window.location.origin}/reset-password`,
@@ -61,7 +58,6 @@ export default function ForgotPasswordPage() {
       }
 
       setSent(true);
-      // Deliberately generic: never confirm or deny that an account exists.
       toast.success('If an account exists, the reset request has been accepted.');
     } catch (error) {
       toast.error(

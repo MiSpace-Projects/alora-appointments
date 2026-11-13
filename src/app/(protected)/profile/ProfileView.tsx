@@ -67,14 +67,11 @@ function getFirstName(name?: string | null): string {
   return name.split(' ')[0];
 }
 
-// A booking is "upcoming" while it's still live and in the future; everything
-// else (completed, cancelled, past) is history.
 function isUpcoming(b: BookingView): boolean {
   const future = new Date(b.startsAt).getTime() > Date.now();
   return future && (b.status === 'PENDING' || b.status === 'CONFIRMED');
 }
 
-/** Human label for the money side of a booking. */
 function paymentLabel(b: BookingView): { text: string; tone: 'paid' | 'refunded' | 'due' } {
   const settled = b.payments.find(
     (p) => p.status === 'SUCCESS' || p.status === 'PARTIALLY_REFUNDED' || p.status === 'REFUNDED',
@@ -141,8 +138,8 @@ export function ProfileView({
             <p className={styles.progressMeta}>
               {loyalty.points} pts
               {loyalty.pointsToNext !== null && loyalty.nextTier
-                ? ` — ${loyalty.pointsToNext} pts to ${loyalty.nextTier}`
-                : ' — top tier reached'}
+                ? ` · ${loyalty.pointsToNext} pts to ${loyalty.nextTier}`
+                : ' · top tier reached'}
             </p>
           </div>
         </div>

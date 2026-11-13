@@ -34,7 +34,7 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Alora — Premium Hair & Beauty Appointments',
+    default: 'Alora · Premium Hair & Beauty Appointments',
     template: '%s · Alora',
   },
   description:
@@ -43,14 +43,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Alora',
-    title: 'Alora — Premium Hair & Beauty Appointments',
+    title: 'Alora · Premium Hair & Beauty Appointments',
     description:
       'Book premium hair and beauty appointments with Alora. Earn loyalty rewards on every visit.',
     url: siteUrl,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Alora — Premium Hair & Beauty Appointments',
+    title: 'Alora · Premium Hair & Beauty Appointments',
     description: 'Book premium hair and beauty appointments with Alora.',
   },
 };
@@ -76,8 +76,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const nonce = (await headers()).get('x-nonce') ?? undefined;
-  // Footer service links come from the live catalog; a DB hiccup must never
-  // take the whole shell down, so fall back to an empty list.
   const footerServices = await listActiveServices()
     .then((services) => services.map(({ slug, name }) => ({ slug, name })))
     .catch(() => []);

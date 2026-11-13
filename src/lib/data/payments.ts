@@ -10,23 +10,11 @@ import {
 } from '@/lib/payments/paystack';
 import { quoteRefund, type RefundQuote } from '@/lib/refund-policy';
 
-/**
- * Payment DAL. Every mutation is idempotent on the provider reference so the
- * callback page and the webhook can both run (in any order, more than once)
- * without double-confirming a booking or double-refunding.
- */
-
 export interface StartPaymentResult {
   authorizationUrl: string;
   reference: string;
 }
 
-/**
- * Create a PENDING payment row for the acting user's own booking and obtain a
- * Paystack checkout URL. Reuses an existing pending attempt's URL when there
- * is one (customer closed the tab and came back) rather than creating a
- * second transaction for the same booking.
- */
 export async function startBookingPayment(
   userId: string,
   userEmail: string,
@@ -86,12 +74,6 @@ export async function startBookingPayment(
 
 export type SettleOutcome = 'PAID' | 'ALREADY_PAID' | 'FAILED' | 'PENDING' | 'UNKNOWN_REFERENCE';
 
-/**
- * Verify a reference with Paystack and apply the result. Safe to call from
- * both the return page and the webhook: a SUCCESS row is never rewritten, and
- * the booking is confirmed exactly once. Amount/currency are checked against
- * what we asked for so a tampered or short payment can never confirm a booking.
- */
 export async function settlePaymentByReference(reference: string): Promise<SettleOutcome> {
   const payment = await prisma.payment.findUnique({ where: { reference } });
   if (!payment) return 'UNKNOWN_REFERENCE';
@@ -139,8 +121,6 @@ async function applyVerifiedTransaction(
 
   const paidAt = verified.paid_at ? new Date(verified.paid_at) : now;
 
-  // Conditional update on PENDING makes the transition exactly-once under
-  // concurrent callback + webhook delivery.
   const result = await prisma.$transaction(async (tx) => {
     const updated = await tx.payment.updateMany({
       where: { id: payment.id, status: 'PENDING' },
@@ -169,12 +149,6 @@ export interface CancelWithRefundResult {
   refundStatus: 'NOT_NEEDED' | 'REQUESTED' | 'FAILED';
 }
 
-/**
- * Cancel the acting user's booking and, if it was paid online, request the
- * policy-determined refund from Paystack. The booking is cancelled first
- * (customer intent is honoured even if the provider call fails); a failed
- * refund is flagged for manual follow-up rather than silently dropped.
- */
 export async function cancelBookingWithRefund(
   userId: string,
   bookingId: string,
@@ -229,7 +203,6 @@ export async function cancelBookingWithRefund(
   }
 }
 
-/** Refund quote for the cancel confirmation dialog (read-only, ownership enforced). */
 export async function getRefundQuoteForBooking(
   userId: string,
   bookingId: string,
@@ -246,10 +219,6 @@ export async function getRefundQuoteForBooking(
   });
 }
 
-/**
- * Record a refund event from the provider (webhook). Reconciles the ledger
- * when a refund was initiated from the Paystack dashboard rather than by us.
- */
 export async function recordProviderRefund(input: {
   transactionReference: string;
   amountCents: number;

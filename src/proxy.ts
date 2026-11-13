@@ -10,7 +10,6 @@ const PUBLIC_ROUTES = [
   '/reset-password',
   '/verify-email',
   '/two-factor',
-  // Legal pages must be readable before sign-up (POPIA s18 notice at collection).
   '/privacy-policy',
   '/cookie-policy',
   '/terms',

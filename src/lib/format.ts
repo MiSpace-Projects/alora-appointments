@@ -1,11 +1,3 @@
-/**
- * format.ts — shared display formatting.
- *
- * Fixed locale + options so the same string renders on the server and the
- * client (no hydration mismatch). Money is stored as integer cents (ZAR); these
- * helpers are the one place we turn that into human text.
- */
-
 const zarDate = new Intl.DateTimeFormat('en-ZA', {
   day: '2-digit',
   month: 'short',
