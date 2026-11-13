@@ -10,10 +10,11 @@ const runId = Date.now().toString(36);
 const password = `E2e-${runId}-Correct-Horse-Battery-9`;
 const createdEmails: string[] = [];
 let ipCounter = 0;
+const runOctet = Math.floor(Math.random() * 250) + 1;
 
 function nextIp(prefix: string): string {
   ipCounter += 1;
-  return `${prefix}.${Math.floor(ipCounter / 250)}.${(ipCounter % 250) + 1}`;
+  return `${prefix.split('.')[0]}.${runOctet}.${Math.floor(ipCounter / 250)}.${(ipCounter % 250) + 1}`;
 }
 
 async function signUp(request: APIRequestContext, email: string) {
@@ -57,7 +58,7 @@ test('failed sign-ins from other addresses do not lock the owner of the account 
     const response = await signIn(request, email, 'definitely-the-wrong-password', nextIp('10.92'));
     expect([401, 429]).toContain(response.status());
   }
-  const victim = await signIn(request, email, password, '10.93.0.1');
+  const victim = await signIn(request, email, password, `10.${runOctet}.93.1`);
   expect(victim.status()).toBe(200);
 });
 
@@ -88,7 +89,7 @@ test('browsing does not rate limit the session check for a shared address', asyn
   const statuses: number[] = [];
   for (let attempt = 0; attempt < 40; attempt += 1) {
     const response = await request.get('/api/auth/get-session', {
-      headers: { 'x-real-ip': '10.95.0.1' },
+      headers: { 'x-real-ip': `10.${runOctet}.95.1` },
     });
     statuses.push(response.status());
   }
