@@ -2,10 +2,10 @@ import 'dotenv/config';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { PrismaClient, PriceType } from '@prisma/client';
-import { PrismaNeon } from '@prisma/adapter-neon';
+import { createDatabaseAdapter } from '../src/lib/db-adapter';
 
 const prisma = new PrismaClient({
-  adapter: new PrismaNeon({ connectionString: process.env.DATABASE_URL }),
+  adapter: createDatabaseAdapter(process.env.DATABASE_URL),
 });
 
 const serviceImages: Record<string, string> = JSON.parse(
