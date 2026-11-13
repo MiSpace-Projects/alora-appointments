@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from 'better-auth/cookies';
 import { loginWithCallback } from '@/lib/safe-redirect';
+import { buildCsp } from '@/lib/csp';
 
 const PROTECTED_PREFIXES = ['/book', '/profile', '/owner'];
 
@@ -8,29 +9,6 @@ function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );
-}
-
-function buildCsp(nonce: string): string {
-  const developmentDirectives =
-    process.env.NODE_ENV === 'development' ? " 'unsafe-eval' ws: http:" : '';
-  return [
-    "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${developmentDirectives}`,
-    `style-src 'self' 'nonce-${nonce}'`,
-    "style-src-attr 'unsafe-inline'",
-    "img-src 'self' data: blob: https://images.pexels.com",
-    "font-src 'self' data:",
-    `connect-src 'self'${developmentDirectives}`,
-    "frame-ancestors 'none'",
-    "base-uri 'self'",
-    "form-action 'self'",
-    "object-src 'none'",
-    "manifest-src 'self'",
-    "worker-src 'self' blob:",
-    'report-uri /api/security/csp-report',
-    'report-to csp-endpoint',
-    ...(process.env.NODE_ENV === 'production' ? ['upgrade-insecure-requests'] : []),
-  ].join('; ');
 }
 
 function applySecurityHeaders(response: NextResponse, csp: string): NextResponse {
@@ -42,7 +20,7 @@ function applySecurityHeaders(response: NextResponse, csp: string): NextResponse
 
 export function proxy(request: NextRequest): NextResponse {
   const nonce = btoa(crypto.randomUUID());
-  const csp = buildCsp(nonce);
+  const csp = buildCsp(nonce, process.env.NODE_ENV);
   const { pathname, search } = request.nextUrl;
   const returnTo = `${pathname}${search}`;
   const hasSession = Boolean(getSessionCookie(request));
