@@ -83,3 +83,14 @@ test('deleting a password account requires the password', async ({ playwright, b
   expect(rightPassword.status()).toBe(200);
   await api.dispose();
 });
+
+test('browsing does not rate limit the session check for a shared address', async ({ request }) => {
+  const statuses: number[] = [];
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    const response = await request.get('/api/auth/get-session', {
+      headers: { 'x-real-ip': '10.95.0.1' },
+    });
+    statuses.push(response.status());
+  }
+  expect(statuses.filter((status) => status === 429)).toHaveLength(0);
+});
