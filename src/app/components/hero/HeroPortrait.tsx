@@ -31,9 +31,9 @@ export function HeroPortrait({
   return (
     <picture className={styles.portraitPicture}>
       <source media={MOBILE_MEDIA} srcSet={mobileSrcSet} sizes="100vw" />
-      {/* eslint-disable-next-line jsx-a11y/alt-text -- alt comes from imgProps */}
       <img
         {...imgProps}
+        alt={alt}
         srcSet={desktopSrcSet}
         className={`${styles.portraitImage} ${themeClassName}`}
       />

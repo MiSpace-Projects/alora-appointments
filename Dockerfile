@@ -1,6 +1,5 @@
 FROM node:22-alpine AS base
 
-# --- Dependencies ---
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
@@ -8,7 +7,6 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# --- Build ---
 FROM base AS builder
 WORKDIR /app
 
@@ -17,7 +15,6 @@ COPY . .
 
 RUN npm run build
 
-# --- Runner ---
 FROM base AS runner
 WORKDIR /app
 
@@ -29,7 +26,6 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 
-# Standalone output includes only the files needed to run
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
