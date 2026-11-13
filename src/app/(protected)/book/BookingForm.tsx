@@ -66,8 +66,6 @@ export function BookingForm({
 
   const selectedId = useWatch({ control, name: 'serviceId' });
   const selected = services.find((s) => s.id === selectedId);
-  // Online pay-now only settles an exact amount, so it is offered for FIXED
-  // prices. "From"/range services are quoted at the salon and paid there.
   const canPayNow = onlinePaymentAvailable && selected?.priceType === 'FIXED';
 
   useEffect(() => {
@@ -132,7 +130,7 @@ export function BookingForm({
                 </option>
                 {services.map((s) => (
                   <option key={s.id} value={s.id}>
-                    {s.name} — {formatPrice(s)}
+                    {s.name} · {formatPrice(s)}
                   </option>
                 ))}
               </select>

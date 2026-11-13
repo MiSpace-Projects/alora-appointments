@@ -52,7 +52,6 @@ export async function createBookingAction(input: unknown): Promise<BookingAction
     bookingId = booking.id;
     revalidatePath('/profile');
     revalidatePath('/owner');
-    // A failed owner notification must never fail a booking that was saved.
     try {
       await notifyOwnerOfNewBooking({
         customerName: session.user.name,

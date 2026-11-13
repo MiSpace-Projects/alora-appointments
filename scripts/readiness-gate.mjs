@@ -50,7 +50,7 @@ check('CI workflow present', () => existsSync('.github/workflows/ci.yml'));
 
 const failed = checks.filter((c) => !c.ok);
 for (const c of checks) {
-  console.log(`${c.ok ? '✓' : '✗'} ${c.name}${c.detail ? ` — ${c.detail}` : ''}`);
+  console.log(`${c.ok ? '✓' : '✗'} ${c.name}${c.detail ? `: ${c.detail}` : ''}`);
 }
 
 if (failed.length > 0) {
