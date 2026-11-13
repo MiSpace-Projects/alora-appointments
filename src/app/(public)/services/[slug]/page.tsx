@@ -10,7 +10,7 @@ import ProtectedLink from '@/app/components/protected/ProtectedLink';
 import { getServiceFamily, serviceFamilies } from '@/app/features/servicesSection/servicesData';
 import styles from '../services.module.css';
 
-export const dynamic = 'force-dynamic';
+export const dynamicParams = false;
 
 interface PageProps {
   params: Promise<{ slug: string }>;
