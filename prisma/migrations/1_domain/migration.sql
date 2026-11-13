@@ -1,10 +1,7 @@
--- CreateEnum
 CREATE TYPE "BookingStatus" AS ENUM ('PENDING', 'CONFIRMED', 'CANCELLED', 'COMPLETED');
 
--- CreateEnum
 CREATE TYPE "PointsReason" AS ENUM ('EARNED_BOOKING', 'REDEEMED', 'SIGNUP_BONUS', 'ADJUSTMENT');
 
--- CreateTable
 CREATE TABLE "service" (
     "id" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
@@ -21,7 +18,6 @@ CREATE TABLE "service" (
     CONSTRAINT "service_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "booking" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -38,7 +34,6 @@ CREATE TABLE "booking" (
     CONSTRAINT "booking_pkey" PRIMARY KEY ("id")
 );
 
--- CreateTable
 CREATE TABLE "points_transaction" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -51,27 +46,19 @@ CREATE TABLE "points_transaction" (
     CONSTRAINT "points_transaction_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
 CREATE UNIQUE INDEX "service_slug_key" ON "service"("slug");
 
--- CreateIndex
 CREATE INDEX "service_active_idx" ON "service"("active");
 
--- CreateIndex
 CREATE INDEX "booking_userId_startsAt_idx" ON "booking"("userId", "startsAt");
 
--- CreateIndex
 CREATE INDEX "booking_startsAt_status_idx" ON "booking"("startsAt", "status");
 
--- CreateIndex
 CREATE INDEX "points_transaction_userId_createdAt_idx" ON "points_transaction"("userId", "createdAt");
 
--- AddForeignKey
 ALTER TABLE "booking" ADD CONSTRAINT "booking_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "booking" ADD CONSTRAINT "booking_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "service"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "points_transaction" ADD CONSTRAINT "points_transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
