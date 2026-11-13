@@ -16,12 +16,9 @@ export default function FloatingThemeToggle() {
       aria-label={`Switch to ${nextTheme} theme`}
       title={`Switch to ${nextTheme} theme`}
     >
-      <span className={styles.icon} suppressHydrationWarning>
-        {theme === 'light' ? (
-          <Moon size={16} strokeWidth={1.6} aria-hidden="true" />
-        ) : (
-          <Sun size={16} strokeWidth={1.6} aria-hidden="true" />
-        )}
+      <span className={styles.icon}>
+        <Moon className={styles.moon} size={16} strokeWidth={1.6} aria-hidden="true" />
+        <Sun className={styles.sun} size={16} strokeWidth={1.6} aria-hidden="true" />
       </span>
     </button>
   );
