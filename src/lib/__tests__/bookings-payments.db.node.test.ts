@@ -19,8 +19,18 @@ describeDb('bookings and payments against a real database', () => {
   let dayOffset = 30;
 
   const nextSlot = () => {
-    dayOffset += 1;
-    return new Date(Date.UTC(2027, 0, 1, 8, 0) + dayOffset * 24 * 60 * 60_000);
+    let slot: Date;
+    do {
+      dayOffset += 1;
+      slot = new Date(Date.UTC(2027, 0, 1, 8, 0) + dayOffset * 24 * 60 * 60_000);
+    } while (slot.getUTCDay() === 0);
+    return slot;
+  };
+
+  const fillSlot = async (slot: Date, count: number) => {
+    const ids: string[] = [];
+    for (let i = 0; i < count; i += 1) ids.push(await makeUser());
+    await Promise.all(ids.map((id) => book(id, slot)));
   };
 
   const makeUser = async () => {
@@ -72,19 +82,20 @@ describeDb('bookings and payments against a real database', () => {
     serviceId = fixedServiceId,
   ) => bookings.createBooking(userId, { serviceId, startsAt, paymentMethod });
 
-  it('lets only one of two customers take the same slot at once', async () => {
-    const [a, b] = [await makeUser(), await makeUser()];
+  it('never books more clients into a slot than the salon can take, even all at once', async () => {
+    const customers: string[] = [];
+    for (let i = 0; i <= rules.concurrentBookings; i += 1) customers.push(await makeUser());
     const slot = nextSlot();
-    const results = await Promise.allSettled([book(a, slot), book(b, slot)]);
-    expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
-    const rejected = results.find((r) => r.status === 'rejected') as PromiseRejectedResult;
-    expect(rejected.reason.message).toBe('SLOT_UNAVAILABLE');
+    const results = await Promise.allSettled(customers.map((id) => book(id, slot)));
+    expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(rules.concurrentBookings);
+    const rejected = results.filter((r) => r.status === 'rejected') as PromiseRejectedResult[];
+    expect(rejected.map((r) => r.reason.message)).toEqual(['SLOT_UNAVAILABLE']);
   });
 
   it('blocks overlapping times but allows back to back bookings', async () => {
-    const [a, b] = [await makeUser(), await makeUser()];
+    const b = await makeUser();
     const slot = nextSlot();
-    await book(a, slot);
+    await fillSlot(slot, rules.concurrentBookings);
     await expect(book(b, new Date(slot.getTime() + 15 * 60_000))).rejects.toThrow(
       'SLOT_UNAVAILABLE',
     );

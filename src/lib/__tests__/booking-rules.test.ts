@@ -1,5 +1,6 @@
 import {
   countOverlapping,
+  describeOpeningHours,
   isWithinOpeningHours,
   parseSastLocalDateTime,
   sastClock,
@@ -70,5 +71,27 @@ describe('countOverlapping', () => {
   it('treats back to back bookings as not overlapping', () => {
     const existing = [at('2026-12-07T08:00:00.000Z', 60)];
     expect(countOverlapping(at('2026-12-07T09:00:00.000Z', 60), existing)).toBe(0);
+  });
+});
+
+describe('describeOpeningHours', () => {
+  it('groups consecutive days with the same hours', () => {
+    const day = { open: '09:00', close: '19:00' };
+    expect(describeOpeningHours({ 0: null, 1: day, 2: day, 3: day, 4: day, 5: day, 6: day })).toBe(
+      'Monday to Saturday, 09:00 to 19:00',
+    );
+  });
+
+  it('lists days with different hours separately', () => {
+    expect(
+      describeOpeningHours({
+        1: { open: '09:00', close: '17:00' },
+        6: { open: '08:00', close: '13:00' },
+      }),
+    ).toBe('Monday, 09:00 to 17:00; Saturday, 08:00 to 13:00');
+  });
+
+  it('returns null when no hours are configured', () => {
+    expect(describeOpeningHours(null)).toBeNull();
   });
 });
