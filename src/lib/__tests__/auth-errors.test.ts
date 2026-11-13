@@ -11,6 +11,15 @@ describe('classifyAuthError', () => {
     expect(classifyAuthError(null, 'USER_NOT_FOUND').category).toBe('UNKNOWN_USER');
   });
 
+  it('maps the better-auth wrong password response from the sign-in endpoint', () => {
+    const result = classifyAuthError(
+      new Error('Invalid email or password'),
+      'INVALID_EMAIL_OR_PASSWORD',
+    );
+    expect(result.category).toBe('INVALID_CREDENTIALS');
+    expect(result.userMessage).toBe('Invalid email or password.');
+  });
+
   it('maps rate limiting from code and 429', () => {
     expect(classifyAuthError(null, 'RATE_LIMIT_EXCEEDED').category).toBe('RATE_LIMITED');
     expect(classifyAuthError(null, 429).category).toBe('RATE_LIMITED');

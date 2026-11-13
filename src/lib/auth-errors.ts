@@ -44,6 +44,10 @@ const ERROR_MAP: Record<string, ClassifiedAuthError> = {
     category: 'INVALID_CREDENTIALS',
     userMessage: 'Invalid email or password.',
   },
+  INVALID_EMAIL_OR_PASSWORD: {
+    category: 'INVALID_CREDENTIALS',
+    userMessage: 'Invalid email or password.',
+  },
 
   RATE_LIMIT_EXCEEDED: {
     category: 'RATE_LIMITED',
