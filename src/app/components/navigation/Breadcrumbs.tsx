@@ -23,7 +23,17 @@ const routeBreadcrumbs: Record<string, BreadcrumbItem[]> = {
   '/book': [{ label: 'My Profile', href: '/profile' }, { label: 'Book an appointment' }],
 };
 
+const segmentLabels: Record<string, string> = {
+  'paia-manual': 'PAIA Manual',
+  'privacy-policy': 'Privacy Policy',
+  'cookie-policy': 'Cookie Policy',
+  terms: 'Terms & Booking Policy',
+  services: 'Services',
+};
+
 function titleFromSegment(segment: string): string {
+  const label = segmentLabels[segment];
+  if (label) return label;
   return segment
     .split('-')
     .filter(Boolean)
