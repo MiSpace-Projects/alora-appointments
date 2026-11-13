@@ -197,7 +197,7 @@ export function BookingForm({
 
             <div className={styles.field}>
               <label className={styles.label} htmlFor="startsAt">
-                Date &amp; time
+                Date &amp; time (South African time)
               </label>
               <input
                 id="startsAt"
