@@ -33,7 +33,7 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Alora — Premium Hair & Beauty Appointments',
+    default: 'Alora · Premium Hair & Beauty Appointments',
     template: '%s · Alora',
   },
   description:
@@ -42,14 +42,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Alora',
-    title: 'Alora — Premium Hair & Beauty Appointments',
+    title: 'Alora · Premium Hair & Beauty Appointments',
     description:
       'Book premium hair and beauty appointments with Alora. Earn loyalty rewards on every visit.',
     url: siteUrl,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Alora — Premium Hair & Beauty Appointments',
+    title: 'Alora · Premium Hair & Beauty Appointments',
     description: 'Book premium hair and beauty appointments with Alora.',
   },
 };

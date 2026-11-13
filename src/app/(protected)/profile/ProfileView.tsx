@@ -138,8 +138,8 @@ export function ProfileView({
             <p className={styles.progressMeta}>
               {loyalty.points} pts
               {loyalty.pointsToNext !== null && loyalty.nextTier
-                ? ` — ${loyalty.pointsToNext} pts to ${loyalty.nextTier}`
-                : ' — top tier reached'}
+                ? ` · ${loyalty.pointsToNext} pts to ${loyalty.nextTier}`
+                : ' · top tier reached'}
             </p>
           </div>
         </div>

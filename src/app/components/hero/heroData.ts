@@ -2,7 +2,7 @@ export const heroCopy = {
   title: 'Alora',
   label: 'Premium Beauty and Hair Services',
   description:
-    'Wig care, nails, makeup & matric farewell looks — crafted with precision. Earn loyalty rewards with every visit.',
+    'Wig care, nails, makeup & matric farewell looks, crafted with precision. Earn loyalty rewards with every visit.',
 } as const;
 
 export const heroActions = [
