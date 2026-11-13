@@ -16,10 +16,13 @@ import {
   type PriceShape,
 } from '@/lib/format';
 import { routes } from '@/app/config/routes';
-import { cancellationPolicy } from '@/app/config/business';
+import { bookingRules, cancellationPolicy } from '@/app/config/business';
+import { describeOpeningHours } from '@/lib/booking-rules';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
 import { createBookingAction } from './actions';
 import styles from './book.module.css';
+
+const openingHoursText = describeOpeningHours(bookingRules.openingHours);
 
 export interface FamilyOption {
   slug: string;
@@ -205,6 +208,7 @@ export function BookingForm({
                 className={styles.input}
                 {...register('startsAt')}
               />
+              {openingHoursText && <p className={styles.priceNote}>Open {openingHoursText}.</p>}
               {errors.startsAt && <span className={styles.error}>{errors.startsAt.message}</span>}
             </div>
 

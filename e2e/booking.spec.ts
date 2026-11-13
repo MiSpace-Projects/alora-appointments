@@ -1,6 +1,7 @@
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 import { PrismaClient } from '@prisma/client';
 import { createDatabaseAdapter } from '../src/lib/db-adapter';
+import { bookingRules } from '../src/app/config/business';
 
 const prisma = new PrismaClient({
   adapter: createDatabaseAdapter(process.env.E2E_DATABASE_URL),
@@ -10,6 +11,7 @@ const runId = Date.now().toString(36);
 const password = `E2e-${runId}-Correct-Horse-Battery-9`;
 const ownerEmail = process.env.E2E_OWNER_EMAIL ?? 'owner@e2e.alora.test';
 const createdEmails: string[] = [];
+const fillerBookingIds: string[] = [];
 let ipCounter = 10;
 
 async function signUp(request: APIRequestContext, email: string, name: string): Promise<void> {
@@ -42,7 +44,8 @@ async function signIn(page: Page, email: string, callbackUrl: string): Promise<v
 }
 
 function futureSastSlot(dayOffset: number): string {
-  const day = new Date(Date.UTC(2028, 0, 3) + (dayOffset + (Date.now() % 500)) * 86_400_000);
+  let day = new Date(Date.UTC(2028, 0, 3) + (dayOffset + (Date.now() % 500)) * 86_400_000);
+  if (day.getUTCDay() === 0) day = new Date(day.getTime() + 86_400_000);
   return `${day.toISOString().slice(0, 10)}T10:00`;
 }
 
@@ -56,6 +59,7 @@ test.afterAll(async () => {
     select: { id: true },
   });
   const ids = users.map((user) => user.id);
+  await prisma.booking.deleteMany({ where: { id: { in: fillerBookingIds } } });
   await prisma.pointsTransaction.deleteMany({ where: { userId: { in: ids } } });
   await prisma.payment.deleteMany({ where: { booking: { userId: { in: ids } } } });
   await prisma.booking.deleteMany({ where: { userId: { in: ids } } });
@@ -122,7 +126,7 @@ test('a verified customer books, pays, sees it in the profile and cancels with a
   expect(payment.refundedCents).toBe(payment.amountCents);
 });
 
-test('a second customer cannot take an already booked slot', async ({ page, request }) => {
+test('a customer cannot take a slot once the salon is fully booked', async ({ page, request }) => {
   const first = `first-${runId}@e2e.alora.test`;
   const second = `second-${runId}@e2e.alora.test`;
   await signUp(request, first, 'First Customer');
@@ -140,6 +144,21 @@ test('a second customer cannot take an already booked slot', async ({ page, requ
     [first, true],
     [second, false],
   ] as const) {
+    if (!expectSuccess) {
+      for (let filled = 1; filled < bookingRules.concurrentBookings; filled += 1) {
+        const filler = await prisma.booking.create({
+          data: {
+            serviceId: service.id,
+            startsAt: new Date(`${slot}:00+02:00`),
+            priceCents: service.priceCents,
+            pointsAwarded: 0,
+            paymentMethod: 'PAY_IN_SALON',
+            status: 'CONFIRMED',
+          },
+        });
+        fillerBookingIds.push(filler.id);
+      }
+    }
     await page.context().clearCookies();
     await signIn(page, email, '/book');
     await page.locator('#familySlug').selectOption('wig-care');

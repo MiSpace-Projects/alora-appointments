@@ -49,8 +49,16 @@ export const bookingRules: {
   maxUpcomingPerCustomer: number;
   maxBookingsPerHourPerCustomer: number;
 } = {
-  openingHours: null,
-  concurrentBookings: 1,
+  openingHours: {
+    0: null,
+    1: { open: '09:00', close: '19:00' },
+    2: { open: '09:00', close: '19:00' },
+    3: { open: '09:00', close: '19:00' },
+    4: { open: '09:00', close: '19:00' },
+    5: { open: '09:00', close: '19:00' },
+    6: { open: '09:00', close: '19:00' },
+  },
+  concurrentBookings: 5,
   maxUpcomingPerCustomer: 3,
   maxBookingsPerHourPerCustomer: 5,
 };

@@ -64,3 +64,29 @@ export function overlaps(a: TimedBooking, b: TimedBooking): boolean {
 export function countOverlapping(candidate: TimedBooking, existing: TimedBooking[]): number {
   return existing.filter((booking) => overlaps(candidate, booking)).length;
 }
+
+const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+export function describeOpeningHours(hours: OpeningHours | null): string | null {
+  if (!hours) return null;
+  const order = [1, 2, 3, 4, 5, 6, 0] as const;
+  const groups: { first: number; last: number; label: string }[] = [];
+  for (const day of order) {
+    const value = hours[day];
+    const label = value ? `${value.open} to ${value.close}` : '';
+    const previous = groups[groups.length - 1];
+    if (previous && previous.label === label) previous.last = day;
+    else groups.push({ first: day, last: day, label });
+  }
+  const open = groups.filter((group) => group.label);
+  if (open.length === 0) return null;
+  return open
+    .map((group) => {
+      const days =
+        group.first === group.last
+          ? DAY_NAMES[group.first]
+          : `${DAY_NAMES[group.first]} to ${DAY_NAMES[group.last]}`;
+      return `${days}, ${group.label}`;
+    })
+    .join('; ');
+}
