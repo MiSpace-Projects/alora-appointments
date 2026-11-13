@@ -58,6 +58,7 @@ export default function Hero() {
           mobileSrc="/hero/alora-dark-mobile-cutout.webp"
           alt="Portrait of a woman with a natural afro, hand resting at her temple"
           themeClassName={styles.darkPortrait}
+          priority
         />
       </motion.div>
     </motion.section>
