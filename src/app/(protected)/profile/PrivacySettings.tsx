@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Lock } from 'lucide-react';
 import { toast } from 'sonner';
 import { authClient } from '@/lib/auth-client';
@@ -14,14 +15,18 @@ import styles from './SecuritySettings.module.css';
 
 interface PrivacySettingsProps {
   initialMarketingOptIn: boolean;
+  hasPassword: boolean;
 }
 
-export function PrivacySettings({ initialMarketingOptIn }: PrivacySettingsProps) {
+export function PrivacySettings({ initialMarketingOptIn, hasPassword }: PrivacySettingsProps) {
+  const router = useRouter();
   const [marketingOptIn, setMarketingOptIn] = useState(initialMarketingOptIn);
   const [savingMarketing, startMarketing] = useTransition();
   const [password, setPassword] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [deleteRequested, setDeleteRequested] = useState(false);
+  const [needsReauthentication, setNeedsReauthentication] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
   const toggleMarketing = () => {
     const next = !marketingOptIn;
@@ -39,11 +44,17 @@ export function PrivacySettings({ initialMarketingOptIn }: PrivacySettingsProps)
 
   const requestDeletion = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!password) return;
+    if (hasPassword && !password) return;
     setDeleting(true);
     try {
-      const { error } = await authClient.deleteUser({ password, callbackURL: '/' });
+      const { error } = await authClient.deleteUser(
+        hasPassword ? { password, callbackURL: '/' } : { callbackURL: '/' },
+      );
       if (error) {
+        if (error.code === 'SESSION_NOT_FRESH') {
+          setNeedsReauthentication(true);
+          return;
+        }
         toast.error(error.message ?? 'Could not start account deletion.');
         return;
       }
@@ -54,6 +65,17 @@ export function PrivacySettings({ initialMarketingOptIn }: PrivacySettingsProps)
       toast.error('Could not start account deletion. Please try again.');
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const signInAgain = async () => {
+    setSigningOut(true);
+    try {
+      await authClient.signOut();
+      router.push(`/login?callbackUrl=${encodeURIComponent(routes.myProfile.path)}`);
+    } catch {
+      toast.error('Could not sign you out. Please try again.');
+      setSigningOut(false);
     }
   };
 
@@ -125,16 +147,36 @@ export function PrivacySettings({ initialMarketingOptIn }: PrivacySettingsProps)
             Confirmation email sent. The link expires in 24 hours; nothing is deleted until you
             click it.
           </p>
+        ) : needsReauthentication ? (
+          <div className={styles.inlineForm} role="alert">
+            <p className={styles.muted}>
+              For your security, sign in again, then come back here to delete your account.
+            </p>
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              disabled={signingOut}
+              onClick={signInAgain}
+            >
+              Sign in again
+            </button>
+          </div>
         ) : (
           <form className={styles.inlineForm} onSubmit={requestDeletion}>
-            <FormField
-              type="password"
-              placeholder="Current password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-            <SubmitButton loading={deleting} disabled={!password} className={styles.dangerSubmit}>
+            {hasPassword && (
+              <FormField
+                type="password"
+                placeholder="Current password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+            )}
+            <SubmitButton
+              loading={deleting}
+              disabled={hasPassword && !password}
+              className={styles.dangerSubmit}
+            >
               Delete my account
             </SubmitButton>
           </form>

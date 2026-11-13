@@ -1,5 +1,5 @@
 import { betterAuth } from 'better-auth';
-import { APIError, createAuthMiddleware } from 'better-auth/api';
+import { APIError, createAuthMiddleware, getSessionFromCtx } from 'better-auth/api';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { haveIBeenPwned, twoFactor } from 'better-auth/plugins';
 import { prisma } from './prisma';
@@ -21,6 +21,12 @@ import {
   registerKnownDevice,
 } from './security-events';
 import { recordSignUpConsents } from './data/consent';
+import {
+  DELETE_PASSWORD_REQUIRED_MESSAGE,
+  DELETE_REAUTHENTICATE_MESSAGE,
+  deletionRequirement,
+  hasCredentialPassword,
+} from './account-deletion';
 
 const HOUR_SECONDS = 60 * 60;
 const SESSION_TTL_SECONDS = 7 * 24 * HOUR_SECONDS;
@@ -224,6 +230,34 @@ export const auth = betterAuth({
 
   hooks: {
     before: createAuthMiddleware(async (context) => {
+      if (context.path === '/delete-user') {
+        const deleteBody = (context.body ?? {}) as Record<string, unknown>;
+        const session = await getSessionFromCtx(context);
+        if (!session) return;
+        const accounts = await context.context.internalAdapter.findAccounts(session.user.id);
+        const requirement = deletionRequirement({
+          hasPassword: hasCredentialPassword(accounts),
+          passwordProvided:
+            typeof deleteBody.password === 'string' && deleteBody.password.length > 0,
+          tokenProvided: typeof deleteBody.token === 'string' && deleteBody.token.length > 0,
+          sessionCreatedAt: session.session.createdAt,
+          now: Date.now(),
+          freshAgeSeconds: SESSION_FRESH_SECONDS,
+        });
+        if (requirement === 'PASSWORD_REQUIRED') {
+          throw new APIError('BAD_REQUEST', {
+            code: 'PASSWORD_REQUIRED',
+            message: DELETE_PASSWORD_REQUIRED_MESSAGE,
+          });
+        }
+        if (requirement === 'REAUTHENTICATE') {
+          throw new APIError('FORBIDDEN', {
+            code: 'SESSION_NOT_FRESH',
+            message: DELETE_REAUTHENTICATE_MESSAGE,
+          });
+        }
+        return;
+      }
       if (context.path !== '/sign-up/email') return;
       const body = (context.body ?? {}) as Record<string, unknown>;
       const parsed = authSignUpSchema.safeParse({
@@ -271,6 +305,10 @@ export const auth = betterAuth({
         });
       },
       beforeDelete: async (user) => {
+        await prisma.booking.updateMany({
+          where: { userId: user.id, notes: { not: null } },
+          data: { notes: null },
+        });
         await recordSecurityEvent({
           event: 'ACCOUNT_DELETED',
           outcome: 'SUCCESS',
