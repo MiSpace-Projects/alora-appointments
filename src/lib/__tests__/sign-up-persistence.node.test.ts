@@ -1,5 +1,3 @@
-/** @jest-environment node */
-
 import { verifyPersistedSignUp } from '@/lib/sign-up-persistence';
 
 const expected = { email: 'person@example.com', name: 'Person Name' };

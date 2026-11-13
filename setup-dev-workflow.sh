@@ -1,25 +1,12 @@
 #!/usr/bin/env bash
-# =============================================================================
-# setup-dev-workflow.sh
-# Senior-grade pre-commit / linting / formatting / testing workflow
-# for React / Next.js projects
-#
-# Usage:
-#   chmod +x setup-dev-workflow.sh
-#   ./setup-dev-workflow.sh
-#
-# Assumes: Node.js >= 18, npm/yarn/pnpm, existing package.json, git repo init'd
-# =============================================================================
 
 set -euo pipefail
 
-# ─── Colour helpers ──────────────────────────────────────────────────────────
 GREEN='\033[0;32m'; YELLOW='\033[1;33m'; CYAN='\033[0;36m'; RESET='\033[0m'
 info()    { echo -e "${CYAN}[INFO]${RESET}  $*"; }
 success() { echo -e "${GREEN}[OK]${RESET}    $*"; }
 warn()    { echo -e "${YELLOW}[WARN]${RESET}  $*"; }
 
-# ─── Detect package manager ──────────────────────────────────────────────────
 detect_pm() {
   if [ -f "pnpm-lock.yaml" ]; then echo "pnpm"
   elif [ -f "yarn.lock" ];    then echo "yarn"
@@ -37,7 +24,6 @@ run_install() {
   esac
 }
 
-# ─── 1. ESLint ───────────────────────────────────────────────────────────────
 info "Installing ESLint + plugins..."
 run_install \
   eslint \
@@ -49,7 +35,7 @@ run_install \
   eslint-plugin-jsx-a11y \
   eslint-plugin-import \
   eslint-plugin-unused-imports \
-  eslint-config-prettier   # must be last — disables rules that conflict with Prettier
+  eslint-config-prettier
 
 cat > .eslintrc.json << 'EOF'
 {
@@ -94,7 +80,6 @@ cat > .eslintrc.json << 'EOF'
 EOF
 success "ESLint configured → .eslintrc.json"
 
-# ─── 2. Prettier ─────────────────────────────────────────────────────────────
 info "Installing Prettier..."
 run_install prettier
 
@@ -123,11 +108,9 @@ public
 EOF
 success "Prettier configured → .prettierrc.json"
 
-# ─── 3. Husky (git hooks) ────────────────────────────────────────────────────
 info "Installing & initialising Husky..."
 run_install husky
 
-# init creates .husky/ and adds prepare script
 case $PM in
   pnpm) pnpm exec husky init ;;
   yarn) yarn husky init ;;
@@ -136,7 +119,6 @@ esac
 
 success "Husky initialised → .husky/"
 
-# ─── 4. lint-staged ──────────────────────────────────────────────────────────
 info "Installing lint-staged..."
 run_install lint-staged
 
@@ -157,18 +139,15 @@ cat > .lintstagedrc.json << 'EOF'
 EOF
 success "lint-staged configured → .lintstagedrc.json"
 
-# ─── 5. Commitlint ───────────────────────────────────────────────────────────
 info "Installing Commitlint..."
 run_install \
   @commitlint/cli \
   @commitlint/config-conventional
 
 cat > commitlint.config.js << 'EOF'
-/** @type {import('@commitlint/types').UserConfig} */
 module.exports = {
   extends: ['@commitlint/config-conventional'],
   rules: {
-    // type must be one of the following
     'type-enum': [
       2,
       'always',
@@ -183,10 +162,8 @@ module.exports = {
 EOF
 success "Commitlint configured → commitlint.config.js"
 
-# ─── 6. Wire up Husky hooks ──────────────────────────────────────────────────
 info "Writing Husky git hooks..."
 
-# pre-commit → lint-staged + tsc
 cat > .husky/pre-commit << 'HOOK'
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
@@ -199,7 +176,6 @@ npx tsc --noEmit
 HOOK
 chmod +x .husky/pre-commit
 
-# commit-msg → commitlint
 cat > .husky/commit-msg << 'HOOK'
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
@@ -208,7 +184,6 @@ npx --no -- commitlint --edit "$1"
 HOOK
 chmod +x .husky/commit-msg
 
-# pre-push → full test suite
 cat > .husky/pre-push << 'HOOK'
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
@@ -220,7 +195,6 @@ chmod +x .husky/pre-push
 
 success "Git hooks written → .husky/pre-commit | commit-msg | pre-push"
 
-# ─── 7. Testing (Jest + React Testing Library) ───────────────────────────────
 info "Installing Jest + React Testing Library..."
 run_install \
   jest \
@@ -235,7 +209,6 @@ run_install \
   @babel/preset-react \
   @babel/preset-typescript
 
-# Only write jest.config if one doesn't exist
 if [ ! -f jest.config.ts ] && [ ! -f jest.config.js ]; then
 cat > jest.config.ts << 'EOF'
 import type { Config } from 'jest';
@@ -271,15 +244,13 @@ EOF
 
   success "Jest configured → jest.config.ts + jest.setup.ts"
 else
-  warn "jest.config already exists — skipping (add setupFilesAfterFramework: ['<rootDir>/jest.setup.ts'] manually)"
+  warn "jest.config already exists, skipping (add setupFilesAfterFramework: ['<rootDir>/jest.setup.ts'] manually)"
 fi
 
 run_install identity-obj-proxy
 
-# ─── 8. package.json scripts ─────────────────────────────────────────────────
 info "Patching package.json scripts..."
 
-# Use node to safely merge scripts without overwriting existing ones
 node << 'JS'
 const fs = require('fs');
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
@@ -301,7 +272,6 @@ JS
 
 success "package.json scripts updated"
 
-# ─── 9. .editorconfig ────────────────────────────────────────────────────────
 if [ ! -f .editorconfig ]; then
 cat > .editorconfig << 'EOF'
 root = true
@@ -320,7 +290,6 @@ EOF
   success ".editorconfig created"
 fi
 
-# ─── 10. VS Code settings ────────────────────────────────────────────────────
 mkdir -p .vscode
 if [ ! -f .vscode/settings.json ]; then
 cat > .vscode/settings.json << 'EOF'
@@ -353,7 +322,6 @@ EOF
   success ".vscode/extensions.json created"
 fi
 
-# ─── Done ────────────────────────────────────────────────────────────────────
 echo ""
 echo -e "${GREEN}════════════════════════════════════════════════${RESET}"
 echo -e "${GREEN}  ✅  Dev workflow setup complete!${RESET}"
