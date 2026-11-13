@@ -1,10 +1,7 @@
--- AddColumn
 ALTER TABLE "user" ADD COLUMN "twoFactorEnabled" BOOLEAN NOT NULL DEFAULT false;
 
--- Enforce one owner for each external provider identity.
 CREATE UNIQUE INDEX "account_providerId_accountId_key" ON "account"("providerId", "accountId");
 
--- Shared, atomic rate-limit counters used by Better Auth and identity throttles.
 CREATE TABLE "rateLimit" (
     "id" TEXT NOT NULL,
     "key" TEXT NOT NULL,
@@ -14,7 +11,6 @@ CREATE TABLE "rateLimit" (
 );
 CREATE UNIQUE INDEX "rateLimit_key_key" ON "rateLimit"("key");
 
--- TOTP secrets and backup codes are encrypted by Better Auth before persistence.
 CREATE TABLE "twoFactor" (
     "id" TEXT NOT NULL,
     "secret" TEXT NOT NULL,
@@ -30,7 +26,6 @@ CREATE INDEX "twoFactor_userId_idx" ON "twoFactor"("userId");
 ALTER TABLE "twoFactor" ADD CONSTRAINT "twoFactor_userId_fkey"
     FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- Append-only authentication and security audit trail.
 CREATE TABLE "security_event" (
     "id" TEXT NOT NULL,
     "event" TEXT NOT NULL,
@@ -51,7 +46,6 @@ CREATE INDEX "security_event_createdAt_idx" ON "security_event"("createdAt");
 ALTER TABLE "security_event" ADD CONSTRAINT "security_event_userId_fkey"
     FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
--- Known devices support new-device detection without retaining raw IP addresses.
 CREATE TABLE "auth_device" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -69,7 +63,6 @@ CREATE INDEX "auth_device_userId_lastSeenAt_idx"
 ALTER TABLE "auth_device" ADD CONSTRAINT "auth_device_userId_fkey"
     FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- Email addresses and action links are encrypted in the application before storage.
 CREATE TABLE "email_outbox" (
     "id" TEXT NOT NULL,
     "kind" TEXT NOT NULL,
