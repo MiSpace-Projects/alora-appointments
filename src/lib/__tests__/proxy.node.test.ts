@@ -1,5 +1,3 @@
-/** @jest-environment node */
-
 import { getSessionCookie } from 'better-auth/cookies';
 import { NextRequest } from 'next/server';
 import { proxy } from '@/proxy';

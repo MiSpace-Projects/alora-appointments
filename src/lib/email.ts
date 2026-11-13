@@ -26,9 +26,9 @@ export async function sendAuthEmail(input: SendAuthEmailInput): Promise<boolean>
 
   if (!apiKey || !from) {
     if (process.env.NODE_ENV !== 'production') {
-      console.warn(`[email] Resend not configured — ${input.kind} not sent.\n${input.text}`);
+      console.warn(`[email] Resend not configured, ${input.kind} not sent.\n${input.text}`);
     } else {
-      console.warn(`[email] Resend not configured — ${input.kind} not sent.`);
+      console.warn(`[email] Resend not configured, ${input.kind} not sent.`);
     }
     return false;
   }
