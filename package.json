@@ -22,7 +22,8 @@
     "validate": "npm run typecheck && npm run lint && npm run format:check && npm run test -- --passWithNoTests --watchAll=false && npm run security:audit",
     "db:local:up": "docker volume create alora-local-db >/dev/null && docker compose -f compose.dev.yml up -d db",
     "db:local:migrate": "DATABASE_URL=postgresql://postgres:alora_local@localhost:5435/alora prisma migrate deploy",
-    "db:local:seed": "DATABASE_URL=postgresql://postgres:alora_local@localhost:5435/alora tsx prisma/seed.ts"
+    "db:local:seed": "DATABASE_URL=postgresql://postgres:alora_local@localhost:5435/alora tsx prisma/seed.ts",
+    "test:db": "TEST_DATABASE_URL=postgresql://postgres:alora_local@localhost:5435/alora jest --watchAll=false bookings-payments.db"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

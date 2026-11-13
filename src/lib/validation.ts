@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { parseSastLocalDateTime } from './booking-rules';
 
 export const loginSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Please enter a valid email'),
@@ -53,9 +54,11 @@ export const resetPasswordSchema = z
 
 export const createBookingSchema = z.object({
   serviceId: z.string().min(1, 'Please choose a service'),
-  startsAt: z.coerce.date().refine((d) => d.getTime() > Date.now(), {
-    message: 'Choose a time in the future',
-  }),
+  startsAt: z
+    .preprocess(parseSastLocalDateTime, z.coerce.date())
+    .refine((d) => d.getTime() > Date.now(), {
+      message: 'Choose a time in the future',
+    }),
   notes: z.string().max(500, 'Notes are too long').optional(),
   paymentMethod: z.enum(['PAY_NOW', 'PAY_IN_SALON']),
 });

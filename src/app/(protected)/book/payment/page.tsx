@@ -34,6 +34,10 @@ const copy: Record<SettleOutcome, { title: string; body: string }> = {
     title: 'Payment did not go through',
     body: 'No money was taken. Your booking is saved as unpaid and you can try again from your profile, or pay at the salon.',
   },
+  REFUNDED: {
+    title: 'Payment refunded',
+    body: 'This booking was already paid or is no longer active, so this payment has been refunded in full. Banks can take up to 10 working days to show it.',
+  },
   UNKNOWN_REFERENCE: {
     title: 'We could not match that payment',
     body: 'The reference does not belong to one of your bookings. If you were charged, contact us with the reference below.',

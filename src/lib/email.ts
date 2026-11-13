@@ -10,7 +10,8 @@ export type AuthEmailKind =
   | 'NEW_DEVICE'
   | 'DELETE_ACCOUNT'
   | 'BOOKING_CREATED_OWNER'
-  | 'BOOKING_CONFIRMED_CUSTOMER';
+  | 'BOOKING_CONFIRMED_CUSTOMER'
+  | 'BOOKING_CANCELLED_CUSTOMER';
 
 interface SendAuthEmailInput {
   kind: AuthEmailKind;
@@ -193,6 +194,33 @@ export function bookingConfirmedCustomerEmail(details: {
        <p>Need to change it? Manage your booking from your Alora profile.</p>`,
     ),
     text: `${greeting}\n\nYour ${details.serviceName} on ${details.when} is confirmed. We look forward to seeing you.\n\nManage your booking from your Alora profile.`,
+  };
+}
+
+export function bookingCancelledCustomerEmail(details: {
+  customerName: string;
+  serviceName: string;
+  when: string;
+  cancelledBy: 'customer' | 'salon';
+  refund: string | null;
+}): { html: string; text: string } {
+  const greeting = details.customerName ? `Hi ${details.customerName},` : 'Hi,';
+  const lead =
+    details.cancelledBy === 'salon'
+      ? `We are sorry, we had to cancel your ${details.serviceName} on ${details.when}.`
+      : `Your ${details.serviceName} on ${details.when} has been cancelled as requested.`;
+  const refund = details.refund
+    ? `A refund of ${details.refund} is on its way to the card you paid with. Banks can take up to 10 working days to show it.`
+    : 'No online payment was taken, so there is nothing to refund.';
+  return {
+    html: shell(
+      'Your booking was cancelled',
+      `<p>${escapeHtml(greeting)}</p>
+       <p>${escapeHtml(lead)}</p>
+       <p>${escapeHtml(refund)}</p>
+       <p>You can book a new time from your Alora profile whenever suits you.</p>`,
+    ),
+    text: `${greeting}\n\n${lead}\n\n${refund}\n\nYou can book a new time from your Alora profile whenever suits you.`,
   };
 }
 
