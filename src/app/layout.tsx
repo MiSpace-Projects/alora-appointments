@@ -25,7 +25,6 @@ const geistMono = Geist_Mono({
 const playfairDisplay = Playfair_Display({
   variable: '--font-playfair-display',
   subsets: ['latin'],
-  weight: ['400', '700'],
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
@@ -83,7 +82,7 @@ export default async function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable}`}>
         <AuthProvider>
           <ThemeProvider>
-            <MotionProvider>
+            <MotionProvider nonce={nonce}>
               <ConsentProvider>
                 <Toaster />
                 <NavigationShell>{children}</NavigationShell>
