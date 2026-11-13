@@ -30,10 +30,19 @@ export async function startBookingPayment(
 ): Promise<StartPaymentResult> {
   const booking = await prisma.booking.findFirst({
     where: { id: bookingId, userId },
-    include: { payments: { orderBy: { createdAt: 'desc' } } },
+    include: {
+      payments: { orderBy: { createdAt: 'desc' } },
+      service: { select: { priceType: true } },
+    },
   });
   if (!booking) throw new Error('BOOKING_NOT_FOUND');
   if (booking.status === 'CANCELLED' || booking.status === 'COMPLETED') {
+    throw new Error('BOOKING_NOT_PAYABLE');
+  }
+  if (booking.service.priceType !== 'FIXED') {
+    throw new Error('ONLINE_PAYMENT_NOT_ALLOWED');
+  }
+  if (booking.startsAt.getTime() <= Date.now()) {
     throw new Error('BOOKING_NOT_PAYABLE');
   }
   if (booking.paidAt || booking.payments.some((p) => p.status === 'SUCCESS')) {

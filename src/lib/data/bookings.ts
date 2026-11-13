@@ -7,7 +7,7 @@ export function listUserBookings(userId: string) {
     where: { userId },
     orderBy: { startsAt: 'desc' },
     include: {
-      service: { select: { name: true, slug: true } },
+      service: { select: { name: true, slug: true, priceType: true } },
       payments: {
         orderBy: { createdAt: 'desc' },
         select: {

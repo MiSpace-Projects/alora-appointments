@@ -24,6 +24,8 @@ const ERROR_COPY: Record<string, string> = {
   PAYMENTS_UNAVAILABLE: 'Online payment is not available right now. You can pay at the salon.',
   ONLINE_PAYMENT_NOT_ALLOWED:
     'This service is priced on consultation, so it can only be settled at the salon.',
+  EMAIL_NOT_VERIFIED:
+    'Please verify your email address before booking. Check your inbox for the link.',
 };
 
 function paymentReturnUrl(): string {
@@ -35,6 +37,9 @@ export async function createBookingAction(input: unknown): Promise<BookingAction
   const session = await getCurrentSession();
   if (!session) {
     return { ok: false, error: 'You must be signed in to book.' };
+  }
+  if (!session.user.emailVerified) {
+    return { ok: false, error: ERROR_COPY.EMAIL_NOT_VERIFIED };
   }
 
   const parsed = createBookingSchema.safeParse(input);
@@ -102,6 +107,9 @@ export async function startPaymentAction(bookingId: unknown): Promise<BookingAct
   const session = await getCurrentSession();
   if (!session) {
     return { ok: false, error: 'You must be signed in.' };
+  }
+  if (!session.user.emailVerified) {
+    return { ok: false, error: ERROR_COPY.EMAIL_NOT_VERIFIED };
   }
   if (typeof bookingId !== 'string' || bookingId.length === 0) {
     return { ok: false, error: ERROR_COPY.BOOKING_NOT_FOUND };

@@ -12,6 +12,7 @@ import { signIn } from '@/lib/auth-client';
 import { classifyAuthError } from '@/lib/auth-errors';
 import { loginSchema, type LoginInput } from '@/lib/validation';
 import { sanitizeRedirect } from '@/lib/safe-redirect';
+import { postSignInDestination } from '@/lib/auth-entry-redirect';
 import { AuthBackground } from '@/app/components/AuthBackground';
 import { AuthCard, AuthHeader } from '@/app/components/authCard/AuthCard';
 import { FormField } from '@/app/components/form/Form';
@@ -79,6 +80,12 @@ function LoginInner() {
           classified.category === 'UNKNOWN_USER' || classified.category === 'INVALID_CREDENTIALS';
 
         toast.error(isCredentialError ? 'Invalid email or password.' : classified.userMessage);
+        return;
+      }
+
+      const next = postSignInDestination(result.data, destination);
+      if (next !== destination) {
+        window.location.replace(next);
         return;
       }
 
