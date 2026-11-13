@@ -51,6 +51,7 @@ export interface ProfileUser {
   email: string;
   twoFactorEnabled?: boolean;
   marketingOptIn?: boolean | null;
+  hasPassword: boolean;
 }
 
 const statusClass: Record<BookingStatus, string> = {
@@ -252,7 +253,10 @@ export function ProfileView({
       </motion.div>
 
       <motion.div variants={item}>
-        <PrivacySettings initialMarketingOptIn={Boolean(user.marketingOptIn)} />
+        <PrivacySettings
+          initialMarketingOptIn={Boolean(user.marketingOptIn)}
+          hasPassword={user.hasPassword}
+        />
       </motion.div>
     </motion.div>
   );
