@@ -51,7 +51,6 @@ describe('proxy authentication redirects', () => {
     '/nope',
     '/services',
     '/services/nail-art',
-    '/services/does-not-exist',
     '/servicesX',
     '/bookings',
     '/profiles',
@@ -87,5 +86,32 @@ describe('proxy authentication redirects', () => {
       const csp = response.headers.get('content-security-policy') ?? '';
       expect(csp).toMatch(/script-src 'self' 'nonce-[A-Za-z0-9+/=]+' 'strict-dynamic'/);
     }
+  });
+
+  it.each(['/services/does-not-exist', '/services/wig-frontal-replacement', '/services/%E0%A4%A'])(
+    'rewrites the unknown service page %s to the not-found route',
+    (path) => {
+      mockedGetSessionCookie.mockReturnValue(null);
+
+      const response = proxy(new NextRequest(`http://localhost${path}`));
+
+      expect(response.headers.get('x-middleware-rewrite')).toBe('http://localhost/_not-found');
+      expect(response.headers.get('content-security-policy')).toContain("'strict-dynamic'");
+    },
+  );
+
+  it.each([
+    '/services/wig-care',
+    '/services/customization-styling',
+    '/services/nail-art',
+    '/services/makeup',
+    '/services/matric-farewell',
+  ])('lets the service family page %s render', (path) => {
+    mockedGetSessionCookie.mockReturnValue(null);
+
+    const response = proxy(new NextRequest(`http://localhost${path}`));
+
+    expect(response.headers.get('x-middleware-rewrite')).toBeNull();
+    expect(response.headers.get('x-middleware-next')).toBe('1');
   });
 });
