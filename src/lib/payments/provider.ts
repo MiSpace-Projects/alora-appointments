@@ -10,9 +10,9 @@ export function getPaymentProvider(): PaymentProvider | null {
 }
 
 export function isMockPaymentsEnabled(): boolean {
+  if (process.env.NODE_ENV === 'production') return false;
   if (process.env.PAYMENTS_MOCK === 'false') return false;
-  if (process.env.PAYMENTS_MOCK === 'true') return true;
-  return process.env.NODE_ENV !== 'production';
+  return true;
 }
 
 export function isOnlinePaymentAvailable(): boolean {

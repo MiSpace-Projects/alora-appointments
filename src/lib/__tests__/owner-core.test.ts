@@ -1,4 +1,4 @@
-import { parseOwnerAllowlist, isOwnerEmail } from '@/lib/owner-core';
+import { parseOwnerAllowlist, isOwnerEmail, isOwnerUser } from '@/lib/owner-core';
 
 describe('parseOwnerAllowlist', () => {
   it('splits, trims, lowercases and drops empties', () => {
@@ -33,5 +33,26 @@ describe('isOwnerEmail', () => {
   it('rejects null or empty email', () => {
     expect(isOwnerEmail(null, allow)).toBe(false);
     expect(isOwnerEmail('', allow)).toBe(false);
+  });
+});
+
+describe('isOwnerUser', () => {
+  const allow = ['owner@alora.co.za'];
+
+  it('accepts an allowlisted owner whose email is verified', () => {
+    expect(isOwnerUser({ email: 'Owner@Alora.co.za', emailVerified: true }, allow)).toBe(true);
+  });
+
+  it('rejects an allowlisted email that has not been verified', () => {
+    expect(isOwnerUser({ email: 'owner@alora.co.za', emailVerified: false }, allow)).toBe(false);
+    expect(isOwnerUser({ email: 'owner@alora.co.za', emailVerified: null }, allow)).toBe(false);
+  });
+
+  it('rejects a verified user who is not on the allowlist', () => {
+    expect(isOwnerUser({ email: 'someone@else.com', emailVerified: true }, allow)).toBe(false);
+  });
+
+  it('rejects a missing user', () => {
+    expect(isOwnerUser(null, allow)).toBe(false);
   });
 });

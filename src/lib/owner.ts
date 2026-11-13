@@ -1,7 +1,7 @@
 import 'server-only';
 import { notFound, redirect } from 'next/navigation';
 import { getCurrentSession, type CurrentSession } from './session';
-import { isOwnerEmail, parseOwnerAllowlist } from './owner-core';
+import { isOwnerUser, parseOwnerAllowlist } from './owner-core';
 
 function ownerAllowlist(): string[] {
   return parseOwnerAllowlist(process.env.ALORA_OWNER_EMAILS);
@@ -9,7 +9,7 @@ function ownerAllowlist(): string[] {
 
 export function isOwnerSession(session: CurrentSession | null): boolean {
   if (!session) return false;
-  return isOwnerEmail(session.user.email, ownerAllowlist());
+  return isOwnerUser(session.user, ownerAllowlist());
 }
 
 export async function isCurrentUserOwner(): Promise<boolean> {
