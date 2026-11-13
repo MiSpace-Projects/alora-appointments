@@ -12,7 +12,8 @@ export type AuthEmailKind =
   | 'BOOKING_CREATED_OWNER'
   | 'BOOKING_CONFIRMED_CUSTOMER'
   | 'BOOKING_CANCELLED_CUSTOMER'
-  | 'EXISTING_ACCOUNT_SIGN_UP';
+  | 'EXISTING_ACCOUNT_SIGN_UP'
+  | 'OPERATIONS_ALERT';
 
 interface SendAuthEmailInput {
   kind: AuthEmailKind;
@@ -252,5 +253,34 @@ export function existingAccountSignUpEmail(urls: { signIn: string; resetPassword
        <p>If it was not you, you can ignore this email. Your account has not been changed.</p>`,
     ),
     text: `Someone tried to create a new Alora account with this email address, but you already have one.\n\nIf it was you, sign in: ${urls.signIn}\nForgot your password? Reset it: ${urls.resetPassword}\n\nIf it was not you, you can ignore this email. Your account has not been changed.`,
+  };
+}
+
+export interface OperationsAlertLine {
+  label: string;
+  count: number;
+}
+
+export function operationsAlertEmail(details: {
+  windowStart: string;
+  windowEnd: string;
+  lines: OperationsAlertLine[];
+}): { html: string; text: string } {
+  const rows = details.lines.filter((line) => line.count > 0);
+  const htmlRows = rows
+    .map(
+      (line) =>
+        `<p><strong>${escapeHtml(line.label)}:</strong> ${escapeHtml(String(line.count))}</p>`,
+    )
+    .join('');
+  const textRows = rows.map((line) => `${line.label}: ${line.count}`).join('\n');
+  return {
+    html: shell(
+      'Alora daily alert',
+      `<p>Failures recorded between ${escapeHtml(details.windowStart)} and ${escapeHtml(details.windowEnd)} (UTC):</p>
+       ${htmlRows}
+       <p>Check the security_event and payment tables for details.</p>`,
+    ),
+    text: `Alora daily alert\n\nFailures recorded between ${details.windowStart} and ${details.windowEnd} (UTC):\n\n${textRows}\n\nCheck the security_event and payment tables for details.`,
   };
 }
