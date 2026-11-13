@@ -11,7 +11,8 @@ export type AuthEmailKind =
   | 'DELETE_ACCOUNT'
   | 'BOOKING_CREATED_OWNER'
   | 'BOOKING_CONFIRMED_CUSTOMER'
-  | 'BOOKING_CANCELLED_CUSTOMER';
+  | 'BOOKING_CANCELLED_CUSTOMER'
+  | 'EXISTING_ACCOUNT_SIGN_UP';
 
 interface SendAuthEmailInput {
   kind: AuthEmailKind;
@@ -234,5 +235,22 @@ export function deleteAccountEmail(url: string): { html: string; text: string } 
        <p>This link expires in 24 hours. If you did not request this, ignore this email and consider changing your password.</p>`,
     ),
     text: `Confirm deletion of your Alora account: ${url}\n\nThis link expires in 24 hours. If you did not request this, ignore this email.`,
+  };
+}
+
+export function existingAccountSignUpEmail(urls: { signIn: string; resetPassword: string }): {
+  html: string;
+  text: string;
+} {
+  return {
+    html: shell(
+      'Someone tried to register with your email',
+      `<p>Someone tried to create a new Alora account with this email address, but you already have one.</p>
+       <p>If it was you, sign in or reset your password.</p>
+       ${ctaButton(urls.signIn, 'Sign In')}
+       <p>Forgot your password? <a href="${escapeHtml(urls.resetPassword)}">Reset it here</a>.</p>
+       <p>If it was not you, you can ignore this email. Your account has not been changed.</p>`,
+    ),
+    text: `Someone tried to create a new Alora account with this email address, but you already have one.\n\nIf it was you, sign in: ${urls.signIn}\nForgot your password? Reset it: ${urls.resetPassword}\n\nIf it was not you, you can ignore this email. Your account has not been changed.`,
   };
 }

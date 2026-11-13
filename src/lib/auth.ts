@@ -5,6 +5,7 @@ import { haveIBeenPwned, twoFactor } from 'better-auth/plugins';
 import { prisma } from './prisma';
 import {
   deleteAccountEmail,
+  existingAccountSignUpEmail,
   newDeviceEmail,
   passwordChangedEmail,
   sendAuthEmail,
@@ -126,6 +127,18 @@ export const auth = betterAuth({
       });
     },
     onExistingUserSignUp: async ({ user }, request) => {
+      const appUrl = authRuntimeConfig.appUrl.replace(/\/$/, '');
+      const content = existingAccountSignUpEmail({
+        signIn: `${appUrl}/login`,
+        resetPassword: `${appUrl}/forgot-password`,
+      });
+      await sendAuthEmail({
+        kind: 'EXISTING_ACCOUNT_SIGN_UP',
+        to: user.email,
+        subject: 'Someone tried to register with your Alora email',
+        ...content,
+        tags: ['authentication', 'security-notice'],
+      });
       await recordSecurityEvent({
         event: 'DUPLICATE_SIGN_UP_ATTEMPT',
         outcome: 'BLOCKED',
