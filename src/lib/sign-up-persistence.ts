@@ -15,6 +15,18 @@ type FindUserById = (id: string) => Promise<PersistedSignUpUser | null>;
 
 export type SignUpPersistence = 'CREATED' | 'DUPLICATE' | 'INVALID';
 
+export interface SignUpOutcome {
+  forwardResponse: boolean;
+  existingAccount: boolean;
+}
+
+export function signUpOutcome(persistence: SignUpPersistence): SignUpOutcome {
+  return {
+    forwardResponse: persistence !== 'INVALID',
+    existingAccount: persistence === 'DUPLICATE',
+  };
+}
+
 function responseUserId(payload: unknown): string | null {
   if (!payload || typeof payload !== 'object' || !('user' in payload)) return null;
   const user = payload.user;
