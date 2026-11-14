@@ -4,6 +4,48 @@
   padding: calc(var(--navbar-height) + var(--breadcrumb-height) + 1.5rem) 1rem 4rem;
 }
 
+.tabs {
+  display: flex;
+  gap: 1.75rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.22);
+}
+
+.tab {
+  position: relative;
+  padding: 0 0 0.85rem;
+  color: inherit;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+
+.tab:hover,
+.tab:focus-visible {
+  opacity: 0.9;
+}
+
+.tab[aria-current='page'] {
+  opacity: 1;
+  font-weight: 600;
+}
+
+.tab[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: #d4c5b0;
+}
+
+:global([data-theme='light']) .tab[aria-current='page']::after {
+  background: #5e493c;
+}
+
 .head {
   display: flex;
   align-items: flex-start;

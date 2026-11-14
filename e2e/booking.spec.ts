@@ -186,4 +186,10 @@ test('the owner dashboard needs a verified allowlisted email', async ({ page, re
   await verify(ownerEmail);
   await page.goto('/owner', { waitUntil: 'networkidle' });
   await expect(page.getByRole('heading', { name: 'Bookings', exact: true })).toBeVisible();
+
+  await page.getByRole('link', { name: 'Customers', exact: true }).click();
+  await page.waitForURL((url) => url.pathname === '/owner/customers');
+  await expect(page.getByRole('heading', { name: 'Customers', exact: true })).toBeVisible();
+  await expect(page.getByRole('tab', { name: /^All/ })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('button', { name: 'Export marketing list' })).toBeVisible();
 });
