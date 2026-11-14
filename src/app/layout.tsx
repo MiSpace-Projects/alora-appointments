@@ -25,7 +25,6 @@ const geistMono = Geist_Mono({
 const playfairDisplay = Playfair_Display({
   variable: '--font-playfair-display',
   subsets: ['latin'],
-  weight: ['400', '700'],
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
@@ -33,7 +32,7 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Alora — Premium Hair & Beauty Appointments',
+    default: 'Alora · Premium Hair & Beauty Appointments',
     template: '%s · Alora',
   },
   description:
@@ -42,14 +41,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     siteName: 'Alora',
-    title: 'Alora — Premium Hair & Beauty Appointments',
+    title: 'Alora · Premium Hair & Beauty Appointments',
     description:
       'Book premium hair and beauty appointments with Alora. Earn loyalty rewards on every visit.',
     url: siteUrl,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Alora — Premium Hair & Beauty Appointments',
+    title: 'Alora · Premium Hair & Beauty Appointments',
     description: 'Book premium hair and beauty appointments with Alora.',
   },
 };
@@ -83,7 +82,7 @@ export default async function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable}`}>
         <AuthProvider>
           <ThemeProvider>
-            <MotionProvider>
+            <MotionProvider nonce={nonce}>
               <ConsentProvider>
                 <Toaster />
                 <NavigationShell>{children}</NavigationShell>

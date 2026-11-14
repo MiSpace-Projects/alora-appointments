@@ -115,9 +115,9 @@ export function SecuritySettings({
   const startEnrollment = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setWorking(true);
-    const result = await authClient.twoFactor.enable({ password });
+    const result = await authClient.twoFactor.enable({ password, method: 'totp' });
     setWorking(false);
-    if (result.error || !result.data) {
+    if (result.error || !result.data || result.data.method !== 'totp') {
       toast.error(result.error?.message ?? 'Two-factor setup could not be started.');
       return;
     }

@@ -1,15 +1,16 @@
 const updateMany = jest.fn();
-const bookingUpdateMany = jest.fn();
+const bookingUpdateMany = jest.fn().mockResolvedValue({ count: 1 });
 const findUnique = jest.fn();
 const verifyTransaction = jest.fn();
+const paymentCount = jest.fn().mockResolvedValue(0);
 
 jest.mock('@/lib/prisma', () => ({
   prisma: {
     payment: { findUnique: (...args: unknown[]) => findUnique(...args), updateMany },
-    booking: { updateMany: bookingUpdateMany },
+    booking: { updateMany: bookingUpdateMany, findUnique: jest.fn().mockResolvedValue(null) },
     $transaction: async (fn: (tx: unknown) => Promise<unknown>) =>
       fn({
-        payment: { updateMany },
+        payment: { updateMany, count: paymentCount },
         booking: { updateMany: bookingUpdateMany },
       }),
   },
@@ -31,9 +32,16 @@ const pendingPayment = {
   refundedCents: 0,
 };
 
+jest.mock('@/lib/notifications', () => ({
+  notifyCustomerBookingConfirmed: jest.fn(),
+  notifyCustomerBookingCancelled: jest.fn(),
+}));
+
 describe('settlePaymentByReference', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    bookingUpdateMany.mockResolvedValue({ count: 1 });
+    paymentCount.mockResolvedValue(0);
   });
 
   it('confirms the booking exactly once on a verified, amount-matching success', async () => {

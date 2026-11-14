@@ -1,3 +1,5 @@
+import type { OpeningHours } from '@/lib/booking-rules';
+
 export const businessContact = {
   tradingName: 'Alora Appointments',
   brandName: 'Alora',
@@ -40,3 +42,23 @@ export const informationRegulator = {
   paiaComplaintsEmail: 'PAIAComplaints@inforegulator.org.za',
   enquiriesEmail: 'enquiries@inforegulator.org.za',
 } as const;
+
+export const bookingRules: {
+  openingHours: OpeningHours | null;
+  concurrentBookings: number;
+  maxUpcomingPerCustomer: number;
+  maxBookingsPerHourPerCustomer: number;
+} = {
+  openingHours: {
+    0: null,
+    1: { open: '09:00', close: '19:00' },
+    2: { open: '09:00', close: '19:00' },
+    3: { open: '09:00', close: '19:00' },
+    4: { open: '09:00', close: '19:00' },
+    5: { open: '09:00', close: '19:00' },
+    6: { open: '09:00', close: '19:00' },
+  },
+  concurrentBookings: 5,
+  maxUpcomingPerCustomer: 3,
+  maxBookingsPerHourPerCustomer: 5,
+};

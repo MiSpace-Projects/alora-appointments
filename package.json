@@ -19,15 +19,20 @@
     "security:audit": "npm audit --omit=dev --audit-level=moderate",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
-    "validate": "npm run typecheck && npm run lint && npm run format:check && npm run test -- --passWithNoTests --watchAll=false && npm run security:audit"
+    "validate": "npm run typecheck && npm run lint && npm run format:check && npm run test -- --passWithNoTests --watchAll=false && npm run security:audit",
+    "db:local:up": "docker volume create alora-local-db >/dev/null && docker compose -f compose.dev.yml up -d db",
+    "db:local:migrate": "DATABASE_URL=postgresql://postgres:alora_local@localhost:5435/alora prisma migrate deploy",
+    "db:local:seed": "DATABASE_URL=postgresql://postgres:alora_local@localhost:5435/alora tsx prisma/seed.ts",
+    "test:db": "TEST_DATABASE_URL=postgresql://postgres:alora_local@localhost:5435/alora jest --watchAll=false bookings-payments.db"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@neondatabase/serverless": "^1.1.0",
     "@node-rs/argon2": "^2.1.0",
     "@prisma/adapter-neon": "7.9.1",
+    "@prisma/adapter-pg": "7.9.1",
     "@prisma/client": "7.9.1",
-    "better-auth": "1.6.29",
+    "better-auth": "1.7.22",
     "dotenv": "^17.4.2",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.16.0",

@@ -197,7 +197,7 @@
 
 .successTitle {
   margin: 0 0 0.5rem;
-  font-family: 'Playfair Display', serif;
+  font-family: var(--font-playfair-display), serif;
   font-size: 1.5rem;
   font-weight: 600;
   color: #ffffff;

@@ -2,7 +2,8 @@
 
 import { revalidatePath, updateTag } from 'next/cache';
 import { requireOwner } from '@/lib/owner';
-import { cancelBookingAsOwner, completeBooking, confirmBooking } from '@/lib/data/bookings';
+import { completeBooking, confirmBooking } from '@/lib/data/bookings';
+import { cancelBookingAsOwnerWithRefund } from '@/lib/data/payments';
 import { SERVICES_CACHE_TAG } from '@/lib/data/services';
 import { notifyCustomerBookingConfirmed } from '@/lib/notifications';
 import { formatDateTime } from '@/lib/format';
@@ -47,7 +48,7 @@ export async function completeBookingAction(formData: FormData): Promise<void> {
 
 export async function cancelBookingAction(formData: FormData): Promise<void> {
   await requireOwner();
-  await cancelBookingAsOwner(bookingId(formData));
+  await cancelBookingAsOwnerWithRefund(bookingId(formData));
   revalidatePath('/owner');
   revalidatePath('/profile');
 }

@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   reactCompiler: true,
   devIndicators: false,
+  agentRules: false,
   poweredByHeader: false,
   images: {
     remotePatterns: [

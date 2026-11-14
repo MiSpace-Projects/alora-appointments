@@ -1,6 +1,7 @@
 import 'server-only';
 import { businessContact } from '@/app/config/business';
 import {
+  bookingCancelledCustomerEmail,
   bookingConfirmedCustomerEmail,
   newBookingOwnerEmail,
   sendAuthEmail,
@@ -27,6 +28,26 @@ export async function notifyCustomerBookingConfirmed(
     kind: 'BOOKING_CONFIRMED_CUSTOMER',
     to,
     subject: 'Your Alora booking is confirmed',
+    html,
+    text,
+  });
+}
+
+export async function notifyCustomerBookingCancelled(
+  to: string,
+  details: {
+    customerName: string;
+    serviceName: string;
+    when: string;
+    cancelledBy: 'customer' | 'salon';
+    refund: string | null;
+  },
+): Promise<void> {
+  const { html, text } = bookingCancelledCustomerEmail(details);
+  await sendAuthEmail({
+    kind: 'BOOKING_CANCELLED_CUSTOMER',
+    to,
+    subject: 'Your Alora booking was cancelled',
     html,
     text,
   });

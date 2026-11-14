@@ -8,7 +8,7 @@ import { PaystackError } from '@/lib/payments/paystack';
 import { isOnlinePaymentAvailable } from '@/lib/payments/provider';
 import { createBookingSchema } from '@/lib/validation';
 import { notifyOwnerOfNewBooking } from '@/lib/notifications';
-import { formatDateTime, formatZar } from '@/lib/format';
+import { formatDateTime, formatPrice } from '@/lib/format';
 import { businessContact } from '@/app/config/business';
 
 export type BookingActionResult =
@@ -18,12 +18,19 @@ export type BookingActionResult =
 const ERROR_COPY: Record<string, string> = {
   SERVICE_NOT_AVAILABLE: 'That service is no longer available.',
   SLOT_ALREADY_BOOKED: 'You already have a booking at that time.',
+  SLOT_UNAVAILABLE: 'That time is already taken. Please choose another time.',
+  OUTSIDE_OPENING_HOURS: 'That time is outside our opening hours. Please choose another time.',
+  TOO_MANY_UPCOMING_BOOKINGS:
+    'You already have the maximum number of upcoming bookings. Cancel one or wait until after your next visit.',
+  TOO_MANY_BOOKING_REQUESTS: 'Too many booking requests. Please wait a while and try again.',
   BOOKING_NOT_FOUND: 'We could not find that booking.',
   BOOKING_NOT_PAYABLE: 'That booking can no longer be paid online.',
   BOOKING_ALREADY_PAID: 'That booking has already been paid.',
   PAYMENTS_UNAVAILABLE: 'Online payment is not available right now. You can pay at the salon.',
   ONLINE_PAYMENT_NOT_ALLOWED:
     'This service is priced on consultation, so it can only be settled at the salon.',
+  EMAIL_NOT_VERIFIED:
+    'Please verify your email address before booking. Check your inbox for the link.',
 };
 
 function paymentReturnUrl(): string {
@@ -35,6 +42,9 @@ export async function createBookingAction(input: unknown): Promise<BookingAction
   const session = await getCurrentSession();
   if (!session) {
     return { ok: false, error: 'You must be signed in to book.' };
+  }
+  if (!session.user.emailVerified) {
+    return { ok: false, error: ERROR_COPY.EMAIL_NOT_VERIFIED };
   }
 
   const parsed = createBookingSchema.safeParse(input);
@@ -58,7 +68,11 @@ export async function createBookingAction(input: unknown): Promise<BookingAction
         customerEmail: session.user.email,
         serviceName: booking.service.name,
         when: formatDateTime(booking.startsAt),
-        price: formatZar(booking.priceCents),
+        price: formatPrice({
+          priceCents: booking.priceCents,
+          priceType: booking.service.priceType,
+          priceMaxCents: booking.service.priceMaxCents,
+        }),
         paymentMethod:
           parsed.data.paymentMethod === 'PAY_NOW' ? 'Pay now (online)' : 'Pay at the salon',
         notes: parsed.data.notes,
@@ -102,6 +116,9 @@ export async function startPaymentAction(bookingId: unknown): Promise<BookingAct
   const session = await getCurrentSession();
   if (!session) {
     return { ok: false, error: 'You must be signed in.' };
+  }
+  if (!session.user.emailVerified) {
+    return { ok: false, error: ERROR_COPY.EMAIL_NOT_VERIFIED };
   }
   if (typeof bookingId !== 'string' || bookingId.length === 0) {
     return { ok: false, error: ERROR_COPY.BOOKING_NOT_FOUND };

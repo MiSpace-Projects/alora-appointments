@@ -1,49 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from 'better-auth/cookies';
 import { loginWithCallback } from '@/lib/safe-redirect';
+import { buildCsp } from '@/lib/csp';
+import { getServiceFamily } from '@/app/features/servicesSection/servicesData';
 
-const PUBLIC_ROUTES = [
-  '/',
-  '/login',
-  '/register',
-  '/forgot-password',
-  '/reset-password',
-  '/verify-email',
-  '/two-factor',
-  '/privacy-policy',
-  '/cookie-policy',
-  '/terms',
-  '/paia-manual',
-  '/services',
-];
-const PROTECTED_PREFIXES = ['/profile'];
+const PROTECTED_PREFIXES = ['/book', '/profile', '/owner'];
 
-function isPublic(pathname: string): boolean {
-  if (pathname === '/') return true;
-  return PUBLIC_ROUTES.some((route) => route !== '/' && pathname.startsWith(route));
+function isProtectedPath(pathname: string): boolean {
+  return PROTECTED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
 }
 
-function buildCsp(nonce: string): string {
-  const developmentDirectives =
-    process.env.NODE_ENV === 'development' ? " 'unsafe-eval' ws: http:" : '';
-  return [
-    "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${developmentDirectives}`,
-    `style-src 'self' 'nonce-${nonce}'`,
-    "style-src-attr 'unsafe-inline'",
-    "img-src 'self' data: blob: https://images.pexels.com",
-    "font-src 'self' data:",
-    `connect-src 'self'${developmentDirectives}`,
-    "frame-ancestors 'none'",
-    "base-uri 'self'",
-    "form-action 'self'",
-    "object-src 'none'",
-    "manifest-src 'self'",
-    "worker-src 'self' blob:",
-    'report-uri /api/security/csp-report',
-    'report-to csp-endpoint',
-    ...(process.env.NODE_ENV === 'production' ? ['upgrade-insecure-requests'] : []),
-  ].join('; ');
+const SERVICE_FAMILY_PATH = /^\/services\/([^/]+)$/;
+
+function isUnknownServiceFamily(pathname: string): boolean {
+  const match = SERVICE_FAMILY_PATH.exec(pathname);
+  if (!match) return false;
+  try {
+    return !getServiceFamily(decodeURIComponent(match[1]));
+  } catch {
+    return true;
+  }
 }
 
 function applySecurityHeaders(response: NextResponse, csp: string): NextResponse {
@@ -55,15 +33,12 @@ function applySecurityHeaders(response: NextResponse, csp: string): NextResponse
 
 export function proxy(request: NextRequest): NextResponse {
   const nonce = btoa(crypto.randomUUID());
-  const csp = buildCsp(nonce);
+  const csp = buildCsp(nonce, process.env.NODE_ENV);
   const { pathname, search } = request.nextUrl;
   const returnTo = `${pathname}${search}`;
   const hasSession = Boolean(getSessionCookie(request));
 
-  const needsAuth =
-    PROTECTED_PREFIXES.some((route) => pathname.startsWith(route)) || !isPublic(pathname);
-
-  if (!hasSession && needsAuth) {
+  if (!hasSession && isProtectedPath(pathname)) {
     return applySecurityHeaders(
       NextResponse.redirect(new URL(loginWithCallback(returnTo), request.url)),
       csp,
@@ -74,6 +49,15 @@ export function proxy(request: NextRequest): NextResponse {
   requestHeaders.set('x-nonce', nonce);
   requestHeaders.set('x-alora-return-to', returnTo);
   requestHeaders.set('Content-Security-Policy', csp);
+
+  if (isUnknownServiceFamily(pathname)) {
+    return applySecurityHeaders(
+      NextResponse.rewrite(new URL('/_not-found', request.url), {
+        request: { headers: requestHeaders },
+      }),
+      csp,
+    );
+  }
 
   return applySecurityHeaders(NextResponse.next({ request: { headers: requestHeaders } }), csp);
 }

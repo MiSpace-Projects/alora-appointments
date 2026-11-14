@@ -39,6 +39,18 @@
   line-height: 0;
 }
 
+.sun {
+  display: none;
+}
+
+:global([data-theme='dark']) .moon {
+  display: none;
+}
+
+:global([data-theme='dark']) .sun {
+  display: block;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .floatingToggle {
     transition: none;

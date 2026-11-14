@@ -10,7 +10,10 @@ export type AuthEmailKind =
   | 'NEW_DEVICE'
   | 'DELETE_ACCOUNT'
   | 'BOOKING_CREATED_OWNER'
-  | 'BOOKING_CONFIRMED_CUSTOMER';
+  | 'BOOKING_CONFIRMED_CUSTOMER'
+  | 'BOOKING_CANCELLED_CUSTOMER'
+  | 'EXISTING_ACCOUNT_SIGN_UP'
+  | 'OPERATIONS_ALERT';
 
 interface SendAuthEmailInput {
   kind: AuthEmailKind;
@@ -26,9 +29,9 @@ export async function sendAuthEmail(input: SendAuthEmailInput): Promise<boolean>
 
   if (!apiKey || !from) {
     if (process.env.NODE_ENV !== 'production') {
-      console.warn(`[email] Resend not configured — ${input.kind} not sent.\n${input.text}`);
+      console.warn(`[email] Resend not configured, ${input.kind} not sent.\n${input.text}`);
     } else {
-      console.warn(`[email] Resend not configured — ${input.kind} not sent.`);
+      console.warn(`[email] Resend not configured, ${input.kind} not sent.`);
     }
     return false;
   }
@@ -196,6 +199,33 @@ export function bookingConfirmedCustomerEmail(details: {
   };
 }
 
+export function bookingCancelledCustomerEmail(details: {
+  customerName: string;
+  serviceName: string;
+  when: string;
+  cancelledBy: 'customer' | 'salon';
+  refund: string | null;
+}): { html: string; text: string } {
+  const greeting = details.customerName ? `Hi ${details.customerName},` : 'Hi,';
+  const lead =
+    details.cancelledBy === 'salon'
+      ? `We are sorry, we had to cancel your ${details.serviceName} on ${details.when}.`
+      : `Your ${details.serviceName} on ${details.when} has been cancelled as requested.`;
+  const refund = details.refund
+    ? `A refund of ${details.refund} is on its way to the card you paid with. Banks can take up to 10 working days to show it.`
+    : 'No online payment was taken, so there is nothing to refund.';
+  return {
+    html: shell(
+      'Your booking was cancelled',
+      `<p>${escapeHtml(greeting)}</p>
+       <p>${escapeHtml(lead)}</p>
+       <p>${escapeHtml(refund)}</p>
+       <p>You can book a new time from your Alora profile whenever suits you.</p>`,
+    ),
+    text: `${greeting}\n\n${lead}\n\n${refund}\n\nYou can book a new time from your Alora profile whenever suits you.`,
+  };
+}
+
 export function deleteAccountEmail(url: string): { html: string; text: string } {
   return {
     html: shell(
@@ -206,5 +236,51 @@ export function deleteAccountEmail(url: string): { html: string; text: string } 
        <p>This link expires in 24 hours. If you did not request this, ignore this email and consider changing your password.</p>`,
     ),
     text: `Confirm deletion of your Alora account: ${url}\n\nThis link expires in 24 hours. If you did not request this, ignore this email.`,
+  };
+}
+
+export function existingAccountSignUpEmail(urls: { signIn: string; resetPassword: string }): {
+  html: string;
+  text: string;
+} {
+  return {
+    html: shell(
+      'Someone tried to register with your email',
+      `<p>Someone tried to create a new Alora account with this email address, but you already have one.</p>
+       <p>If it was you, sign in or reset your password.</p>
+       ${ctaButton(urls.signIn, 'Sign In')}
+       <p>Forgot your password? <a href="${escapeHtml(urls.resetPassword)}">Reset it here</a>.</p>
+       <p>If it was not you, you can ignore this email. Your account has not been changed.</p>`,
+    ),
+    text: `Someone tried to create a new Alora account with this email address, but you already have one.\n\nIf it was you, sign in: ${urls.signIn}\nForgot your password? Reset it: ${urls.resetPassword}\n\nIf it was not you, you can ignore this email. Your account has not been changed.`,
+  };
+}
+
+export interface OperationsAlertLine {
+  label: string;
+  count: number;
+}
+
+export function operationsAlertEmail(details: {
+  windowStart: string;
+  windowEnd: string;
+  lines: OperationsAlertLine[];
+}): { html: string; text: string } {
+  const rows = details.lines.filter((line) => line.count > 0);
+  const htmlRows = rows
+    .map(
+      (line) =>
+        `<p><strong>${escapeHtml(line.label)}:</strong> ${escapeHtml(String(line.count))}</p>`,
+    )
+    .join('');
+  const textRows = rows.map((line) => `${line.label}: ${line.count}`).join('\n');
+  return {
+    html: shell(
+      'Alora daily alert',
+      `<p>Failures recorded between ${escapeHtml(details.windowStart)} and ${escapeHtml(details.windowEnd)} (UTC):</p>
+       ${htmlRows}
+       <p>Check the security_event and payment tables for details.</p>`,
+    ),
+    text: `Alora daily alert\n\nFailures recorded between ${details.windowStart} and ${details.windowEnd} (UTC):\n\n${textRows}\n\nCheck the security_event and payment tables for details.`,
   };
 }
