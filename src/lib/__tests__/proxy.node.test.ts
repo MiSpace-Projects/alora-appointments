@@ -96,6 +96,7 @@ describe('proxy authentication redirects', () => {
       const response = proxy(new NextRequest(`http://localhost${path}`));
 
       expect(response.headers.get('x-middleware-rewrite')).toBe('http://localhost/_not-found');
+      expect(response.status).toBe(404);
       expect(response.headers.get('content-security-policy')).toContain("'strict-dynamic'");
     },
   );
