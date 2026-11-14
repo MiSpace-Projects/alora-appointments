@@ -53,6 +53,7 @@ export function proxy(request: NextRequest): NextResponse {
   if (isUnknownServiceFamily(pathname)) {
     return applySecurityHeaders(
       NextResponse.rewrite(new URL('/_not-found', request.url), {
+        status: 404,
         request: { headers: requestHeaders },
       }),
       csp,
