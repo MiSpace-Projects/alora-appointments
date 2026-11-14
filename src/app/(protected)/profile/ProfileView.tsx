@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { EASE_OUT } from '@/lib/motion';
-import type { BookingStatus, PaymentStatus, PaymentMethod } from '@prisma/client';
+import type { BookingStatus, PaymentStatus, PaymentMethod, PriceType } from '@prisma/client';
 import type { LoyaltyStanding } from '@/lib/loyalty-core';
 import {
   formatZar,
@@ -43,7 +43,7 @@ export interface BookingView {
     amountCents: number;
     refundedCents: number;
   }[];
-  service: { name: string };
+  service: { name: string; priceType: PriceType };
 }
 
 export interface ProfileUser {
@@ -51,6 +51,7 @@ export interface ProfileUser {
   email: string;
   twoFactorEnabled?: boolean;
   marketingOptIn?: boolean | null;
+  hasPassword: boolean;
 }
 
 const statusClass: Record<BookingStatus, string> = {
@@ -138,8 +139,8 @@ export function ProfileView({
             <p className={styles.progressMeta}>
               {loyalty.points} pts
               {loyalty.pointsToNext !== null && loyalty.nextTier
-                ? ` — ${loyalty.pointsToNext} pts to ${loyalty.nextTier}`
-                : ' — top tier reached'}
+                ? ` · ${loyalty.pointsToNext} pts to ${loyalty.nextTier}`
+                : ' · top tier reached'}
             </p>
           </div>
         </div>
@@ -234,6 +235,7 @@ export function ProfileView({
                     bookingId={booking.id}
                     canPay={
                       onlinePaymentAvailable &&
+                      booking.service.priceType === 'FIXED' &&
                       !booking.paidAt &&
                       !booking.payments.some((p) => p.status === 'SUCCESS')
                     }
@@ -251,7 +253,10 @@ export function ProfileView({
       </motion.div>
 
       <motion.div variants={item}>
-        <PrivacySettings initialMarketingOptIn={Boolean(user.marketingOptIn)} />
+        <PrivacySettings
+          initialMarketingOptIn={Boolean(user.marketingOptIn)}
+          hasPassword={user.hasPassword}
+        />
       </motion.div>
     </motion.div>
   );

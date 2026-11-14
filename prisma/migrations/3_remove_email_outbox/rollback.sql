@@ -1,4 +1,3 @@
--- CreateTable
 CREATE TABLE "email_outbox" (
     "id" TEXT NOT NULL,
     "kind" TEXT NOT NULL,
@@ -17,9 +16,7 @@ CREATE TABLE "email_outbox" (
     CONSTRAINT "email_outbox_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
 CREATE INDEX "email_outbox_status_nextAttemptAt_idx" ON "email_outbox"("status", "nextAttemptAt");
 
--- CreateIndex
 CREATE INDEX "email_outbox_recipientHash_createdAt_idx" ON "email_outbox"("recipientHash", "createdAt");
 

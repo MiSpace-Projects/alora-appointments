@@ -218,24 +218,25 @@ enum PaymentStatus {
 }
 
 model Payment {
-  id               String        @id @default(cuid())
-  bookingId        String
-  userId           String?
-  provider         String        @default("paystack")
-  reference        String        @unique
-  amountCents      Int
-  currency         String        @default("ZAR")
-  status           PaymentStatus @default(PENDING)
-  channel          String?
-  providerId       String?
-  authorizationUrl String?
-  paidAt           DateTime?
-  refundedCents    Int           @default(0)
-  refundReference  String?
-  failureReason    String?
-  lastEventAt      DateTime?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  id                 String        @id @default(cuid())
+  bookingId          String
+  userId             String?
+  provider           String        @default("paystack")
+  reference          String        @unique
+  amountCents        Int
+  currency           String        @default("ZAR")
+  status             PaymentStatus @default(PENDING)
+  channel            String?
+  providerId         String?
+  authorizationUrl   String?
+  paidAt             DateTime?
+  refundedCents      Int           @default(0)
+  pendingRefundCents Int           @default(0)
+  refundReference    String?
+  failureReason      String?
+  lastEventAt        DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
   booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
   user    User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
@@ -257,6 +258,7 @@ model PointsTransaction {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([bookingId, reason])
   @@index([userId, createdAt])
   @@map("points_transaction")
 }

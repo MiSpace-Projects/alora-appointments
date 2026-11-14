@@ -1,10 +1,12 @@
 const zarDate = new Intl.DateTimeFormat('en-ZA', {
+  timeZone: 'Africa/Johannesburg',
   day: '2-digit',
   month: 'short',
   year: 'numeric',
 });
 
 const zarTime = new Intl.DateTimeFormat('en-ZA', {
+  timeZone: 'Africa/Johannesburg',
   hour: '2-digit',
   minute: '2-digit',
   hour12: false,

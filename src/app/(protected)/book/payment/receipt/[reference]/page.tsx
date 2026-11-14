@@ -17,7 +17,7 @@ interface PageProps {
 }
 
 function formatDateTime(value: Date | null): string {
-  if (!value) return '—';
+  if (!value) return '-';
   return `${formatBookingDate(value)}, ${formatBookingTime(value)}`;
 }
 

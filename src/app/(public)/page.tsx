@@ -5,7 +5,6 @@ import { StyleShowcase } from '../features/styleShowcase/StyleShowcase';
 import { listActiveServices } from '@/lib/data/services';
 import LoyaltyPage from '../features/loyalty/Loyalty';
 import QuickBookingsSection from '../features/quickBookings/QuickBookings';
-import Testimonials from '../features/testimonials/Testimonials';
 import { businessContact } from '@/app/config/business';
 import type { Metadata } from 'next';
 import { routes } from '@/app/config/routes';
@@ -66,7 +65,6 @@ export default async function Home() {
         />
         <LoyaltyPage />
         <QuickBookingsSection />
-        <Testimonials />
       </div>
     </>
   );

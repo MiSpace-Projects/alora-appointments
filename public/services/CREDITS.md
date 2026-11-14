@@ -22,7 +22,7 @@ manifest `source` at a local file and rebuild.
 | `wig-customization-glueless` | Pexels | 10305432 |
 | `wig-styling` | Pexels | 11037450 |
 | `wig-colouring` | Pexels | 32767443 |
-| `wig-frontal-replacement` | Pexels | 8106142 |
+| `wig-frontal-replacement` | Pexels | 12510838 |
 | `nails-gelx-short` | Unsplash | photo-1677739424301-ba2cdf1631e9 |
 | `nails-gelx-medium` | Unsplash | photo-1633955726992-2b7c0d2d2a69 |
 | `nails-gelx-long` | Unsplash | photo-1690749072212-373daf1d58ca |

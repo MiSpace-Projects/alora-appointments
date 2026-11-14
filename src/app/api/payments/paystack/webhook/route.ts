@@ -48,6 +48,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
   } catch (error) {
     console.error('[paystack webhook] handler error', name, error);
+    return NextResponse.json({ error: 'handler failed' }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });

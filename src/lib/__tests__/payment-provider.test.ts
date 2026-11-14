@@ -36,7 +36,7 @@ describe('getPaymentProvider', () => {
     expect(dev.isOnlinePaymentAvailable()).toBe(false);
   });
 
-  it('is off in production by default, on with an explicit flag (pre-launch WIP)', async () => {
+  it('never enables the mock in production, even with PAYMENTS_MOCK=true', async () => {
     process.env = { ...ORIGINAL_ENV, NODE_ENV: 'production' };
     delete process.env.PAYSTACK_SECRET_KEY;
     delete process.env.PAYMENTS_MOCK;
@@ -46,8 +46,9 @@ describe('getPaymentProvider', () => {
     jest.resetModules();
     process.env = { ...ORIGINAL_ENV, NODE_ENV: 'production', PAYMENTS_MOCK: 'true' };
     delete process.env.PAYSTACK_SECRET_KEY;
-    const on = await import('@/lib/payments/provider');
-    expect(on.getPaymentProvider()).toBe('mock');
+    const forced = await import('@/lib/payments/provider');
+    expect(forced.isMockPaymentsEnabled()).toBe(false);
+    expect(forced.getPaymentProvider()).toBeNull();
   });
 
   it('lets a real Paystack key win over the mock flag', async () => {

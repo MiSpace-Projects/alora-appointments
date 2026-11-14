@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaNeon } from '@prisma/adapter-neon';
+import { createDatabaseAdapter } from './db-adapter';
 import { neonConfig } from '@neondatabase/serverless';
 import ws from 'ws';
 
@@ -10,9 +10,7 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
-  const adapter = new PrismaNeon({
-    connectionString: process.env.DATABASE_URL,
-  });
+  const adapter = createDatabaseAdapter(process.env.DATABASE_URL);
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === 'development' ? ['query', 'warn', 'error'] : ['warn', 'error'],

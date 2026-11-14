@@ -3,14 +3,17 @@ import { getProductionAuthConfigurationErrors } from '@/lib/auth-config';
 import {
   consumeIdentityThrottle,
   getIdentityPolicy,
+  getSignInRetryAfter,
   IdentityRateLimitError,
+  recordSignInAttempt,
 } from '@/lib/identity-throttle';
 import { getConfiguredClientAddress, recordSecurityEvent } from '@/lib/security-events';
-import { verifyPersistedSignUp } from '@/lib/sign-up-persistence';
+import { signUpOutcome, verifyPersistedSignUp } from '@/lib/sign-up-persistence';
 import { toNextJsHandler } from 'better-auth/next-js';
 
 const handlers = toNextJsHandler(auth.handler);
 const AUTH_PREFIX = '/api/auth';
+const SIGN_IN_PATH = '/sign-in/email';
 
 interface AuthRequestBody {
   email?: unknown;
@@ -62,14 +65,53 @@ function configurationFailure(errors: string[]): Response {
   );
 }
 
-function duplicateSignUpResponse(): Response {
+function tooManyRequests(retryAfter: number): Response {
   return Response.json(
+    { code: 'TOO_MANY_REQUESTS', message: 'Too many requests. Please try again later.' },
     {
-      code: 'USER_ALREADY_EXISTS',
-      message: 'An account with this email already exists. Sign in instead.',
+      status: 429,
+      headers: {
+        'Cache-Control': 'no-store',
+        'Retry-After': String(retryAfter),
+        'X-Retry-After': String(retryAfter),
+      },
     },
-    { status: 409, headers: { 'Cache-Control': 'no-store' } },
   );
+}
+
+async function recordThrottleBlock(
+  path: string,
+  email: string,
+  request: Request,
+  reason: string,
+): Promise<void> {
+  await recordSecurityEvent({
+    event: EVENT_BY_PATH[path] ?? 'AUTH_REQUEST',
+    outcome: 'BLOCKED',
+    actor: email,
+    ipAddress: getConfiguredClientAddress(request.headers),
+    userAgent: request.headers.get('user-agent'),
+    metadata: { reason },
+  });
+}
+
+async function recordSignInResult(
+  email: string,
+  clientAddress: string | null,
+  status: number,
+): Promise<void> {
+  try {
+    await recordSignInAttempt(email, clientAddress, status);
+  } catch (error) {
+    console.error(
+      JSON.stringify({
+        level: 'error',
+        service: 'auth',
+        event: 'SIGN_IN_THROTTLE_RECORD_FAILED',
+        errorName: error instanceof Error ? error.name : 'UnknownError',
+      }),
+    );
+  }
 }
 
 function signUpPersistenceFailure(): Response {
@@ -95,41 +137,40 @@ async function handlePost(request: Request): Promise<Response> {
     ? await auth.api.getSession({ headers: request.headers })
     : null;
 
+  const clientAddress = getConfiguredClientAddress(request.headers);
+
+  if (path === SIGN_IN_PATH && email) {
+    const retryAfter = await getSignInRetryAfter(email, clientAddress);
+    if (retryAfter !== null) {
+      await recordThrottleBlock(path, email, request, 'sign-in-failure-limit');
+      return tooManyRequests(retryAfter);
+    }
+  }
+
   if (policy && email) {
     try {
       await consumeIdentityThrottle(policy, email);
     } catch (error) {
       if (!(error instanceof IdentityRateLimitError)) throw error;
-      await recordSecurityEvent({
-        event: EVENT_BY_PATH[path] ?? 'AUTH_REQUEST',
-        outcome: 'BLOCKED',
-        actor: email,
-        ipAddress: getConfiguredClientAddress(request.headers),
-        userAgent: request.headers.get('user-agent'),
-        metadata: { reason: 'identity-rate-limit' },
-      });
-      return Response.json(
-        { code: 'TOO_MANY_REQUESTS', message: 'Too many requests. Please try again later.' },
-        {
-          status: 429,
-          headers: {
-            'Cache-Control': 'no-store',
-            'Retry-After': String(error.retryAfter),
-            'X-Retry-After': String(error.retryAfter),
-          },
-        },
-      );
+      await recordThrottleBlock(path, email, request, 'identity-rate-limit');
+      return tooManyRequests(error.retryAfter);
     }
   }
 
   let response = await handlers.POST(request);
+  let duplicateSignUp = false;
+
+  if (path === SIGN_IN_PATH && email) {
+    await recordSignInResult(email, clientAddress, response.status);
+  }
 
   if (path === '/sign-up/email' && response.ok && email && name) {
     try {
       const payload = (await response.clone().json()) as unknown;
       const persistence = await verifyPersistedSignUp(payload, { email, name });
-      if (persistence === 'DUPLICATE') response = duplicateSignUpResponse();
-      if (persistence === 'INVALID') response = signUpPersistenceFailure();
+      const outcome = signUpOutcome(persistence);
+      duplicateSignUp = outcome.existingAccount;
+      if (!outcome.forwardResponse) response = signUpPersistenceFailure();
     } catch (error) {
       console.error(
         JSON.stringify({
@@ -147,14 +188,16 @@ async function handlePost(request: Request): Promise<Response> {
   if (event) {
     await recordSecurityEvent({
       event,
-      outcome: response.ok
-        ? 'SUCCESS'
-        : [409, 429].includes(response.status)
-          ? 'BLOCKED'
-          : 'FAILURE',
+      outcome: duplicateSignUp
+        ? 'BLOCKED'
+        : response.ok
+          ? 'SUCCESS'
+          : [409, 429].includes(response.status)
+            ? 'BLOCKED'
+            : 'FAILURE',
       userId: sessionBefore?.user.id ?? null,
       actor: email,
-      ipAddress: getConfiguredClientAddress(request.headers),
+      ipAddress: clientAddress,
       userAgent: request.headers.get('user-agent'),
       metadata: { status: response.status, path },
     });
