@@ -9,6 +9,7 @@ import {
   cancelBookingAction,
   refreshCatalogAction,
 } from './actions';
+import { OwnerTabs } from './OwnerTabs';
 import styles from './owner.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -28,6 +29,7 @@ export default async function OwnerBookingsPage() {
 
   return (
     <main className={styles.page}>
+      <OwnerTabs active="bookings" />
       <header className={styles.head}>
         <div>
           <h1 className={styles.title}>Bookings</h1>
