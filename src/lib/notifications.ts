@@ -1,5 +1,5 @@
 import 'server-only';
-import { businessContact } from '@/app/config/business';
+import { parseOwnerAllowlist } from './owner-core';
 import {
   bookingCancelledCustomerEmail,
   bookingConfirmedCustomerEmail,
@@ -9,14 +9,23 @@ import {
 } from './email';
 
 export async function notifyOwnerOfNewBooking(details: BookingEmailDetails): Promise<void> {
+  const owners = parseOwnerAllowlist(process.env.ALORA_OWNER_EMAILS);
+  if (owners.length === 0) {
+    console.warn('[notifications] ALORA_OWNER_EMAILS is empty, new booking alert not sent.');
+    return;
+  }
   const { html, text } = newBookingOwnerEmail(details);
-  await sendAuthEmail({
-    kind: 'BOOKING_CREATED_OWNER',
-    to: businessContact.email,
-    subject: `New booking: ${details.serviceName}`,
-    html,
-    text,
-  });
+  await Promise.all(
+    owners.map((to) =>
+      sendAuthEmail({
+        kind: 'BOOKING_CREATED_OWNER',
+        to,
+        subject: `New booking: ${details.serviceName}`,
+        html,
+        text,
+      }),
+    ),
+  );
 }
 
 export async function notifyCustomerBookingConfirmed(
