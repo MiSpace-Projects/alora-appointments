@@ -10,6 +10,7 @@ export type AuthEmailKind =
   | 'NEW_DEVICE'
   | 'DELETE_ACCOUNT'
   | 'BOOKING_CREATED_OWNER'
+  | 'BOOKING_RECEIVED_CUSTOMER'
   | 'BOOKING_CONFIRMED_CUSTOMER'
   | 'BOOKING_CANCELLED_CUSTOMER'
   | 'EXISTING_ACCOUNT_SIGN_UP'
@@ -22,6 +23,7 @@ interface SendAuthEmailInput {
   html: string;
   text: string;
   tags?: string[];
+  attachments?: { filename: string; content: Buffer; contentType?: string }[];
 }
 
 export async function sendAuthEmail(input: SendAuthEmailInput): Promise<boolean> {
@@ -44,6 +46,15 @@ export async function sendAuthEmail(input: SendAuthEmailInput): Promise<boolean>
       subject: input.subject,
       html: input.html,
       text: input.text,
+      ...(input.attachments?.length
+        ? {
+            attachments: input.attachments.map((file) => ({
+              filename: file.filename,
+              content: file.content,
+              contentType: file.contentType,
+            })),
+          }
+        : {}),
     });
 
     if (error) {
@@ -143,86 +154,6 @@ export function newDeviceEmail(): { html: string; text: string } {
       '<p>Your Alora account was signed in from a device we have not seen before.</p><p>If this was not you, reset your password and revoke active sessions from your profile.</p>',
     ),
     text: 'Your Alora account was signed in from a new device. If this was not you, reset your password and revoke active sessions from your profile.',
-  };
-}
-
-export interface BookingEmailDetails {
-  customerName: string;
-  customerEmail: string;
-  serviceName: string;
-  when: string;
-  price: string;
-  paymentMethod: string;
-  notes?: string | null;
-}
-
-export function newBookingOwnerEmail(details: BookingEmailDetails): {
-  html: string;
-  text: string;
-} {
-  const rows = [
-    ['Customer', `${details.customerName} (${details.customerEmail})`],
-    ['Service', details.serviceName],
-    ['When', details.when],
-    ['Price', details.price],
-    ['Payment', details.paymentMethod],
-    ...(details.notes ? [['Notes', details.notes] as const] : []),
-  ];
-  const list = rows
-    .map(([label, value]) => `<p><strong>${escapeHtml(label)}:</strong> ${escapeHtml(value)}</p>`)
-    .join('');
-  const textList = rows.map(([label, value]) => `${label}: ${value}`).join('\n');
-  return {
-    html: shell(
-      'New booking request',
-      `<p>A new booking has come in and is waiting to be confirmed.</p>${list}
-       <p>Open the bookings dashboard to confirm or manage it.</p>`,
-    ),
-    text: `New booking request (awaiting confirmation)\n\n${textList}\n\nOpen the bookings dashboard to confirm or manage it.`,
-  };
-}
-
-export function bookingConfirmedCustomerEmail(details: {
-  customerName: string;
-  serviceName: string;
-  when: string;
-}): { html: string; text: string } {
-  const greeting = details.customerName ? `Hi ${details.customerName},` : 'Hi,';
-  return {
-    html: shell(
-      'Your booking is confirmed',
-      `<p>${escapeHtml(greeting)}</p>
-       <p>Your ${escapeHtml(details.serviceName)} on ${escapeHtml(details.when)} is confirmed. We look forward to seeing you.</p>
-       <p>Need to change it? Manage your booking from your Alora profile.</p>`,
-    ),
-    text: `${greeting}\n\nYour ${details.serviceName} on ${details.when} is confirmed. We look forward to seeing you.\n\nManage your booking from your Alora profile.`,
-  };
-}
-
-export function bookingCancelledCustomerEmail(details: {
-  customerName: string;
-  serviceName: string;
-  when: string;
-  cancelledBy: 'customer' | 'salon';
-  refund: string | null;
-}): { html: string; text: string } {
-  const greeting = details.customerName ? `Hi ${details.customerName},` : 'Hi,';
-  const lead =
-    details.cancelledBy === 'salon'
-      ? `We are sorry, we had to cancel your ${details.serviceName} on ${details.when}.`
-      : `Your ${details.serviceName} on ${details.when} has been cancelled as requested.`;
-  const refund = details.refund
-    ? `A refund of ${details.refund} is on its way to the card you paid with. Banks can take up to 10 working days to show it.`
-    : 'No online payment was taken, so there is nothing to refund.';
-  return {
-    html: shell(
-      'Your booking was cancelled',
-      `<p>${escapeHtml(greeting)}</p>
-       <p>${escapeHtml(lead)}</p>
-       <p>${escapeHtml(refund)}</p>
-       <p>You can book a new time from your Alora profile whenever suits you.</p>`,
-    ),
-    text: `${greeting}\n\n${lead}\n\n${refund}\n\nYou can book a new time from your Alora profile whenever suits you.`,
   };
 }
 

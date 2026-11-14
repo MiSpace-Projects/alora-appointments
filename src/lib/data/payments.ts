@@ -14,7 +14,7 @@ import {
   notifyCustomerBookingCancelled,
   notifyCustomerBookingConfirmed,
 } from '@/lib/notifications';
-import { formatDateTime, formatZar } from '@/lib/format';
+import { formatZar } from '@/lib/format';
 import {
   getPaymentProvider,
   isMockReference,
@@ -458,26 +458,9 @@ export async function recordProviderRefund(input: {
   });
 }
 
-async function bookingContact(bookingId: string) {
-  return prisma.booking.findUnique({
-    where: { id: bookingId },
-    select: {
-      startsAt: true,
-      service: { select: { name: true } },
-      user: { select: { name: true, email: true } },
-    },
-  });
-}
-
 async function sendBookingConfirmation(bookingId: string): Promise<void> {
   try {
-    const booking = await bookingContact(bookingId);
-    if (!booking?.user?.email) return;
-    await notifyCustomerBookingConfirmed(booking.user.email, {
-      customerName: booking.user.name ?? '',
-      serviceName: booking.service.name,
-      when: formatDateTime(booking.startsAt),
-    });
+    await notifyCustomerBookingConfirmed(bookingId);
   } catch (error) {
     console.error(
       '[payments] confirmation email failed:',
@@ -492,12 +475,7 @@ async function sendBookingCancellation(
   refundCents: number,
 ): Promise<void> {
   try {
-    const booking = await bookingContact(bookingId);
-    if (!booking?.user?.email) return;
-    await notifyCustomerBookingCancelled(booking.user.email, {
-      customerName: booking.user.name ?? '',
-      serviceName: booking.service.name,
-      when: formatDateTime(booking.startsAt),
+    await notifyCustomerBookingCancelled(bookingId, {
       cancelledBy,
       refund: refundCents > 0 ? formatZar(refundCents) : null,
     });
