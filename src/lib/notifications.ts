@@ -1,63 +1,113 @@
 import 'server-only';
+import { prisma } from '@/lib/prisma';
+import { formatPrice } from './format';
 import { parseOwnerAllowlist } from './owner-core';
+import { sendAuthEmail, type AuthEmailKind } from './email';
 import {
   bookingCancelledCustomerEmail,
   bookingConfirmedCustomerEmail,
+  bookingReceivedCustomerEmail,
   newBookingOwnerEmail,
-  sendAuthEmail,
-  type BookingEmailDetails,
-} from './email';
+  type BookingEmail,
+  type BookingEmailContext,
+} from './booking-emails';
 
-export async function notifyOwnerOfNewBooking(details: BookingEmailDetails): Promise<void> {
+export async function loadBookingEmailContext(
+  bookingId: string,
+): Promise<BookingEmailContext | null> {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    select: {
+      id: true,
+      startsAt: true,
+      priceCents: true,
+      paymentMethod: true,
+      paidAt: true,
+      notes: true,
+      user: { select: { name: true, email: true } },
+      service: {
+        select: {
+          name: true,
+          slug: true,
+          durationMinutes: true,
+          priceType: true,
+          priceMaxCents: true,
+        },
+      },
+    },
+  });
+  if (!booking?.user) return null;
+  return {
+    bookingId: booking.id,
+    customerName: booking.user.name,
+    customerEmail: booking.user.email,
+    serviceName: booking.service.name,
+    serviceSlug: booking.service.slug,
+    startsAt: booking.startsAt,
+    durationMinutes: booking.service.durationMinutes,
+    price: formatPrice({
+      priceCents: booking.priceCents,
+      priceType: booking.service.priceType,
+      priceMaxCents: booking.service.priceMaxCents,
+    }),
+    paymentMethod: booking.paymentMethod,
+    paid: booking.paidAt !== null,
+    notes: booking.notes,
+  };
+}
+
+async function send(kind: AuthEmailKind, to: string, email: BookingEmail): Promise<void> {
+  await sendAuthEmail({
+    kind,
+    to,
+    subject: email.subject,
+    html: email.html,
+    text: email.text,
+    attachments: email.attachments,
+  });
+}
+
+export async function notifyOwnerOfNewBooking(bookingId: string): Promise<void> {
   const owners = parseOwnerAllowlist(process.env.ALORA_OWNER_EMAILS);
   if (owners.length === 0) {
     console.warn('[notifications] ALORA_OWNER_EMAILS is empty, new booking alert not sent.');
     return;
   }
-  const { html, text } = newBookingOwnerEmail(details);
-  await Promise.all(
-    owners.map((to) =>
-      sendAuthEmail({
-        kind: 'BOOKING_CREATED_OWNER',
-        to,
-        subject: `New booking: ${details.serviceName}`,
-        html,
-        text,
-      }),
-    ),
+  const context = await loadBookingEmailContext(bookingId);
+  if (!context) return;
+  const email = newBookingOwnerEmail(context);
+  await Promise.all(owners.map((to) => send('BOOKING_CREATED_OWNER', to, email)));
+}
+
+export async function notifyCustomerBookingReceived(bookingId: string): Promise<void> {
+  const context = await loadBookingEmailContext(bookingId);
+  if (!context) return;
+  await send(
+    'BOOKING_RECEIVED_CUSTOMER',
+    context.customerEmail,
+    bookingReceivedCustomerEmail(context),
   );
 }
 
-export async function notifyCustomerBookingConfirmed(
-  to: string,
-  details: { customerName: string; serviceName: string; when: string },
-): Promise<void> {
-  const { html, text } = bookingConfirmedCustomerEmail(details);
-  await sendAuthEmail({
-    kind: 'BOOKING_CONFIRMED_CUSTOMER',
-    to,
-    subject: 'Your Alora booking is confirmed',
-    html,
-    text,
-  });
+export async function notifyCustomerBookingConfirmed(bookingId: string): Promise<void> {
+  const context = await loadBookingEmailContext(bookingId);
+  if (!context) return;
+  await send(
+    'BOOKING_CONFIRMED_CUSTOMER',
+    context.customerEmail,
+    bookingConfirmedCustomerEmail(context),
+  );
 }
 
 export async function notifyCustomerBookingCancelled(
-  to: string,
-  details: {
-    customerName: string;
-    serviceName: string;
-    when: string;
-    cancelledBy: 'customer' | 'salon';
-    refund: string | null;
-  },
+  bookingId: string,
+  details: { cancelledBy: 'customer' | 'salon'; refund: string | null },
 ): Promise<void> {
-  const { html, text } = bookingCancelledCustomerEmail(details);
-  await sendAuthEmail({
-    kind: 'BOOKING_CANCELLED_CUSTOMER',
-    to,
-    subject: 'Your Alora booking was cancelled',
-    html,
-    text,
-  });
+  const context = await loadBookingEmailContext(bookingId);
+  if (!context) return;
+  await send(
+    'BOOKING_CANCELLED_CUSTOMER',
+    context.customerEmail,
+    bookingCancelledCustomerEmail(context, details),
+  );
 }

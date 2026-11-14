@@ -6,7 +6,6 @@ import { completeBooking, confirmBooking } from '@/lib/data/bookings';
 import { cancelBookingAsOwnerWithRefund } from '@/lib/data/payments';
 import { SERVICES_CACHE_TAG } from '@/lib/data/services';
 import { notifyCustomerBookingConfirmed } from '@/lib/notifications';
-import { formatDateTime } from '@/lib/format';
 
 function bookingId(formData: FormData): string {
   const id = formData.get('bookingId');
@@ -25,11 +24,7 @@ export async function confirmBookingAction(formData: FormData): Promise<void> {
 
   if (booking?.user?.email) {
     try {
-      await notifyCustomerBookingConfirmed(booking.user.email, {
-        customerName: booking.user.name ?? '',
-        serviceName: booking.service.name,
-        when: formatDateTime(booking.startsAt),
-      });
+      await notifyCustomerBookingConfirmed(booking.id);
     } catch (error) {
       console.error(
         '[owner] confirmation email failed:',

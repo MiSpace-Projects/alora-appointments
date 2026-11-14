@@ -126,3 +126,5 @@ describe('settlePaymentByReference', () => {
     expect(verifyTransaction).not.toHaveBeenCalled();
   });
 });
+
+export {};
