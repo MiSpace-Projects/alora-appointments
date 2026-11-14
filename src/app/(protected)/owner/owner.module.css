@@ -25,6 +25,11 @@
   flex-shrink: 0;
 }
 
+:global([data-theme='light']) .refresh {
+  border-color: rgba(94, 73, 60, 0.45);
+  color: #5e493c;
+}
+
 .title {
   margin: 0;
   font-size: clamp(1.6rem, 4vw, 2.2rem);
