@@ -118,7 +118,7 @@
 .credit {
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.5rem;
   color: inherit;
   text-decoration: none;
   font-size: 1rem;
@@ -130,6 +130,7 @@
 }
 
 .creditLabel {
+  margin-right: 0.15rem;
   opacity: 0.6;
 }
 

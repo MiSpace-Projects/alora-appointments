@@ -89,6 +89,7 @@ export default function Footer() {
           target="_blank"
           rel="noopener noreferrer"
         >
+          <span className={styles.creditLabel}>Site by</span>
           <Image
             className={styles.creditMark}
             src="/brand/oddityone-mark.svg"
@@ -97,7 +98,6 @@ export default function Footer() {
             height={28}
             unoptimized
           />
-          <span className={styles.creditLabel}>Site by</span>
           <span className={styles.creditName}>OddityOne</span>
           <span className={styles.srOnly}> (opens in a new tab)</span>
         </a>
