@@ -3,7 +3,7 @@ import type { OpeningHours } from '@/lib/booking-rules';
 export const businessContact = {
   tradingName: 'Alora Appointments',
   brandName: 'Alora',
-  email: 'alorabookings@gmail.com',
+  email: 'mmbalimaseko@gmail.com',
   phoneDisplay: '+27 (60) 639-7955',
   phoneE164: '+27606397955',
   location: 'Bethlehem, Free State',
