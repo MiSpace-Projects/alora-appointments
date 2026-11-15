@@ -103,13 +103,12 @@
   z-index: 1;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.35rem 1.5rem;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem 1.5rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-  padding-top: 1.5rem;
-  align-items: center;
+  padding: 1.5rem 2rem 0 0;
   font-size: 0.8rem;
-  text-align: center;
 }
 
 .copyright {
@@ -117,33 +116,32 @@
 }
 
 .credit {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.85rem;
-  border: 1px solid currentColor;
-  border-radius: 999px;
-  color: inherit;
-  text-decoration: none;
-  letter-spacing: 0.02em;
-  opacity: 0.85;
-  transition:
-    opacity 0.2s ease,
-    background-color 0.2s ease;
+  margin: 0;
 }
 
-.credit:hover,
-.credit:focus-visible {
-  opacity: 1;
-  background-color: rgba(128, 128, 128, 0.12);
+.credit,
+.creditLink {
+  color: inherit;
 }
 
 .creditLabel {
-  opacity: 0.7;
+  opacity: 0.55;
 }
 
-.creditName {
-  font-weight: 700;
+.creditLink {
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.3em;
+  transition:
+    text-decoration-thickness 0.2s ease,
+    text-underline-offset 0.2s ease;
+}
+
+.creditLink:hover,
+.creditLink:focus-visible {
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
 }
 
 .srOnly {
@@ -156,6 +154,13 @@
 }
 
 @media (max-width: 768px) {
+  .bottom {
+    flex-direction: column;
+    align-items: center;
+    padding-right: 0;
+    text-align: center;
+  }
+
   .watermark {
     right: -5rem;
     bottom: -4rem;
