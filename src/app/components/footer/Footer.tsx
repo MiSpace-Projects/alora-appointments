@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { routes } from '@/app/config/routes';
 import { businessContact } from '@/app/config/business';
@@ -82,17 +83,24 @@ export default function Footer() {
         <span className={styles.copyright}>
           © {year} {businessContact.tradingName}. All rights reserved.
         </span>
-        <p className={styles.credit}>
-          <span className={styles.creditLabel}>Site by</span>{' '}
-          <a
-            className={styles.creditLink}
-            href="https://oddityone.co.za"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            OddityOne<span className={styles.srOnly}> (opens in a new tab)</span>
-          </a>
-        </p>
+        <a
+          className={styles.credit}
+          href="https://oddityone.co.za"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Image
+            className={styles.creditMark}
+            src="/brand/oddityone-mark.svg"
+            alt=""
+            width={28}
+            height={28}
+            unoptimized
+          />
+          <span className={styles.creditLabel}>Site by</span>
+          <span className={styles.creditName}>OddityOne</span>
+          <span className={styles.srOnly}> (opens in a new tab)</span>
+        </a>
       </div>
     </footer>
   );
