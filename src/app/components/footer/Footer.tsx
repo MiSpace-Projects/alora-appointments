@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ArrowUpRight } from 'lucide-react';
 import { routes } from '@/app/config/routes';
 import { businessContact } from '@/app/config/business';
 import { serviceFamilies } from '@/app/features/servicesSection/servicesData';
@@ -79,10 +80,20 @@ export default function Footer() {
       </div>
 
       <div className={styles.bottom}>
-        <span>
+        <span className={styles.copyright}>
           © {year} {businessContact.tradingName}. All rights reserved.
         </span>
-        <span className={styles.credit}>Platform © {year} OddityOne</span>
+        <a
+          className={styles.credit}
+          href="https://oddityone.co.za"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span className={styles.creditLabel}>Platform by</span>
+          <span className={styles.creditName}>OddityOne</span>
+          <ArrowUpRight size={14} strokeWidth={2} aria-hidden="true" />
+          <span className={styles.srOnly}>(opens in a new tab)</span>
+        </a>
       </div>
     </footer>
   );
