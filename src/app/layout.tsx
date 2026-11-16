@@ -38,6 +38,7 @@ export const metadata: Metadata = {
   description:
     'Book premium hair and beauty appointments with Alora. Earn loyalty rewards on every visit.',
   applicationName: 'Alora',
+  formatDetection: { telephone: false, email: false, address: false, date: false },
   openGraph: {
     type: 'website',
     siteName: 'Alora',
@@ -55,16 +56,19 @@ export const metadata: Metadata = {
 
 const themeScript = `
   (function() {
+    var theme = null;
     try {
       var saved = localStorage.getItem('theme');
-      if (saved === 'light' || saved === 'dark') {
-        document.documentElement.setAttribute('data-theme', saved);
-      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      } else {
-        document.documentElement.setAttribute('data-theme', 'light');
-      }
+      if (saved === 'light' || saved === 'dark') theme = saved;
     } catch (e) {}
+    if (!theme) {
+      try {
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      } catch (e) {
+        theme = 'light';
+      }
+    }
+    document.documentElement.setAttribute('data-theme', theme);
   })();
 `;
 

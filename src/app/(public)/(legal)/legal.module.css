@@ -19,7 +19,7 @@
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  opacity: 0.55;
+  opacity: 0.65;
 }
 
 .title {
@@ -59,7 +59,7 @@
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  opacity: 0.55;
+  opacity: 0.65;
 }
 
 .tocList {
@@ -80,7 +80,7 @@
 .tocList a:hover,
 .tocList a:focus-visible {
   opacity: 1;
-  color: #d4c5b0;
+  color: var(--accent-ink);
 }
 
 .body {
@@ -125,7 +125,7 @@
 }
 
 .body a {
-  color: #d4c5b0;
+  color: var(--accent-ink);
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }
@@ -147,7 +147,7 @@
 }
 
 .facts dt {
-  opacity: 0.55;
+  opacity: 0.65;
 }
 
 .facts dd {
@@ -159,7 +159,7 @@
   padding: 0.05rem 0.5rem;
   border: 1px dashed rgba(212, 197, 176, 0.7);
   border-radius: 999px;
-  color: #d4c5b0;
+  color: var(--accent-ink);
   font-size: 0.78rem;
   letter-spacing: 0.04em;
 }
@@ -184,7 +184,7 @@
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  opacity: 0.55;
+  opacity: 0.65;
 }
 
 .callout {

@@ -57,7 +57,7 @@
   color: var(--text);
   font: inherit;
   font-size: 0.95rem;
-  opacity: 0.55;
+  opacity: 0.65;
   cursor: pointer;
   transition:
     opacity 0.2s ease,
@@ -159,7 +159,7 @@
   font-style: italic;
   font-size: 1.15rem;
   letter-spacing: 0.02em;
-  color: #d4c5b0;
+  color: var(--accent-ink);
 }
 
 .name {
@@ -248,7 +248,7 @@
   font-family: var(--font-playfair-display), serif;
   font-size: 1.5rem;
   font-weight: 600;
-  color: #d4c5b0;
+  color: var(--accent-ink);
   white-space: nowrap;
 }
 

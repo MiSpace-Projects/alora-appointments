@@ -162,7 +162,7 @@
   font-family: var(--font-playfair-display), serif;
   font-size: 1.2rem;
   font-weight: 700;
-  color: #d4c5b0;
+  color: var(--accent-ink);
 }
 
 .note {
@@ -173,7 +173,7 @@
 }
 
 .note a {
-  color: #d4c5b0;
+  color: var(--accent-ink);
 }
 
 .actions {
