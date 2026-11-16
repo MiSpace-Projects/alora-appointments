@@ -7,7 +7,7 @@
   padding: 1.35rem 1.5rem 1.4rem;
   border: 1px solid rgba(128, 128, 128, 0.22);
   border-radius: 1rem;
-  background: var(--content-bg, #000);
+  background: var(--content-bg);
   color: var(--text-color);
   box-shadow: 0 24px 50px rgba(0, 0, 0, 0.3);
   animation: rise 0.28s cubic-bezier(0.22, 1, 0.36, 1);
@@ -31,7 +31,7 @@
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  opacity: 0.55;
+  opacity: 0.65;
 }
 
 .title {
@@ -51,7 +51,7 @@
 }
 
 .body a {
-  color: #d4c5b0;
+  color: var(--accent-ink);
   text-decoration: underline;
   text-underline-offset: 0.15em;
 }

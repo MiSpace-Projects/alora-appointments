@@ -2,15 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+:root,
+[data-theme='light'] {
   --navbar-height: 72px;
   --breadcrumb-height: 40px;
-  --logo-ink: #050505;
-}
-
-[data-theme='light'] {
   --background: #ffffff;
   --foreground: #171717;
   --navbar-bg: rgba(255, 255, 255, 0.95);
@@ -18,6 +13,8 @@
   --content-bg: #f8f9fa;
   --logo-filter: none;
   --logo-ink: #050505;
+  --accent-ink: #5e493c;
+  color-scheme: light;
 }
 
 [data-theme='dark'] {
@@ -28,6 +25,22 @@
   --content-bg: #000;
   --logo-filter: brightness(0) invert(1);
   --logo-ink: #ede6dc;
+  --accent-ink: #d4c5b0;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --background: #000;
+    --foreground: #ededed;
+    --navbar-bg: rgba(0, 0, 0, 0.08);
+    --text-color: #ffffff;
+    --content-bg: #000;
+    --logo-filter: brightness(0) invert(1);
+    --logo-ink: #ede6dc;
+    --accent-ink: #d4c5b0;
+    color-scheme: dark;
+  }
 }
 
 html,
@@ -77,12 +90,6 @@ main {
 a {
   color: inherit;
   text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
 }
 
 .sr-only {

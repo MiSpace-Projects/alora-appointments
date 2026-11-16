@@ -29,7 +29,7 @@
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  opacity: 0.55;
+  opacity: 0.65;
 }
 
 .title {
@@ -117,7 +117,7 @@
   content: counter(step, decimal-leading-zero);
   font-family: var(--font-playfair-display), serif;
   font-size: 1.1rem;
-  color: #d4c5b0;
+  color: var(--accent-ink);
 }
 
 .includeTitle {
@@ -187,7 +187,7 @@
   font-family: var(--font-playfair-display), serif;
   font-size: 1.2rem;
   font-weight: 600;
-  color: #d4c5b0;
+  color: var(--accent-ink);
   white-space: nowrap;
 }
 
@@ -276,7 +276,7 @@
 }
 
 .addOnPrice {
-  color: #d4c5b0;
+  color: var(--accent-ink);
   white-space: nowrap;
 }
 

@@ -9,7 +9,7 @@
   flex-direction: column;
   gap: 3rem;
   color: var(--text);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(128, 128, 128, 0.22);
 }
 
 .top {
@@ -72,7 +72,7 @@
   font-size: 0.75rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  opacity: 0.5;
+  opacity: 0.65;
 }
 
 .links {
@@ -105,14 +105,14 @@
   flex-direction: column;
   align-items: center;
   gap: 1.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(128, 128, 128, 0.22);
   padding-top: 1.75rem;
   text-align: center;
 }
 
 .copyright {
   font-size: 0.8rem;
-  opacity: 0.45;
+  opacity: 0.65;
 }
 
 .credit {
