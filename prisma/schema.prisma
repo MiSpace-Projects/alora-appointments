@@ -23,6 +23,7 @@ model User {
   securityEvents   SecurityEvent[]
   authDevices      AuthDevice[]
   bookings         Booking[]
+  testimonials     Testimonial[]
   pointsLedger     PointsTransaction[]
   consentRecords   ConsentRecord[]
   payments         Payment[]
@@ -200,9 +201,10 @@ model Booking {
   updatedAt     DateTime      @updatedAt
   cancelledAt   DateTime?
 
-  user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-  service  Service   @relation(fields: [serviceId], references: [id], onDelete: Restrict)
-  payments Payment[]
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  service     Service      @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  payments    Payment[]
+  testimonial Testimonial?
 
   @@index([userId, startsAt])
   @@index([startsAt, status])
@@ -284,4 +286,52 @@ model ConsentRecord {
 
   @@index([userId, kind, createdAt])
   @@map("consent_record")
+}
+
+enum TestimonialStatus {
+  INVITED
+  SUBMITTED
+  PUBLISHED
+  HIDDEN
+}
+
+model Testimonial {
+  id          String            @id @default(cuid())
+  bookingId   String            @unique
+  userId      String?
+  tokenHash   String            @unique
+  expiresAt   DateTime
+  status      TestimonialStatus @default(INVITED)
+  rating      Int?
+  body        String?
+  displayName String?
+  consentAt   DateTime?
+  submittedAt DateTime?
+  publishedAt DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  booking Booking            @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  user    User?              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photos  TestimonialPhoto[]
+
+  @@index([status, publishedAt])
+  @@index([userId])
+  @@map("testimonial")
+}
+
+model TestimonialPhoto {
+  id            String   @id @default(cuid())
+  testimonialId String
+  url           String
+  pathname      String
+  width         Int
+  height        Int
+  position      Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  testimonial Testimonial @relation(fields: [testimonialId], references: [id], onDelete: Cascade)
+
+  @@index([testimonialId, position])
+  @@map("testimonial_photo")
 }
