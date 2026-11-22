@@ -5,7 +5,11 @@ import { requireOwner } from '@/lib/owner';
 import { completeBooking, confirmBooking } from '@/lib/data/bookings';
 import { cancelBookingAsOwnerWithRefund } from '@/lib/data/payments';
 import { SERVICES_CACHE_TAG } from '@/lib/data/services';
-import { notifyCustomerBookingConfirmed } from '@/lib/notifications';
+import { createTestimonialInvite } from '@/lib/data/testimonials';
+import {
+  notifyCustomerBookingCompleted,
+  notifyCustomerBookingConfirmed,
+} from '@/lib/notifications';
 
 function bookingId(formData: FormData): string {
   const id = formData.get('bookingId');
@@ -36,9 +40,20 @@ export async function confirmBookingAction(formData: FormData): Promise<void> {
 
 export async function completeBookingAction(formData: FormData): Promise<void> {
   await requireOwner();
-  await completeBooking(bookingId(formData));
+  const id = bookingId(formData);
+  await completeBooking(id);
   revalidatePath('/owner');
   revalidatePath('/profile');
+
+  try {
+    const token = await createTestimonialInvite(id);
+    await notifyCustomerBookingCompleted(id, token);
+  } catch (error) {
+    console.error(
+      '[owner] completion email failed:',
+      error instanceof Error ? error.message : error,
+    );
+  }
 }
 
 export async function cancelBookingAction(formData: FormData): Promise<void> {

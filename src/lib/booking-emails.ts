@@ -322,6 +322,64 @@ export function bookingCancelledCustomerEmail(
   return { subject: `Cancelled: ${context.serviceName}, ${time.date}`, html, text };
 }
 
+export function bookingCompletedCustomerEmail(
+  context: BookingEmailContext,
+  details: { testimonialUrl: string | null; pointsEarned: number },
+): BookingEmail {
+  const name = firstName(context.customerName);
+  const time = when(context);
+  const rows: [string, string][] = [
+    ['Service', context.serviceName],
+    ['Visit', `${time.day}, ${time.date} at ${time.start}`],
+    ['Price', context.price],
+    ['Payment', context.paid ? 'Paid online' : 'At the salon'],
+    ...(details.pointsEarned > 0
+      ? ([['Loyalty points', `+${details.pointsEarned}`]] as [string, string][])
+      : []),
+    ['Reference', reference(context.bookingId)],
+  ];
+  const ask = details.testimonialUrl
+    ? actions(
+        button(details.testimonialUrl, 'Leave a testimonial', 'sand'),
+        'It takes a minute. This link is just for you and works for 30 days.',
+      )
+    : actions(button(`${siteUrl()}/book`, 'Book your next visit'));
+  const html = layout(
+    `Thank you for visiting Alora Studios. Here is your receipt for ${context.serviceName}.`,
+    [
+      hero({
+        kicker: 'Visit complete',
+        title: `Thank you, ${name}.`,
+        lead: details.testimonialUrl
+          ? `We loved having you in for ${context.serviceName}. How did we do?`
+          : `We loved having you in for ${context.serviceName}.`,
+        imageUrl: `${siteUrl()}/email/services/${context.serviceSlug}.jpg`,
+        imageAlt: context.serviceName,
+      }),
+      detailRows(rows),
+      ask,
+      paragraph(
+        `Ready for the next one? ${link(`${siteUrl()}/book`, 'Book your next visit')}.`,
+        '28px 40px 0',
+      ),
+    ].join(''),
+    `You are receiving this because you booked at ${siteUrl().replace(/^https?:\/\//, '')}.`,
+  );
+  const text = [
+    `Thank you, ${name}.`,
+    '',
+    `We loved having you in for ${context.serviceName}.`,
+    '',
+    ...rows.map(([label, value]) => `${label}: ${value}`),
+    '',
+    ...(details.testimonialUrl
+      ? [`Leave a testimonial (link works for 30 days): ${details.testimonialUrl}`, '']
+      : []),
+    `Book your next visit: ${siteUrl()}/book`,
+  ].join('\n');
+  return { subject: `Thank you for visiting: your ${context.serviceName} receipt`, html, text };
+}
+
 export function newBookingOwnerEmail(context: BookingEmailContext): BookingEmail {
   const time = when(context);
   const dashboard = `${siteUrl()}/owner`;
