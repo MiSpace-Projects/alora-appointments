@@ -3,6 +3,8 @@ import { APIError, createAuthMiddleware, getSessionFromCtx } from 'better-auth/a
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { haveIBeenPwned, twoFactor } from 'better-auth/plugins';
 import { prisma } from './prisma';
+import { testimonialPhotoUrlsForUser } from './data/testimonials-owner';
+import { deleteStoredPhotos } from './testimonial-photo-storage';
 import {
   deleteAccountEmail,
   existingAccountSignUpEmail,
@@ -306,6 +308,7 @@ export const auth = betterAuth({
         });
       },
       beforeDelete: async (user) => {
+        await deleteStoredPhotos(await testimonialPhotoUrlsForUser(user.id));
         await prisma.booking.updateMany({
           where: { userId: user.id, notes: { not: null } },
           data: { notes: null },

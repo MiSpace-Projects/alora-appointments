@@ -60,3 +60,13 @@ describe('buildCsp', () => {
     }
   });
 });
+
+describe('testimonial photos', () => {
+  it('allows images from the public Vercel Blob store only', () => {
+    const imgSrc = buildCsp('nonce', 'production')
+      .split('; ')
+      .find((directive) => directive.startsWith('img-src'));
+    expect(imgSrc).toContain('https://*.public.blob.vercel-storage.com');
+    expect(imgSrc).not.toContain('https://*.vercel-storage.com ');
+  });
+});

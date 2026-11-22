@@ -12,7 +12,7 @@ export function buildCsp(nonce: string, environment: string | undefined): string
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${developmentDirectives}`,
     styleSrc,
     "style-src-attr 'unsafe-inline'",
-    "img-src 'self' data: blob: https://images.pexels.com",
+    "img-src 'self' data: blob: https://images.pexels.com https://*.public.blob.vercel-storage.com",
     "font-src 'self' data:",
     `connect-src 'self'${developmentDirectives}`,
     "frame-ancestors 'none'",
