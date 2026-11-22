@@ -45,6 +45,8 @@ function breadcrumbsFor(pathname: string): BreadcrumbItem[] {
   const configured = routeBreadcrumbs[pathname];
   if (configured) return configured;
 
+  if (pathname.startsWith('/testimonial/')) return [{ label: 'Your testimonial' }];
+
   const familyMatch = pathname.match(/^\/services\/([a-z0-9-]+)$/);
   const family = familyMatch ? getServiceFamily(familyMatch[1]) : undefined;
   if (family) return [{ label: 'Services', href: '/services' }, { label: family.title }];
