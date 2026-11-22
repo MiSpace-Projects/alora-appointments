@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 import { PrismaClient } from '@prisma/client';
 import { createDatabaseAdapter } from '../src/lib/db-adapter';
@@ -192,4 +193,73 @@ test('the owner dashboard needs a verified allowlisted email', async ({ page, re
   await expect(page.getByRole('heading', { name: 'Customers', exact: true })).toBeVisible();
   await expect(page.getByRole('tab', { name: /^All/ })).toHaveAttribute('aria-selected', 'true');
   await expect(page.getByRole('button', { name: 'Export marketing list' })).toBeVisible();
+});
+
+test('a completed visit invites a testimonial the owner can publish', async ({
+  browser,
+  page,
+  request,
+}) => {
+  const owner = await prisma.user.findUnique({ where: { email: ownerEmail } });
+  if (!owner) await signUp(request, ownerEmail, 'Salon Owner');
+  await verify(ownerEmail);
+
+  const email = `testimonial-${runId}@e2e.alora.test`;
+  await signUp(request, email, 'Lindiwe Testimonial');
+  const customer = await prisma.user.findUniqueOrThrow({ where: { email } });
+  const service = await prisma.service.findFirstOrThrow();
+  const booking = await prisma.booking.create({
+    data: {
+      userId: customer.id,
+      serviceId: service.id,
+      startsAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+      status: 'CONFIRMED',
+      priceCents: 25_000,
+      pointsAwarded: 10,
+    },
+  });
+
+  await page.context().clearCookies();
+  await signIn(page, ownerEmail, '/owner');
+  await page
+    .locator('li', { hasText: 'Lindiwe Testimonial' })
+    .getByRole('button', { name: 'Mark done' })
+    .click();
+  await expect.poll(() => prisma.testimonial.count({ where: { bookingId: booking.id } })).toBe(1);
+
+  const token = `e2e${runId}`.padEnd(43, 'x').slice(0, 43);
+  await prisma.testimonial.update({
+    where: { bookingId: booking.id },
+    data: { tokenHash: createHash('sha256').update(token).digest('hex') },
+  });
+
+  const guest = await browser.newPage();
+  await guest.goto(`/testimonial/${token}`, { waitUntil: 'networkidle' });
+  await expect(guest.getByRole('heading', { name: `How was your ${service.name}?` })).toBeVisible();
+  await guest.locator('label', { hasText: '5 stars, Loved it' }).click();
+  await expect(guest.getByRole('radio', { name: '5 stars, Loved it' })).toBeChecked();
+  await guest
+    .getByPlaceholder('What did you love about your visit?')
+    .fill('Best appointment I have had all year.');
+  await guest.getByRole('button', { name: 'Send testimonial' }).click();
+  await expect(guest.getByText('Please agree so we can share your testimonial.')).toBeVisible();
+  await expect(guest.getByPlaceholder('What did you love about your visit?')).toHaveValue(
+    'Best appointment I have had all year.',
+  );
+  await guest.getByRole('checkbox').check();
+  await guest.getByRole('button', { name: 'Send testimonial' }).click();
+  await expect(guest.getByText('Thank you, Lindiwe.')).toBeVisible();
+  await guest.reload({ waitUntil: 'networkidle' });
+  await expect(guest.getByText('We already have your testimonial for this visit.')).toBeVisible();
+  await guest.close();
+
+  await page.getByRole('link', { name: 'Testimonials', exact: true }).click();
+  await page.waitForURL((url) => url.pathname === '/owner/testimonials');
+  const card = page.locator('li', { hasText: 'Best appointment I have had all year.' });
+  await expect(card.getByText('Awaiting review')).toBeVisible();
+  await expect(card.getByLabel('5 out of 5 stars')).toBeVisible();
+  await card.getByRole('button', { name: 'Publish' }).click();
+  await expect(card.getByText('Live on site')).toBeVisible();
+  await card.getByRole('button', { name: 'Hide' }).click();
+  await expect(card.getByText('Hidden', { exact: true })).toBeVisible();
 });
