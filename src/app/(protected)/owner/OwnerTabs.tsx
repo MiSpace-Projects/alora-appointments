@@ -4,6 +4,7 @@ import styles from './owner.module.css';
 const TABS = [
   { href: '/owner', label: 'Bookings', key: 'bookings' },
   { href: '/owner/customers', label: 'Customers', key: 'customers' },
+  { href: '/owner/testimonials', label: 'Testimonials', key: 'testimonials' },
 ] as const;
 
 export function OwnerTabs({ active }: { active: (typeof TABS)[number]['key'] }) {
