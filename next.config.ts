@@ -18,11 +18,20 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   agentRules: false,
   poweredByHeader: false,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '4mb',
+    },
+  },
   images: {
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'images.pexels.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com',
       },
     ],
   },
