@@ -260,6 +260,16 @@ test('a completed visit invites a testimonial the owner can publish', async ({
   await expect(card.getByLabel('5 out of 5 stars')).toBeVisible();
   await card.getByRole('button', { name: 'Publish' }).click();
   await expect(card.getByText('Live on site')).toBeVisible();
+
+  const visitor = await browser.newPage();
+  await visitor.goto('/', { waitUntil: 'networkidle' });
+  const section = visitor.getByRole('region', { name: 'In their words' });
+  await expect(section.getByText('Best appointment I have had all year.')).toBeVisible();
+  await expect(section.getByText('Lindiwe', { exact: true })).toBeVisible();
+
   await card.getByRole('button', { name: 'Hide' }).click();
   await expect(card.getByText('Hidden', { exact: true })).toBeVisible();
+  await visitor.reload({ waitUntil: 'networkidle' });
+  await expect(visitor.getByText('Best appointment I have had all year.')).toHaveCount(0);
+  await visitor.close();
 });
