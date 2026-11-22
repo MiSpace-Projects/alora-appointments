@@ -1,5 +1,6 @@
 import {
   bookingCancelledCustomerEmail,
+  bookingCompletedCustomerEmail,
   bookingConfirmedCustomerEmail,
   bookingReceivedCustomerEmail,
   newBookingOwnerEmail,
@@ -74,5 +75,23 @@ describe('booking emails', () => {
     for (const email of all) {
       expect(email.html + email.text + email.subject).not.toContain(String.fromCharCode(0x2014));
     }
+  });
+  it('thanks the customer with a receipt and a testimonial link', () => {
+    const url = 'https://www.alorastudios.co.za/testimonial/abc';
+    const email = bookingCompletedCustomerEmail(context, { testimonialUrl: url, pointsEarned: 10 });
+    expect(email.subject).toContain('receipt');
+    expect(email.html).toContain(`href="${url}"`);
+    expect(email.html).toContain('Leave a testimonial');
+    expect(email.html).toContain('+10');
+    expect(email.html).not.toContain('<script>');
+    expect(email.text).toContain(url);
+    expect(email.attachments).toBeUndefined();
+  });
+
+  it('falls back to a rebook prompt when there is no testimonial link', () => {
+    const email = bookingCompletedCustomerEmail(context, { testimonialUrl: null, pointsEarned: 0 });
+    expect(email.html).not.toContain('Leave a testimonial');
+    expect(email.html).not.toContain('Loyalty points');
+    expect(email.html).toContain('/book');
   });
 });

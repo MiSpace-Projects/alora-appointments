@@ -5,9 +5,11 @@ import { parseOwnerAllowlist } from './owner-core';
 import { sendAuthEmail, type AuthEmailKind } from './email';
 import {
   bookingCancelledCustomerEmail,
+  bookingCompletedCustomerEmail,
   bookingConfirmedCustomerEmail,
   bookingReceivedCustomerEmail,
   newBookingOwnerEmail,
+  siteUrl,
   type BookingEmail,
   type BookingEmailContext,
 } from './booking-emails';
@@ -109,5 +111,25 @@ export async function notifyCustomerBookingCancelled(
     'BOOKING_CANCELLED_CUSTOMER',
     context.customerEmail,
     bookingCancelledCustomerEmail(context, details),
+  );
+}
+
+export async function notifyCustomerBookingCompleted(
+  bookingId: string,
+  testimonialToken: string | null,
+): Promise<void> {
+  const context = await loadBookingEmailContext(bookingId);
+  if (!context) return;
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    select: { pointsAwarded: true },
+  });
+  await send(
+    'BOOKING_COMPLETED_CUSTOMER',
+    context.customerEmail,
+    bookingCompletedCustomerEmail(context, {
+      testimonialUrl: testimonialToken ? `${siteUrl()}/testimonial/${testimonialToken}` : null,
+      pointsEarned: booking?.pointsAwarded ?? 0,
+    }),
   );
 }
