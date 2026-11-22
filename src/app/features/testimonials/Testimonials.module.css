@@ -1,0 +1,165 @@
+.section {
+  width: 100%;
+  padding: 5rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  color: var(--text-color);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.kicker {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-playfair-display), serif;
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  align-items: start;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgba(128, 128, 128, 0.22);
+  border-radius: 1.25rem;
+}
+
+.photo {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  background: rgba(128, 128, 128, 0.12);
+}
+
+.photoImg {
+  object-fit: cover;
+}
+
+.more {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 1.5rem;
+}
+
+.stars {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  color: var(--accent-ink);
+}
+
+.quote {
+  flex: 1;
+  margin: 0;
+}
+
+.quote p {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.caption {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.service {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+@media (max-width: 900px) {
+  .section {
+    padding: 3.5rem 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 3rem 0;
+  }
+
+  .header {
+    padding: 0 1.5rem;
+  }
+
+  .list {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0 1.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 1.5rem;
+    scrollbar-width: none;
+  }
+
+  .list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .card {
+    flex: 0 0 80%;
+    scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0 1.25rem;
+  }
+
+  .list {
+    padding: 0 1.25rem;
+    scroll-padding: 0 1.25rem;
+  }
+
+  .card {
+    flex-basis: 85%;
+  }
+}

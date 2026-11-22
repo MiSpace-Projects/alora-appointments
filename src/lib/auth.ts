@@ -3,7 +3,9 @@ import { APIError, createAuthMiddleware, getSessionFromCtx } from 'better-auth/a
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { haveIBeenPwned, twoFactor } from 'better-auth/plugins';
 import { prisma } from './prisma';
+import { revalidateTag } from 'next/cache';
 import { testimonialPhotoUrlsForUser } from './data/testimonials-owner';
+import { TESTIMONIALS_CACHE_TAG } from './data/testimonials-public';
 import { deleteStoredPhotos } from './testimonial-photo-storage';
 import {
   deleteAccountEmail,
@@ -318,6 +320,9 @@ export const auth = betterAuth({
           outcome: 'SUCCESS',
           userId: user.id,
         });
+      },
+      afterDelete: async () => {
+        revalidateTag(TESTIMONIALS_CACHE_TAG, { expire: 0 });
       },
     },
   },

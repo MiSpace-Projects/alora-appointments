@@ -5,6 +5,8 @@ import { StyleShowcase } from '../features/styleShowcase/StyleShowcase';
 import { listActiveServices } from '@/lib/data/services';
 import LoyaltyPage from '../features/loyalty/Loyalty';
 import QuickBookingsSection from '../features/quickBookings/QuickBookings';
+import { Testimonials } from '../features/testimonials/Testimonials';
+import { listPublishedTestimonials } from '@/lib/data/testimonials-public';
 import { businessContact } from '@/app/config/business';
 import type { Metadata } from 'next';
 import { routes } from '@/app/config/routes';
@@ -35,10 +37,16 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const services = await listActiveServices().catch((error: unknown) => {
-    console.error('[home] failed to load the service catalog', error);
-    return [];
-  });
+  const [services, testimonials] = await Promise.all([
+    listActiveServices().catch((error: unknown) => {
+      console.error('[home] failed to load the service catalog', error);
+      return [];
+    }),
+    listPublishedTestimonials().catch((error: unknown) => {
+      console.error('[home] failed to load testimonials', error);
+      return [];
+    }),
+  ]);
 
   return (
     <>
@@ -64,6 +72,7 @@ export default async function Home() {
           }))}
         />
         <LoyaltyPage />
+        <Testimonials testimonials={testimonials} />
         <QuickBookingsSection />
       </div>
     </>

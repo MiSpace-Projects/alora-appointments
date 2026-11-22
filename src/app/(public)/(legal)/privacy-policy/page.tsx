@@ -101,6 +101,15 @@ const sections: LegalSection[] = [
                 <td>Automatic when you complete a booking.</td>
               </tr>
               <tr>
+                <td>Testimonials</td>
+                <td>
+                  If you leave one after a visit: your star rating, what you wrote, the name you
+                  chose to show (first or full name), when you agreed to publication, and any photos
+                  of your look that the salon adds.
+                </td>
+                <td>No. Only if you choose to leave a testimonial.</td>
+              </tr>
+              <tr>
                 <td>Payments</td>
                 <td>
                   If you pay online: the amount, currency, payment reference, status and payment
@@ -206,6 +215,10 @@ const sections: LegalSection[] = [
                 <td>Legitimate interest (s11(1)(f))</td>
               </tr>
               <tr>
+                <td>Publishing your testimonial on our website, with photos of your look</td>
+                <td>Your consent, which you can withdraw at any time (s11(1)(a))</td>
+              </tr>
+              <tr>
                 <td>Marketing emails about offers and new services</td>
                 <td>Your consent, which you can withdraw at any time (s11(1)(a), s69)</td>
               </tr>
@@ -266,7 +279,7 @@ const sections: LegalSection[] = [
             <tbody>
               <tr>
                 <td>Vercel Inc.</td>
-                <td>Hosts this website and runs its code.</td>
+                <td>Hosts this website, runs its code and stores testimonial photos.</td>
                 <td>United States</td>
               </tr>
               <tr>
@@ -339,6 +352,10 @@ const sections: LegalSection[] = [
             <strong>Bookings and payment records:</strong> five years from the transaction, as
             required by tax law. After you close your account these records are kept without your
             name or email attached.
+          </li>
+          <li>
+            <strong>Testimonials and their photos:</strong> until you ask us to remove them or close
+            your account. Testimonial links in our emails stop working after 30 days.
           </li>
           <li>
             <strong>Security logs:</strong> twelve months.

@@ -1,7 +1,8 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, updateTag } from 'next/cache';
 import { requireOwner } from '@/lib/owner';
+import { TESTIMONIALS_CACHE_TAG } from '@/lib/data/testimonials-public';
 import {
   addTestimonialPhoto,
   assertPhotoSlot,
@@ -28,6 +29,7 @@ function requiredId(formData: FormData, key: string): string {
 }
 
 function refresh(): void {
+  updateTag(TESTIMONIALS_CACHE_TAG);
   revalidatePath('/owner/testimonials');
   revalidatePath('/');
 }
