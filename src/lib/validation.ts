@@ -14,9 +14,11 @@ export const accountNameSchema = z
   .max(80, 'Name must be 80 characters or fewer')
   .refine((name) => !/[\u0000-\u001f\u007f]/.test(name), 'Name contains invalid characters');
 
+export const PASSWORD_MIN_LENGTH = 8;
+
 export const newPasswordSchema = z
   .string()
-  .min(15, 'Password must be at least 15 characters')
+  .min(PASSWORD_MIN_LENGTH, `Password must be at least ${PASSWORD_MIN_LENGTH} characters`)
   .max(128, 'Password is too long');
 
 export const authSignUpSchema = z.object({

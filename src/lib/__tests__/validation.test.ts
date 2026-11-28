@@ -41,12 +41,15 @@ describe('registration validation', () => {
     expect(authSignUpSchema.parse({ ...base, marketingOptIn: true }).marketingOptIn).toBe(true);
   });
 
-  it('accepts a 15-character passphrase without composition rules', () => {
-    expect(registerSchema.safeParse(base).success).toBe(true);
+  it('accepts an 8-character password without composition rules', () => {
+    const password = 'abcdefgh';
+    expect(registerSchema.safeParse({ ...base, password, confirmPassword: password }).success).toBe(
+      true,
+    );
   });
 
-  it('rejects a password shorter than 15 characters', () => {
-    const password = 'too short';
+  it('rejects a password shorter than 8 characters', () => {
+    const password = 'abcdefg';
     expect(registerSchema.safeParse({ ...base, password, confirmPassword: password }).success).toBe(
       false,
     );
