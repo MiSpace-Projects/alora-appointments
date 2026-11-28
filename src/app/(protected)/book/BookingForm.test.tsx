@@ -79,3 +79,48 @@ describe('BookingForm family-first selection', () => {
     expect(screen.getByLabelText<HTMLSelectElement>('Service').value).toBe('m1');
   });
 });
+
+describe('BookingForm points', () => {
+  const reviewWith = async (pointsBalance: number) => {
+    const user = userEvent.setup();
+    render(
+      <BookingForm
+        families={families}
+        services={services}
+        preselectedServiceId="n1"
+        onlinePaymentAvailable={false}
+        pointsBalance={pointsBalance}
+      />,
+    );
+    await user.type(screen.getByLabelText(/Date & time/), '2030-03-04T10:00');
+    await user.click(screen.getByRole('button', { name: 'Review booking' }));
+    return user;
+  };
+
+  it('offers points in 100 steps up to half the price and lowers the total', async () => {
+    const { createBookingAction } = jest.requireMock('./actions') as {
+      createBookingAction: jest.Mock;
+    };
+    createBookingAction.mockResolvedValue({ ok: true, bookingId: 'b1' });
+    const user = await reviewWith(450);
+
+    const picker = screen.getByLabelText<HTMLSelectElement>('Use your points');
+    expect(
+      within(picker)
+        .getAllByRole('option')
+        .map((option) => option.textContent),
+    ).toEqual(['Don’t use points', '100 points · R50 off', '200 points · R100 off']);
+
+    await user.selectOptions(picker, '200');
+    expect(screen.getByText('R150')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Confirm booking' }));
+    expect(createBookingAction).toHaveBeenCalledWith(
+      expect.objectContaining({ serviceId: 'n1', redeemPoints: 200 }),
+    );
+  });
+
+  it('hides the picker when there are not enough points', async () => {
+    await reviewWith(99);
+    expect(screen.queryByLabelText('Use your points')).not.toBeInTheDocument();
+  });
+});

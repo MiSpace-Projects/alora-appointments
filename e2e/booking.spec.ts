@@ -274,6 +274,66 @@ test('a completed visit invites a testimonial the owner can publish', async ({
   await visitor.close();
 });
 
+test('a customer pays part of a booking with points and gets them back on cancelling', async ({
+  page,
+  request,
+}) => {
+  const email = `points-${runId}@e2e.alora.test`;
+  await signUp(request, email, 'Points Customer');
+  await verify(email);
+  const user = await prisma.user.findUniqueOrThrow({ where: { email } });
+  await prisma.pointsTransaction.create({
+    data: { userId: user.id, delta: 300, reason: 'ADJUSTMENT' },
+  });
+
+  const service = await prisma.service.findFirstOrThrow({
+    where: { active: true, category: 'Wig Care', priceType: 'FIXED', priceCents: { gte: 20_000 } },
+    orderBy: { priceCents: 'asc' },
+  });
+  const rand = (cents: number) => `R${Math.round(cents / 100).toLocaleString('en-ZA')}`;
+
+  await page.context().clearCookies();
+  await signIn(page, email, '/book');
+  await page.locator('#familySlug').selectOption('wig-care');
+  await page.locator('#serviceId').selectOption(service.id);
+  await page.locator('#startsAt').fill(futureSastSlot(9));
+  await page.locator('input[value="PAY_NOW"]').check();
+  await page.getByRole('button', { name: 'Review booking' }).click();
+
+  await page.getByLabel('Use your points').selectOption('100');
+  await expect(page.getByText('100 points · R50 off').first()).toBeVisible();
+  await page
+    .getByRole('button', { name: `Confirm & pay ${rand(service.priceCents - 5_000)}` })
+    .click();
+  await expect(page).toHaveURL(/\/book\/payment\/mock\?reference=mock_/);
+  await page.locator('button[name="outcome"][value="success"]').click();
+  await expect(page.getByRole('heading', { name: 'Payment received' })).toBeVisible();
+
+  const booking = await prisma.booking.findFirstOrThrow({
+    where: { userId: user.id },
+    include: { payments: true },
+  });
+  expect(booking.pointsRedeemed).toBe(100);
+  expect(booking.discountCents).toBe(5_000);
+  expect(booking.payments[0]?.amountCents).toBe(service.priceCents - 5_000);
+
+  await page.goto('/profile', { waitUntil: 'networkidle' });
+  await expect(page.getByText('100 points used · R50 off')).toBeVisible();
+  await expect(page.getByText('points · worth R100')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Cancel', exact: true }).first().click();
+  await page.getByRole('button', { name: 'Yes, cancel' }).click();
+  await expect
+    .poll(async () => {
+      const sum = await prisma.pointsTransaction.aggregate({
+        where: { userId: user.id },
+        _sum: { delta: true },
+      });
+      return sum._sum.delta;
+    })
+    .toBe(300);
+});
+
 test('an account without accepted terms must accept them before booking', async ({
   page,
   request,

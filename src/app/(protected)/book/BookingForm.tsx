@@ -19,6 +19,12 @@ import { routes } from '@/app/config/routes';
 import { bookingRules, cancellationPolicy } from '@/app/config/business';
 import { describeOpeningHours } from '@/lib/booking-rules';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
+import {
+  maxRedeemablePoints,
+  MAX_REDEEM_SHARE_PERCENT,
+  pointsValueCents,
+  REDEEM_STEP_POINTS,
+} from '@/lib/rewards-core';
 import { createBookingAction } from './actions';
 import styles from './book.module.css';
 
@@ -45,6 +51,7 @@ interface BookingFormProps {
   services: ServiceOption[];
   preselectedServiceId?: string;
   onlinePaymentAvailable: boolean;
+  pointsBalance?: number;
 }
 
 type FormInput = z.input<typeof createBookingSchema>;
@@ -54,12 +61,14 @@ export function BookingForm({
   services,
   preselectedServiceId,
   onlinePaymentAvailable,
+  pointsBalance = 0,
 }: BookingFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
   const [step, setStep] = useState<'details' | 'review'>('details');
   const [reviewed, setReviewed] = useState<CreateBookingInput | null>(null);
+  const [redeemPoints, setRedeemPoints] = useState(0);
   const [familySlug, setFamilySlug] = useState<string>(
     () =>
       services.find((s) => s.id === preselectedServiceId)?.familySlug ??
@@ -93,6 +102,7 @@ export function BookingForm({
   const goToReview = (data: CreateBookingInput) => {
     setServerError(null);
     setReviewed(data);
+    setRedeemPoints(0);
     setStep('review');
   };
 
@@ -100,7 +110,7 @@ export function BookingForm({
     if (!reviewed) return;
     setServerError(null);
     startTransition(async () => {
-      const result = await createBookingAction(reviewed);
+      const result = await createBookingAction({ ...reviewed, redeemPoints });
       if (!result.ok) {
         setServerError(result.error);
         toast.error(result.error);
@@ -120,6 +130,24 @@ export function BookingForm({
   const reviewedService = reviewed && services.find((s) => s.id === reviewed.serviceId);
   const reviewedFamily =
     reviewedService && families.find((family) => family.slug === reviewedService.familySlug);
+  const redeemable = reviewedService
+    ? maxRedeemablePoints(pointsBalance, reviewedService.priceCents)
+    : 0;
+  const redeemOptions = Array.from(
+    { length: redeemable / REDEEM_STEP_POINTS },
+    (_, index) => (index + 1) * REDEEM_STEP_POINTS,
+  );
+  const discountCents = pointsValueCents(redeemPoints);
+  const reviewedTotal = reviewedService
+    ? {
+        ...reviewedService,
+        priceCents: reviewedService.priceCents - discountCents,
+        priceMaxCents:
+          reviewedService.priceMaxCents === null
+            ? null
+            : reviewedService.priceMaxCents - discountCents,
+      }
+    : null;
 
   const chooseFamily = (slug: string) => {
     setFamilySlug(slug);
@@ -284,8 +312,8 @@ export function BookingForm({
                   <dd>{reviewedService.durationMinutes} min</dd>
                 </div>
                 <div className={styles.reviewRow}>
-                  <dt>Loyalty</dt>
-                  <dd>+{reviewedService.pointsAwarded} points on completion</dd>
+                  <dt>Rewards</dt>
+                  <dd>Points are added when your visit is completed</dd>
                 </div>
                 <div className={styles.reviewRow}>
                   <dt>Payment</dt>
@@ -299,11 +327,46 @@ export function BookingForm({
                     <dd>{reviewed.notes}</dd>
                   </div>
                 )}
+                {discountCents > 0 && (
+                  <div className={styles.reviewRow}>
+                    <dt>Points</dt>
+                    <dd>
+                      {redeemPoints} points · {formatZar(discountCents)} off
+                    </dd>
+                  </div>
+                )}
                 <div className={`${styles.reviewRow} ${styles.reviewTotal}`}>
                   <dt>Total</dt>
-                  <dd>{formatPrice(reviewedService)}</dd>
+                  <dd>{formatPrice(reviewedTotal ?? reviewedService)}</dd>
                 </div>
               </dl>
+
+              {redeemOptions.length > 0 && (
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="redeemPoints">
+                    Use your points
+                  </label>
+                  <select
+                    id="redeemPoints"
+                    className={styles.select}
+                    value={redeemPoints}
+                    disabled={isPending}
+                    onChange={(event) => setRedeemPoints(Number(event.target.value))}
+                  >
+                    <option value={0}>Don&rsquo;t use points</option>
+                    {redeemOptions.map((points) => (
+                      <option key={points} value={points}>
+                        {points} points · {formatZar(pointsValueCents(points))} off
+                      </option>
+                    ))}
+                  </select>
+                  <p className={styles.priceNote}>
+                    You have {pointsBalance} points, worth{' '}
+                    {formatZar(pointsValueCents(pointsBalance))}. Points can pay for up to{' '}
+                    {MAX_REDEEM_SHARE_PERCENT}% of a booking and come back if you cancel.
+                  </p>
+                </div>
+              )}
 
               <p className={styles.legalNote}>
                 By confirming you accept the{' '}
@@ -319,7 +382,7 @@ export function BookingForm({
 
               <SubmitButton type="button" loading={isPending} onClick={confirm}>
                 {reviewed.paymentMethod === 'PAY_NOW'
-                  ? `Confirm & pay ${formatZar(reviewedService.priceCents)}`
+                  ? `Confirm & pay ${formatZar(reviewedService.priceCents - discountCents)}`
                   : 'Confirm booking'}
               </SubmitButton>
               <button
