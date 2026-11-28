@@ -9,7 +9,7 @@ import { HeroPortrait } from './HeroPortrait';
 import { heroVariants, textBlockVariants, visualVariants } from './heroAnimations';
 import { heroActions, heroCopy } from './heroData';
 
-export default function Hero() {
+export default function Hero({ festive = false }: { festive?: boolean }) {
   return (
     <motion.section
       className={styles.hero}
@@ -18,7 +18,7 @@ export default function Hero() {
       variants={heroVariants}
     >
       <motion.div className={styles.content} variants={textBlockVariants}>
-        <p className={styles.label}>{heroCopy.label}</p>
+        <p className={styles.label}>{festive ? heroCopy.festiveLabel : heroCopy.label}</p>
         <h1 className={styles.title}>{heroCopy.title}</h1>
         <p className={styles.description}>{heroCopy.description}</p>
 

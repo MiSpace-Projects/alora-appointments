@@ -10,6 +10,7 @@ import { listPublishedTestimonials } from '@/lib/data/testimonials-public';
 import { businessContact } from '@/app/config/business';
 import type { Metadata } from 'next';
 import { routes } from '@/app/config/routes';
+import { festiveSeasonNow } from '@/lib/festive';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000';
 
@@ -54,7 +55,7 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
-      <Hero />
+      <Hero festive={festiveSeasonNow()} />
       <div className={styles.home}>
         <Services />
         <StyleShowcase

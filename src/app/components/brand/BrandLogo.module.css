@@ -1,0 +1,11 @@
+.logo {
+  overflow: visible;
+}
+
+.hat {
+  display: none;
+}
+
+:global(html[data-festive='true']) .hat {
+  display: inline;
+}
