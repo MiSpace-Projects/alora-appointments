@@ -45,6 +45,9 @@ export async function createBookingAction(input: unknown): Promise<BookingAction
   if (!session.user.emailVerified) {
     return { ok: false, error: ERROR_COPY.EMAIL_NOT_VERIFIED };
   }
+  if (!session.user.termsAccepted) {
+    return { ok: false, error: 'Please accept the terms on the welcome page before booking.' };
+  }
 
   const parsed = createBookingSchema.safeParse(input);
   if (!parsed.success) {
@@ -109,6 +112,9 @@ export async function startPaymentAction(bookingId: unknown): Promise<BookingAct
   }
   if (!session.user.emailVerified) {
     return { ok: false, error: ERROR_COPY.EMAIL_NOT_VERIFIED };
+  }
+  if (!session.user.termsAccepted) {
+    return { ok: false, error: 'Please accept the terms on the welcome page before booking.' };
   }
   if (typeof bookingId !== 'string' || bookingId.length === 0) {
     return { ok: false, error: ERROR_COPY.BOOKING_NOT_FOUND };

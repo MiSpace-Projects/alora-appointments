@@ -273,3 +273,49 @@ test('a completed visit invites a testimonial the owner can publish', async ({
   await expect(visitor.getByText('Best appointment I have had all year.')).toHaveCount(0);
   await visitor.close();
 });
+
+test('an account without accepted terms must accept them before booking', async ({
+  page,
+  request,
+}) => {
+  const email = `social-${runId}@e2e.alora.test`;
+  await signUp(request, email, 'Zinhle Social');
+  await verify(email);
+  await page.context().clearCookies();
+  await signIn(page, email, '/profile');
+
+  const user = await prisma.user.update({
+    where: { email },
+    data: { termsAccepted: false },
+  });
+  await prisma.consentRecord.deleteMany({ where: { userId: user.id } });
+
+  await page.goto('/book', { waitUntil: 'networkidle' });
+  await page.waitForURL((url) => url.pathname === '/welcome');
+  expect(new URL(page.url()).searchParams.get('next')).toBe('/book');
+  await expect(page.getByRole('heading', { name: 'Welcome, Zinhle' })).toBeVisible();
+
+  await page.getByRole('button', { name: /continue/i }).click();
+  await expect(
+    page.getByText('Please accept the terms and privacy policy to continue.'),
+  ).toBeVisible();
+
+  await page.getByRole('checkbox', { name: /Terms & Booking Policy/ }).check();
+  await page.getByRole('button', { name: /continue/i }).click();
+  await page.waitForURL((url) => url.pathname === '/book');
+
+  const refreshed = await prisma.user.findUniqueOrThrow({ where: { email } });
+  expect(refreshed.termsAccepted).toBe(true);
+  expect(refreshed.marketingOptIn).toBe(false);
+  const kinds = await prisma.consentRecord.findMany({
+    where: { userId: user.id },
+    select: { kind: true, granted: true },
+  });
+  expect(kinds).toEqual(
+    expect.arrayContaining([
+      { kind: 'TERMS', granted: true },
+      { kind: 'PRIVACY_NOTICE', granted: true },
+      { kind: 'MARKETING', granted: false },
+    ]),
+  );
+});

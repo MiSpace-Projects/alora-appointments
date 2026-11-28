@@ -39,13 +39,6 @@ const EMAIL_VERIFICATION_TTL_SECONDS = 24 * HOUR_SECONDS;
 const RESET_PASSWORD_TTL_SECONDS = HOUR_SECONDS;
 
 const socialProviders = {
-  ...(process.env.GITHUB_CLIENT_ID &&
-    process.env.GITHUB_CLIENT_SECRET && {
-      github: {
-        clientId: process.env.GITHUB_CLIENT_ID,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      },
-    }),
   ...(process.env.GOOGLE_CLIENT_ID &&
     process.env.GOOGLE_CLIENT_SECRET && {
       google: {
@@ -58,13 +51,9 @@ const socialProviders = {
       apple: {
         clientId: process.env.APPLE_CLIENT_ID,
         clientSecret: process.env.APPLE_CLIENT_SECRET,
-      },
-    }),
-  ...(process.env.DISCORD_CLIENT_ID &&
-    process.env.DISCORD_CLIENT_SECRET && {
-      discord: {
-        clientId: process.env.DISCORD_CLIENT_ID,
-        clientSecret: process.env.DISCORD_CLIENT_SECRET,
+        ...(process.env.APPLE_APP_BUNDLE_IDENTIFIER && {
+          appBundleIdentifier: process.env.APPLE_APP_BUNDLE_IDENTIFIER,
+        }),
       },
     }),
 };
@@ -197,7 +186,8 @@ export const auth = betterAuth({
     encryptOAuthTokens: true,
     accountLinking: {
       enabled: true,
-      disableImplicitLinking: true,
+      disableImplicitLinking: false,
+      requireLocalEmailVerified: true,
       allowDifferentEmails: false,
       allowUnlinkingAll: false,
     },
@@ -229,7 +219,10 @@ export const auth = betterAuth({
     },
   },
 
-  trustedOrigins: getTrustedOrigins(),
+  trustedOrigins: [
+    ...getTrustedOrigins(),
+    ...(process.env.APPLE_CLIENT_ID ? ['https://appleid.apple.com'] : []),
+  ],
   socialProviders,
   plugins: authPlugins,
 
@@ -293,7 +286,7 @@ export const auth = betterAuth({
 
   user: {
     additionalFields: {
-      termsAccepted: { type: 'boolean', required: true, input: true },
+      termsAccepted: { type: 'boolean', required: false, defaultValue: false, input: true },
       marketingOptIn: { type: 'boolean', required: false, defaultValue: false, input: true },
     },
     deleteUser: {
@@ -336,6 +329,7 @@ export const auth = betterAuth({
             outcome: 'SUCCESS',
             userId: user.id,
           });
+          if ((user as { termsAccepted?: boolean }).termsAccepted !== true) return;
           await recordSignUpConsents({
             userId: user.id,
             marketingOptIn: Boolean((user as { marketingOptIn?: boolean }).marketingOptIn),

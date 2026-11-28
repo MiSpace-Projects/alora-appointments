@@ -15,6 +15,7 @@ import { AuthCard, AuthHeader } from '@/app/components/authCard/AuthCard';
 import { FormField } from '@/app/components/form/Form';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
 import { TabControl } from '@/app/components/AuthTabs/TabControl';
+import { SocialAuthButtons } from '@/app/components/socialAuthButtons/SocialAuthButtons';
 import { routes } from '@/app/config/routes';
 import styles from './page.module.css';
 import shared from '../shared.module.css';
@@ -198,6 +199,7 @@ export default function RegisterPage() {
             <p className={styles.subtitle}>Join Alora and start earning loyalty rewards</p>
           </div>
           {registerForm}
+          <SocialAuthButtons redirectTo="/profile" />
           {loginPrompt}
         </>
       ),

@@ -39,6 +39,14 @@ const itemVariants = {
   },
 };
 
+function socialErrorMessage(code: string | null): string | null {
+  if (!code) return null;
+  if (code === 'account_not_linked') {
+    return 'This email already has an Alora account. Sign in with your password, then link Google or Apple from your profile.';
+  }
+  return 'Sign-in with Google or Apple did not complete. Please try again.';
+}
+
 function LoginInner() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -58,6 +66,7 @@ function LoginInner() {
   });
 
   const destination = sanitizeRedirect(searchParams.get('callbackUrl'));
+  const socialError = socialErrorMessage(searchParams.get('error'));
 
   const onSubmit: SubmitHandler<LoginInput> = async (data) => {
     setLoading(true);
@@ -108,6 +117,11 @@ function LoginInner() {
 
   const loginForm = (
     <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+      {socialError && (
+        <p className={styles.formNotice} role="alert">
+          {socialError}
+        </p>
+      )}
       <motion.div variants={itemVariants}>
         <FormField
           type="email"
