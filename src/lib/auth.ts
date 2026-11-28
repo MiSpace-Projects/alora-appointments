@@ -18,7 +18,7 @@ import {
 } from './email';
 import { authRuntimeConfig, getTrustedOrigins } from './auth-config';
 import { hashPassword, verifyPassword } from './password';
-import { authSignUpSchema } from './validation';
+import { authSignUpSchema, PASSWORD_MIN_LENGTH } from './validation';
 import {
   getConfiguredClientAddress,
   recordSecurityEvent,
@@ -102,7 +102,7 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: false,
     autoSignIn: false,
-    minPasswordLength: 15,
+    minPasswordLength: PASSWORD_MIN_LENGTH,
     maxPasswordLength: 128,
     resetPasswordTokenExpiresIn: RESET_PASSWORD_TTL_SECONDS,
     revokeSessionsOnPasswordReset: true,
