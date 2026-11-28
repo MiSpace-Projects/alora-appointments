@@ -22,10 +22,11 @@ interface Enrollment {
   backupCodes: string[];
 }
 
+const PROVIDER_LABEL: Record<string, string> = { google: 'Google', apple: 'Apple' };
+
 const enabledProviders = [
   ...(process.env.NEXT_PUBLIC_GOOGLE_ENABLED === 'true' ? ['google'] : []),
-  ...(process.env.NEXT_PUBLIC_GITHUB_ENABLED === 'true' ? ['github'] : []),
-  ...(process.env.NEXT_PUBLIC_DISCORD_ENABLED === 'true' ? ['discord'] : []),
+  ...(process.env.NEXT_PUBLIC_APPLE_ENABLED === 'true' ? ['apple'] : []),
 ];
 
 function deviceLabel(userAgent: string | null | undefined): string {
@@ -384,7 +385,9 @@ export function SecuritySettings({
                   onClick={() => authClient.linkSocial({ provider, callbackURL: '/profile' })}
                 >
                   <LinkIcon size={15} />
-                  {linked ? `${provider} linked` : `Link ${provider}`}
+                  {linked
+                    ? `${PROVIDER_LABEL[provider] ?? provider} linked`
+                    : `Link ${PROVIDER_LABEL[provider] ?? provider}`}
                 </button>
               );
             })}
