@@ -12,7 +12,7 @@ export function isFestiveSeason(now: Date, override?: string): boolean {
   const parts = SAST_PARTS.formatToParts(now);
   const month = Number(parts.find((part) => part.type === 'month')?.value);
   const day = Number(parts.find((part) => part.type === 'day')?.value);
-  return month === 12 || (month === 1 && day <= 6);
+  return (month === 11 && day >= 28) || (month === 12 && day <= 26);
 }
 
 export function festiveSeasonNow(): boolean {
