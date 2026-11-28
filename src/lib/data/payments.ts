@@ -1,6 +1,7 @@
 import 'server-only';
 import type { Payment, PaymentStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
+import { returnRedeemedPoints } from './rewards';
 import {
   buildPaymentReference,
   initializeTransaction,
@@ -79,7 +80,7 @@ export async function startBookingPayment(
     const reference = buildPaymentReference(booking.id);
     init = await initializeTransaction({
       email: userEmail,
-      amountCents: booking.priceCents,
+      amountCents: booking.priceCents - booking.discountCents,
       reference,
       callbackUrl,
       metadata: { bookingId: booking.id, userId },
@@ -92,7 +93,7 @@ export async function startBookingPayment(
         bookingId: booking.id,
         userId,
         reference: init.reference,
-        amountCents: booking.priceCents,
+        amountCents: booking.priceCents - booking.discountCents,
         authorizationUrl: init.authorizationUrl,
         status: 'PENDING',
       },
@@ -331,6 +332,7 @@ export async function cancelBookingWithRefund(
     data: { status: 'CANCELLED', cancelledAt: new Date() },
   });
   if (claimed.count === 0) throw new Error('BOOKING_NOT_FOUND');
+  await returnRedeemedPoints(bookingId);
 
   const paid = booking.payments[0] ?? null;
   const quote = quoteRefund({
@@ -364,6 +366,7 @@ export async function cancelBookingAsOwnerWithRefund(
     data: { status: 'CANCELLED', cancelledAt: new Date() },
   });
   if (claimed.count === 0) throw new Error('BOOKING_NOT_FOUND');
+  await returnRedeemedPoints(bookingId);
 
   const payments = await prisma.payment.findMany({
     where: { bookingId, status: { in: ['SUCCESS', 'PARTIALLY_REFUNDED'] } },

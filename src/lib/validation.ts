@@ -61,6 +61,7 @@ export const createBookingSchema = z.object({
     }),
   notes: z.string().max(500, 'Notes are too long').optional(),
   paymentMethod: z.enum(['PAY_NOW', 'PAY_IN_SALON']),
+  redeemPoints: z.number().int().min(0).max(100_000).optional(),
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

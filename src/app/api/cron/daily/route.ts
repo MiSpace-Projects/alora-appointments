@@ -1,5 +1,6 @@
 import { isAuthorizedCronRequest } from '@/lib/cron-auth';
 import { countRecentFailures, purgeExpiredData } from '@/lib/data/retention';
+import { expireDormantPoints } from '@/lib/data/rewards';
 import { sendFailureAlert } from '@/lib/operations-alert';
 import { retentionCutoffs } from '@/lib/retention-core';
 
@@ -19,6 +20,7 @@ export async function GET(request: Request): Promise<Response> {
     const failures = await countRecentFailures(alertWindowStart);
     const alert = await sendFailureAlert(failures, { start: alertWindowStart, end: now });
     const retention = await purgeExpiredData(now);
+    const pointsExpired = await expireDormantPoints(now);
 
     console.info(
       JSON.stringify({
@@ -28,6 +30,7 @@ export async function GET(request: Request): Promise<Response> {
         failures,
         alert,
         retention,
+        pointsExpired,
       }),
     );
 
@@ -39,6 +42,7 @@ export async function GET(request: Request): Promise<Response> {
         failures,
         alert,
         retention,
+        pointsExpired,
       },
       { headers: NO_STORE },
     );

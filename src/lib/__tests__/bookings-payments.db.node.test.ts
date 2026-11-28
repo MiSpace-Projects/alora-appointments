@@ -3,12 +3,16 @@ const describeDb = TEST_DATABASE_URL ? describe : describe.skip;
 
 type Bookings = typeof import('@/lib/data/bookings');
 type Payments = typeof import('@/lib/data/payments');
+type Rewards = typeof import('@/lib/data/rewards');
 type Db = typeof import('@/lib/prisma');
 type Config = typeof import('@/app/config/business');
 
 describeDb('bookings and payments against a real database', () => {
   let bookings: Bookings;
   let payments: Payments;
+  let rewards: Rewards;
+  let rewardServiceId = '';
+  let rewardPriceCents = 0;
   let prisma: Db['prisma'];
   let rules: Config['bookingRules'];
   const runId = `t${Date.now().toString(36)}`;
@@ -51,6 +55,7 @@ describeDb('bookings and payments against a real database', () => {
     ({ prisma } = await import('@/lib/prisma'));
     bookings = await import('@/lib/data/bookings');
     payments = await import('@/lib/data/payments');
+    rewards = await import('@/lib/data/rewards');
     ({ bookingRules: rules } = await import('@/app/config/business'));
     const fixed = await prisma.service.findFirstOrThrow({
       where: { active: true, priceType: 'FIXED', category: { not: null } },
@@ -58,6 +63,17 @@ describeDb('bookings and payments against a real database', () => {
     const from = await prisma.service.findFirstOrThrow({
       where: { active: true, priceType: { not: 'FIXED' }, category: { not: null } },
     });
+    const rewardService = await prisma.service.findFirstOrThrow({
+      where: {
+        active: true,
+        priceType: 'FIXED',
+        category: { not: null },
+        priceCents: { gte: 25_000 },
+      },
+      orderBy: { priceCents: 'desc' },
+    });
+    rewardServiceId = rewardService.id;
+    rewardPriceCents = rewardService.priceCents;
     fixedServiceId = fixed.id;
     fromServiceId = from.id;
     durationMinutes = fixed.durationMinutes;
@@ -81,6 +97,129 @@ describeDb('bookings and payments against a real database', () => {
     paymentMethod: 'PAY_NOW' | 'PAY_IN_SALON' = 'PAY_IN_SALON',
     serviceId = fixedServiceId,
   ) => bookings.createBooking(userId, { serviceId, startsAt, paymentMethod });
+
+  const grant = (userId: string, points: number) =>
+    prisma.pointsTransaction.create({ data: { userId, delta: points, reason: 'ADJUSTMENT' } });
+
+  const balance = async (userId: string) =>
+    (await prisma.pointsTransaction.aggregate({ where: { userId }, _sum: { delta: true } }))._sum
+      .delta ?? 0;
+
+  const redeemBooking = (
+    userId: string,
+    redeemPoints: number,
+    paymentMethod: 'PAY_NOW' | 'PAY_IN_SALON' = 'PAY_IN_SALON',
+  ) =>
+    bookings.createBooking(userId, {
+      serviceId: rewardServiceId,
+      startsAt: nextSlot(),
+      paymentMethod,
+      redeemPoints,
+    });
+
+  it('takes redeemed points off the booking and the online payment', async () => {
+    const a = await makeUser();
+    await grant(a, 300);
+    const booking = await redeemBooking(a, 200, 'PAY_NOW');
+    expect(booking.pointsRedeemed).toBe(200);
+    expect(booking.discountCents).toBe(10_000);
+    expect(await balance(a)).toBe(100);
+    const { reference } = await payments.startBookingPayment(
+      a,
+      'x@alora.test',
+      booking.id,
+      'http://localhost/back',
+    );
+    const payment = await prisma.payment.findUniqueOrThrow({ where: { reference } });
+    expect(payment.amountCents).toBe(rewardPriceCents - 10_000);
+  });
+
+  it('refuses redemptions over the balance, over half the price or off the 100 step', async () => {
+    const a = await makeUser();
+    await grant(a, 150);
+    await expect(redeemBooking(a, 200)).rejects.toThrow('INVALID_POINTS_REDEMPTION');
+    await expect(redeemBooking(a, 50)).rejects.toThrow('INVALID_POINTS_REDEMPTION');
+    const rich = await makeUser();
+    const overHalf = (Math.floor(rewardPriceCents / 2 / 5_000) + 1) * 100;
+    await grant(rich, overHalf);
+    await expect(redeemBooking(rich, overHalf)).rejects.toThrow('INVALID_POINTS_REDEMPTION');
+    expect(await prisma.booking.count({ where: { userId: { in: [a, rich] } } })).toBe(0);
+  });
+
+  it('never spends the same points twice when two bookings redeem at once', async () => {
+    const a = await makeUser();
+    await grant(a, 100);
+    const results = await Promise.allSettled([redeemBooking(a, 100), redeemBooking(a, 100)]);
+    expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
+    expect(await balance(a)).toBe(0);
+  });
+
+  it('returns redeemed points once when a booking is cancelled twice at the same time', async () => {
+    const a = await makeUser();
+    await grant(a, 100);
+    const booking = await redeemBooking(a, 100);
+    await Promise.allSettled([
+      payments.cancelBookingWithRefund(a, booking.id),
+      payments.cancelBookingWithRefund(a, booking.id),
+    ]);
+    expect(await balance(a)).toBe(100);
+    const owner = await makeUser();
+    await grant(owner, 100);
+    const salonCancelled = await redeemBooking(owner, 100);
+    await payments.cancelBookingAsOwnerWithRefund(salonCancelled.id);
+    expect(await balance(owner)).toBe(100);
+  });
+
+  it('earns on the amount paid, at the tier multiplier', async () => {
+    const a = await makeUser();
+    await prisma.booking.create({
+      data: {
+        userId: a,
+        serviceId: rewardServiceId,
+        startsAt: new Date(Date.now() - 30 * 24 * 60 * 60_000),
+        status: 'COMPLETED',
+        priceCents: 260_000,
+        pointsAwarded: 0,
+      },
+    });
+    await grant(a, 100);
+    const booking = await redeemBooking(a, 100);
+    await bookings.completeBooking(booking.id);
+    const completed = await prisma.booking.findUniqueOrThrow({ where: { id: booking.id } });
+    const base = booking.pointsAwarded;
+    const expected = Math.floor((base * (rewardPriceCents - 5_000) * 12) / (rewardPriceCents * 10));
+    expect(completed.pointsAwarded).toBe(expected);
+    expect(await balance(a)).toBe(expected);
+  });
+
+  it('expires points 36 months after the last visit, once', async () => {
+    const dormant = await makeUser();
+    const active = await makeUser();
+    const longAgo = new Date(Date.now() - 37 * 31 * 24 * 60 * 60_000);
+    for (const [userId, startsAt] of [
+      [dormant, longAgo],
+      [active, new Date(Date.now() - 24 * 60 * 60_000)],
+    ] as const) {
+      await prisma.booking.create({
+        data: {
+          userId,
+          serviceId: rewardServiceId,
+          startsAt,
+          status: 'COMPLETED',
+          priceCents: 10_000,
+          pointsAwarded: 10,
+        },
+      });
+      await grant(userId, 250);
+    }
+    await rewards.expireDormantPoints();
+    await rewards.expireDormantPoints();
+    expect(await balance(dormant)).toBe(0);
+    expect(await balance(active)).toBe(250);
+    expect(
+      await prisma.pointsTransaction.count({ where: { userId: dormant, reason: 'EXPIRED' } }),
+    ).toBe(1);
+  });
 
   it('never books more clients into a slot than the salon can take, even all at once', async () => {
     const customers: string[] = [];
