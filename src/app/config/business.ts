@@ -29,7 +29,7 @@ export const cancellationPolicy = {
 } as const;
 
 export const legalVersions = {
-  privacy: '2026-11-22',
+  privacy: '2026-11-28',
   cookies: '2026-09-24',
   terms: '2026-11-28',
 } as const;

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { headers } from 'next/headers';
+import { festiveSeasonNow } from '@/lib/festive';
 import { Geist, Geist_Mono, Playfair_Display } from 'next/font/google';
 import './globals.css';
 
@@ -79,7 +80,7 @@ export default async function RootLayout({
 }>) {
   const nonce = (await headers()).get('x-nonce') ?? undefined;
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-festive={festiveSeasonNow() ? 'true' : undefined} suppressHydrationWarning>
       <head>
         <script nonce={nonce} dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

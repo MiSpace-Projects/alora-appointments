@@ -1,6 +1,7 @@
 export const heroCopy = {
   title: 'Alora',
   label: 'Premium Beauty and Hair Services',
+  festiveLabel: 'Your Festive Season Glow-Up',
   description:
     'Wig care, nails, makeup & matric farewell looks, crafted with precision. Earn loyalty rewards with every visit.',
 } as const;

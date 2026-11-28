@@ -7,10 +7,9 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   const requestHeaders = await headers();
   const session = await auth.api.getSession({ headers: requestHeaders });
 
-  if (!session) {
-    const returnTo = sanitizeRedirect(requestHeaders.get('x-alora-return-to'));
-    redirect(loginWithCallback(returnTo));
-  }
+  const returnTo = sanitizeRedirect(requestHeaders.get('x-alora-return-to'));
+  if (!session) redirect(loginWithCallback(returnTo));
+  if (!session.user.termsAccepted) redirect(`/welcome?next=${encodeURIComponent(returnTo)}`);
 
   return <>{children}</>;
 }

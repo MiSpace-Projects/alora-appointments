@@ -163,8 +163,11 @@ const sections: LegalSection[] = [
             or &ldquo;EFT&rdquo;).
           </li>
           <li>
-            <strong>Social sign-in.</strong> If social sign-in is offered and you use it, the
-            provider (for example Google) sends us your name, email address and profile picture.
+            <strong>Google or Apple sign-in.</strong> If you choose to sign in with Google, Google
+            sends us your name, email address and profile picture. If you sign in with Apple, Apple
+            sends us your name and either your email address or a private relay address that
+            forwards to it, as you choose. We never receive your Google or Apple password. Before
+            your first booking we ask you to accept our terms, as we do on the sign-up form.
           </li>
           <li>
             <strong>Your browser.</strong> Technical details such as IP address and user-agent are

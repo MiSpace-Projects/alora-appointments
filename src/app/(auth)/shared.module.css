@@ -125,6 +125,16 @@
   color: #ff8f8f;
 }
 
+.formNotice {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(255, 143, 143, 0.35);
+  border-radius: 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #ffc9c9;
+}
+
 .link {
   font-size: 0.8rem;
   color: #d4c5b0;

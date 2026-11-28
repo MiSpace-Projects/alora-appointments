@@ -9,18 +9,21 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { signUp } from '@/lib/auth-client';
-import { registerSchema, type RegisterInput } from '@/lib/validation';
+import { PASSWORD_MIN_LENGTH, registerSchema, type RegisterInput } from '@/lib/validation';
 import { AuthBackground } from '@/app/components/AuthBackground';
 import { AuthCard, AuthHeader } from '@/app/components/authCard/AuthCard';
 import { FormField } from '@/app/components/form/Form';
 import { SubmitButton } from '@/app/components/submitButton/SubmitButton';
 import { TabControl } from '@/app/components/AuthTabs/TabControl';
+import { SocialAuthButtons } from '@/app/components/socialAuthButtons/SocialAuthButtons';
 import { routes } from '@/app/config/routes';
 import styles from './page.module.css';
 import shared from '../shared.module.css';
 
 function PasswordStrength({ password }: { password: string }) {
-  const checks = [{ label: '15+ characters', met: password.length >= 15 }];
+  const checks = [
+    { label: `${PASSWORD_MIN_LENGTH}+ characters`, met: password.length >= PASSWORD_MIN_LENGTH },
+  ];
 
   if (!password) return null;
 
@@ -33,7 +36,7 @@ function PasswordStrength({ password }: { password: string }) {
     >
       <div className={styles.strengthBar}>
         <div
-          className={`${styles.strengthSegment} ${password.length >= 15 ? styles.strengthMet : ''}`}
+          className={`${styles.strengthSegment} ${password.length >= PASSWORD_MIN_LENGTH ? styles.strengthMet : ''}`}
         />
       </div>
 
@@ -198,6 +201,7 @@ export default function RegisterPage() {
             <p className={styles.subtitle}>Join Alora and start earning loyalty rewards</p>
           </div>
           {registerForm}
+          <SocialAuthButtons redirectTo="/profile" />
           {loginPrompt}
         </>
       ),

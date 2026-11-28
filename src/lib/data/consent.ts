@@ -89,3 +89,20 @@ export async function setMarketingConsent(input: SetMarketingConsentInput): Prom
     }),
   ]);
 }
+
+export interface AcceptTermsInput {
+  userId: string;
+  marketingOptIn: boolean;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+}
+
+export async function acceptTermsForUser(input: AcceptTermsInput): Promise<boolean> {
+  const result = await prisma.user.updateMany({
+    where: { id: input.userId, termsAccepted: false },
+    data: { termsAccepted: true, marketingOptIn: input.marketingOptIn },
+  });
+  if (result.count === 0) return false;
+  await recordSignUpConsents(input);
+  return true;
+}
