@@ -1,6 +1,6 @@
 import 'server-only';
 import { prisma } from '@/lib/prisma';
-import { formatPrice } from './format';
+import { formatPrice, formatZar } from './format';
 import { parseOwnerAllowlist } from './owner-core';
 import { sendAuthEmail, type AuthEmailKind } from './email';
 import {
@@ -23,6 +23,8 @@ export async function loadBookingEmailContext(
       id: true,
       startsAt: true,
       priceCents: true,
+      discountCents: true,
+      pointsRedeemed: true,
       paymentMethod: true,
       paidAt: true,
       notes: true,
@@ -47,11 +49,21 @@ export async function loadBookingEmailContext(
     serviceSlug: booking.service.slug,
     startsAt: booking.startsAt,
     durationMinutes: booking.service.durationMinutes,
-    price: formatPrice({
-      priceCents: booking.priceCents,
-      priceType: booking.service.priceType,
-      priceMaxCents: booking.service.priceMaxCents,
-    }),
+    price:
+      booking.discountCents > 0
+        ? `${formatPrice({
+            priceCents: booking.priceCents - booking.discountCents,
+            priceType: booking.service.priceType,
+            priceMaxCents:
+              booking.service.priceMaxCents === null
+                ? null
+                : booking.service.priceMaxCents - booking.discountCents,
+          })} after ${booking.pointsRedeemed} points (${formatZar(booking.discountCents)} off)`
+        : formatPrice({
+            priceCents: booking.priceCents,
+            priceType: booking.service.priceType,
+            priceMaxCents: booking.service.priceMaxCents,
+          }),
     paymentMethod: booking.paymentMethod,
     paid: booking.paidAt !== null,
     notes: booking.notes,

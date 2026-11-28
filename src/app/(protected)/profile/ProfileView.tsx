@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { EASE_OUT } from '@/lib/motion';
 import type { BookingStatus, PaymentStatus, PaymentMethod, PriceType } from '@prisma/client';
-import type { LoyaltyStanding } from '@/lib/loyalty-core';
+import type { RewardsStanding } from '@/lib/data/rewards';
 import {
   formatZar,
   formatBookingDate,
@@ -35,6 +35,8 @@ export interface BookingView {
   status: BookingStatus;
   priceCents: number;
   pointsAwarded: number;
+  pointsRedeemed: number;
+  discountCents: number;
   paymentMethod: PaymentMethod;
   paidAt: Date | string | null;
   payments: {
@@ -92,7 +94,7 @@ export function ProfileView({
 }: {
   user: ProfileUser;
   bookings: BookingView[];
-  loyalty: LoyaltyStanding;
+  loyalty: RewardsStanding;
   onlinePaymentAvailable: boolean;
   isOwner?: boolean;
 }) {
@@ -121,12 +123,15 @@ export function ProfileView({
         <div className={`${styles.card} ${styles.loyaltyCard}`}>
           <div className={styles.loyaltyTop}>
             <div>
-              <p className={styles.loyaltyLabel}>Loyalty Status</p>
+              <p className={styles.loyaltyLabel}>Rewards Tier</p>
               <p className={styles.tierName}>{loyalty.tier}</p>
+              <p className={styles.progressMeta}>Earning {loyalty.multiplierTenths / 10}x points</p>
             </div>
             <div className={styles.pointsBadge}>
               <span className={styles.pointsNumber}>{loyalty.points}</span>
-              <span className={styles.pointsLabel}>points earned</span>
+              <span className={styles.pointsLabel}>
+                points · worth {formatZar(loyalty.valueCents)}
+              </span>
             </div>
           </div>
           <div className={styles.progressWrap}>
@@ -137,11 +142,16 @@ export function ProfileView({
               />
             </div>
             <p className={styles.progressMeta}>
-              {loyalty.points} pts
-              {loyalty.pointsToNext !== null && loyalty.nextTier
-                ? ` · ${loyalty.pointsToNext} pts to ${loyalty.nextTier}`
+              {formatZar(loyalty.spendCents)} spent in the last 12 months
+              {loyalty.spendToNextCents !== null && loyalty.nextTier
+                ? ` · ${formatZar(loyalty.spendToNextCents)} more for ${loyalty.nextTier}`
                 : ' · top tier reached'}
             </p>
+            {loyalty.pointsExpireAt && (
+              <p className={styles.progressMeta}>
+                Points stay valid while you visit at least once every 3 years.
+              </p>
+            )}
           </div>
         </div>
 
@@ -209,13 +219,26 @@ export function ProfileView({
                   <span className={`${styles.statusBadge} ${statusClass[booking.status]}`}>
                     {booking.status.toLowerCase()}
                   </span>
-                  <p className={styles.bookingPrice}>{formatZar(booking.priceCents)}</p>
+                  <p className={styles.bookingPrice}>
+                    {formatZar(booking.priceCents - booking.discountCents)}
+                  </p>
+                  {booking.discountCents > 0 && (
+                    <p className={styles.bookingPoints}>
+                      {booking.pointsRedeemed} points used · {formatZar(booking.discountCents)} off
+                    </p>
+                  )}
                   <p
                     className={`${styles.paymentLabel} ${styles[`payment_${paymentLabel(booking).tone}`]}`}
                   >
                     {paymentLabel(booking).text}
                   </p>
-                  <p className={styles.bookingPoints}>+{booking.pointsAwarded} loyalty points</p>
+                  {booking.status !== 'CANCELLED' && booking.pointsAwarded > 0 && (
+                    <p className={styles.bookingPoints}>
+                      {booking.status === 'COMPLETED'
+                        ? `+${booking.pointsAwarded} points earned`
+                        : `+${booking.pointsAwarded} points on completion`}
+                    </p>
+                  )}
                   {(() => {
                     const settled = booking.payments.find((p) =>
                       ['SUCCESS', 'PARTIALLY_REFUNDED', 'REFUNDED'].includes(p.status),

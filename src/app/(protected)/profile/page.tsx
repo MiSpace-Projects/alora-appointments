@@ -1,7 +1,7 @@
 import { requireSession } from '@/lib/session';
 import { isOwnerSession } from '@/lib/owner';
 import { listUserBookings } from '@/lib/data/bookings';
-import { getUserLoyalty } from '@/lib/data/loyalty';
+import { getRewardsStanding } from '@/lib/data/rewards';
 import { userHasPassword } from '@/lib/data/accounts';
 import { ProfileView } from './ProfileView';
 import { isOnlinePaymentAvailable } from '@/lib/payments/provider';
@@ -11,7 +11,7 @@ export default async function ProfilePage() {
 
   const [bookings, loyalty, hasPassword] = await Promise.all([
     listUserBookings(session.user.id),
-    getUserLoyalty(session.user.id),
+    getRewardsStanding(session.user.id),
     userHasPassword(session.user.id),
   ]);
 

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import type { BookingStatus } from '@prisma/client';
 import { requireOwner } from '@/lib/owner';
 import { listAllBookings } from '@/lib/data/bookings';
+import { pointsLiabilityCents } from '@/lib/data/rewards';
 import { formatDateTime, formatZar } from '@/lib/format';
 import {
   confirmBookingAction,
@@ -24,7 +25,7 @@ const STATUS_LABEL: Record<BookingStatus, string> = {
 
 export default async function OwnerBookingsPage() {
   await requireOwner();
-  const bookings = await listAllBookings();
+  const [bookings, liabilityCents] = await Promise.all([listAllBookings(), pointsLiabilityCents()]);
   const pending = bookings.filter((booking) => booking.status === 'PENDING').length;
 
   return (
@@ -37,6 +38,9 @@ export default async function OwnerBookingsPage() {
             {bookings.length === 0
               ? 'No bookings yet.'
               : `${bookings.length} booking${bookings.length === 1 ? '' : 's'} · ${pending} awaiting confirmation`}
+          </p>
+          <p className={styles.subtitle}>
+            Unused customer points are worth {formatZar(liabilityCents)} in discounts.
           </p>
         </div>
         <form action={refreshCatalogAction}>
@@ -68,7 +72,14 @@ export default async function OwnerBookingsPage() {
                   <span className={`${styles.badge} ${styles[`status_${booking.status}`]}`}>
                     {STATUS_LABEL[booking.status]}
                   </span>
-                  <span className={styles.price}>{formatZar(booking.priceCents)}</span>
+                  <span className={styles.price}>
+                    {formatZar(booking.priceCents - booking.discountCents)}
+                  </span>
+                  {booking.discountCents > 0 && (
+                    <span className={styles.pay}>
+                      {formatZar(booking.discountCents)} off with {booking.pointsRedeemed} points
+                    </span>
+                  )}
                   <span className={styles.pay}>
                     {booking.paymentMethod === 'PAY_NOW' ? 'Pay now' : 'At salon'}
                     {payment ? ` · ${payment.status.toLowerCase()}` : ''}

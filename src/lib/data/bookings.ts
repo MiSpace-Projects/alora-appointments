@@ -3,10 +3,17 @@ import { prisma } from '@/lib/prisma';
 import type { CreateBookingInput } from '@/lib/validation';
 import { bookingRules } from '@/app/config/business';
 import { countOverlapping, isWithinOpeningHours } from '@/lib/booking-rules';
+import {
+  isValidRedemption,
+  pointsEarned,
+  pointsValueCents,
+  tierForSpend,
+} from '@/lib/rewards-core';
+import { BOOKING_LOCK_KEY } from './locks';
+import { pointsBalance, spendInTierWindow } from './rewards';
 
 const HOUR_MS = 60 * 60_000;
 const DAY_MS = 24 * HOUR_MS;
-const BOOKING_LOCK_KEY = 7_406_201;
 
 export function listUserBookings(userId: string) {
   return prisma.booking.findMany({
@@ -92,13 +99,23 @@ export async function createBooking(userId: string, input: CreateBookingInput) {
       throw new Error('SLOT_UNAVAILABLE');
     }
 
-    return tx.booking.create({
+    const redeem = input.redeemPoints ?? 0;
+    if (redeem > 0) {
+      const balance = await pointsBalance(tx, userId);
+      if (!isValidRedemption(redeem, balance, service.priceCents)) {
+        throw new Error('INVALID_POINTS_REDEMPTION');
+      }
+    }
+
+    const booking = await tx.booking.create({
       data: {
         userId,
         serviceId: service.id,
         startsAt: input.startsAt,
         priceCents: service.priceCents,
         pointsAwarded: service.pointsAwarded,
+        pointsRedeemed: redeem,
+        discountCents: pointsValueCents(redeem),
         notes: input.notes,
         paymentMethod: input.paymentMethod,
         status: 'PENDING',
@@ -107,6 +124,12 @@ export async function createBooking(userId: string, input: CreateBookingInput) {
         service: { select: { name: true, priceType: true, priceMaxCents: true } },
       },
     });
+    if (redeem > 0) {
+      await tx.pointsTransaction.create({
+        data: { userId, bookingId: booking.id, delta: -redeem, reason: 'REDEEMED' },
+      });
+    }
+    return booking;
   });
 }
 
@@ -153,11 +176,20 @@ export async function completeBooking(bookingId: string) {
     }
 
     const booking = await tx.booking.findUniqueOrThrow({ where: { id: bookingId } });
-    if (booking.pointsAwarded > 0 && booking.userId) {
+    if (!booking.userId) return;
+    const spend = await spendInTierWindow(tx, booking.userId, new Date(), booking.id);
+    const earned = pointsEarned({
+      basePoints: booking.pointsAwarded,
+      priceCents: booking.priceCents,
+      discountCents: booking.discountCents,
+      multiplierTenths: tierForSpend(spend).multiplierTenths,
+    });
+    await tx.booking.update({ where: { id: booking.id }, data: { pointsAwarded: earned } });
+    if (earned > 0) {
       await tx.pointsTransaction.create({
         data: {
           userId: booking.userId,
-          delta: booking.pointsAwarded,
+          delta: earned,
           reason: 'EARNED_BOOKING',
           bookingId: booking.id,
         },

@@ -15,6 +15,8 @@ export type BookingActionResult =
   | { ok: false; error: string };
 
 const ERROR_COPY: Record<string, string> = {
+  INVALID_POINTS_REDEMPTION:
+    'Those points cannot be used on this booking. Refresh to see your current balance.',
   SERVICE_NOT_AVAILABLE: 'That service is no longer available.',
   SLOT_ALREADY_BOOKED: 'You already have a booking at that time.',
   SLOT_UNAVAILABLE: 'That time is already taken. Please choose another time.',
