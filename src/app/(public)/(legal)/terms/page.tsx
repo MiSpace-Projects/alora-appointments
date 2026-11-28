@@ -7,6 +7,14 @@ import {
   cancellationPolicy,
   legalVersions,
 } from '@/app/config/business';
+import { formatZar } from '@/lib/format';
+import {
+  MAX_REDEEM_SHARE_PERCENT,
+  POINTS_EXPIRY_MONTHS,
+  pointsValueCents,
+  REDEEM_STEP_POINTS,
+  REWARD_TIERS,
+} from '@/lib/rewards-core';
 import { Fact, LegalDocument, type LegalSection } from '../LegalDocument';
 import styles from '../legal.module.css';
 
@@ -286,18 +294,42 @@ const sections: LegalSection[] = [
   },
   {
     id: 'loyalty',
-    title: 'Loyalty points',
+    title: 'Alora Rewards',
     content: (
       <ul>
         <li>
-          Each service shows the points it earns. Points are added when the appointment is
-          completed, not when it is booked.
+          You earn 1 point for every R10 you pay for a completed appointment, added when the
+          appointment is completed. The part of a booking paid with points earns nothing. Cancelled
+          and no-show bookings earn nothing.
         </li>
-        <li>Cancelled or no-show bookings earn no points.</li>
         <li>
-          Points have no cash value, cannot be transferred, and are removed if an account is closed.
-          We may change the programme with 30 days&rsquo; notice by email; points already earned
-          keep their value until then.
+          Your tier depends on what you paid for completed appointments in the last 12 months:{' '}
+          {REWARD_TIERS.map((rule, index) => (
+            <span key={rule.tier}>
+              {index > 0 ? (index === REWARD_TIERS.length - 1 ? ' and ' : ', ') : ''}
+              {rule.tier}{' '}
+              {rule.minSpendCents === 0
+                ? 'from your first visit'
+                : `from ${formatZar(rule.minSpendCents)}`}{' '}
+              ({rule.multiplierTenths / 10}x points)
+            </span>
+          ))}
+          . Using points never lowers your tier.
+        </li>
+        <li>
+          {REDEEM_STEP_POINTS} points are worth {formatZar(pointsValueCents(REDEEM_STEP_POINTS))}{' '}
+          off a booking. You choose how many to use when you book, in steps of {REDEEM_STEP_POINTS},
+          for up to {MAX_REDEEM_SHARE_PERCENT}% of the booking price. If the booking is cancelled by
+          you or by us, the points come back to your account.
+        </li>
+        <li>
+          Points expire {POINTS_EXPIRY_MONTHS} months after your last completed appointment. Any
+          visit in that time keeps all of them.
+        </li>
+        <li>
+          Points have no cash value, cannot be transferred or exchanged for cash, and are removed if
+          an account is closed. We may change the programme with 30 days&rsquo; notice by email;
+          points already earned keep their value until then.
         </li>
       </ul>
     ),

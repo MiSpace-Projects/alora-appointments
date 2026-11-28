@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { requireSession } from '@/lib/session';
 import { listActiveServices } from '@/lib/data/services';
+import { getRewardsStanding } from '@/lib/data/rewards';
 import { isOnlinePaymentAvailable } from '@/lib/payments/provider';
 import { groupByFamily } from '@/app/features/servicesSection/servicesData';
 import { BookingForm, type FamilyOption, type ServiceOption } from './BookingForm';
@@ -39,7 +40,11 @@ export default async function BookPage({
     );
   }
 
-  const [services, params] = await Promise.all([listActiveServices(), searchParams]);
+  const [services, params, rewards] = await Promise.all([
+    listActiveServices(),
+    searchParams,
+    getRewardsStanding(session.user.id),
+  ]);
   const requestedSlug = Array.isArray(params.service) ? params.service[0] : params.service;
 
   const groups = groupByFamily(services);
@@ -69,6 +74,7 @@ export default async function BookPage({
       services={options}
       preselectedServiceId={preselected?.id}
       onlinePaymentAvailable={isOnlinePaymentAvailable()}
+      pointsBalance={rewards.points}
     />
   );
 }

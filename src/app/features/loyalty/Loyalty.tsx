@@ -4,46 +4,33 @@ import Image from 'next/image';
 import styles from './Loyalty.module.css';
 import { motion } from 'framer-motion';
 import { staggerContainer, fadeUpItem } from '@/lib/motion';
-import { Star, Trophy, Gift, Crown, type LucideIcon } from 'lucide-react';
+import { Star, Gift, Crown, type LucideIcon } from 'lucide-react';
+import { formatZar } from '@/lib/format';
+import {
+  POINT_VALUE_CENTS,
+  pointsValueCents,
+  REDEEM_STEP_POINTS,
+  REWARD_TIERS,
+  type RewardTier,
+} from '@/lib/rewards-core';
 import ProtectedLink from '@/app/components/protected/ProtectedLink';
 import { routes } from '@/app/config/routes';
 
-const tiers: {
-  level: string;
-  name: string;
-  range: string;
-  detail: string;
-  icon: LucideIcon;
-}[] = [
-  {
-    level: '01',
-    name: 'Bronze',
-    range: '0 – 499 pts',
-    detail: 'Earn 10 pts per booking',
-    icon: Star,
-  },
-  {
-    level: '02',
-    name: 'Silver',
-    range: '500 – 999 pts',
-    detail: '5% off every 5th visit',
-    icon: Gift,
-  },
-  {
-    level: '03',
-    name: 'Gold',
-    range: '1 000 – 1 999 pts',
-    detail: '10% off + add-on',
-    icon: Trophy,
-  },
-  {
-    level: '04',
-    name: 'Platinum',
-    range: '2 000+ pts',
-    detail: '15% off + priority booking',
-    icon: Crown,
-  },
-];
+const TIER_ICONS: Record<RewardTier, LucideIcon> = { Member: Star, Silver: Gift, Gold: Crown };
+
+const tiers = REWARD_TIERS.map((rule, index) => {
+  const percentBack = (POINT_VALUE_CENTS * rule.multiplierTenths) / 100;
+  return {
+    level: String(index + 1).padStart(2, '0'),
+    name: rule.tier,
+    range:
+      rule.minSpendCents === 0
+        ? 'From your first visit'
+        : `${formatZar(rule.minSpendCents)}+ in 12 months`,
+    detail: `${rule.multiplierTenths / 10}x points · ${percentBack}% back`,
+    icon: TIER_ICONS[rule.tier],
+  };
+});
 
 export default function LoyaltyPage() {
   return (
@@ -66,7 +53,9 @@ export default function LoyaltyPage() {
           </motion.h2>
 
           <motion.p className={styles.subtitle} variants={fadeUpItem}>
-            Every visit earns points. Climb the tiers and unlock exclusive perks.
+            Every R10 you spend earns a point. {REDEEM_STEP_POINTS} points take{' '}
+            {formatZar(pointsValueCents(REDEEM_STEP_POINTS))} off a booking, and regulars earn
+            faster.
           </motion.p>
         </div>
 
