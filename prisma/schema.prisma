@@ -155,6 +155,8 @@ enum PointsReason {
   REDEEMED
   SIGNUP_BONUS
   ADJUSTMENT
+  REDEMPTION_REVERSED
+  EXPIRED
 }
 
 enum PriceType {
@@ -187,19 +189,21 @@ model Service {
 }
 
 model Booking {
-  id            String        @id @default(cuid())
-  userId        String?
-  serviceId     String
-  startsAt      DateTime
-  status        BookingStatus @default(PENDING)
-  priceCents    Int
-  pointsAwarded Int
-  notes         String?
-  paymentMethod PaymentMethod @default(PAY_IN_SALON)
-  paidAt        DateTime?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  cancelledAt   DateTime?
+  id             String        @id @default(cuid())
+  userId         String?
+  serviceId      String
+  startsAt       DateTime
+  status         BookingStatus @default(PENDING)
+  priceCents     Int
+  pointsAwarded  Int
+  pointsRedeemed Int           @default(0)
+  discountCents  Int           @default(0)
+  notes          String?
+  paymentMethod  PaymentMethod @default(PAY_IN_SALON)
+  paidAt         DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  cancelledAt    DateTime?
 
   user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
   service     Service      @relation(fields: [serviceId], references: [id], onDelete: Restrict)
